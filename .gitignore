@@ -1,0 +1,24 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Obsidian local state (machine-specific, no value in sharing)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+
+# Plugin node_modules and compiled binaries (too heavy, not needed by collaborators)
+.obsidian/plugins/lean-terminal/node_modules/
+.obsidian/plugins/*/node_modules/
+
+# Claude / Claudian session files (local session state, not knowledge)
+.claude/
+.claudian/
+
+# Per-plugin local data
+.obsidian/plugins/*/data.json
+
+# Large binary assets
+raw/assets/*.mp4
+raw/assets/*.mov
+raw/assets/*.zip
