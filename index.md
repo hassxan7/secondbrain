@@ -1,6 +1,6 @@
 ---
 title: "Wiki Index"
-updated: 2026-06-14
+updated: 2026-07-17
 ---
 
 # Wiki Index
@@ -72,6 +72,7 @@ Curated pages for building code knowledge relevant to Civly's YAML rule packs an
 | Page | Question | Date |
 |------|---------|------|
 | [[Civly Architecture Reference]] | Master reference: architecture, four implementation surfaces, relevance scoring heuristic | 2026-06-14 |
+| [[Drafting vs Coordination Strategy Shift]] | Hesh/Reuben recommended coordination; Civly shifts wedge to drafting — why and what changes | 2026-07-17 |
 
 ---
 
@@ -82,12 +83,22 @@ See [[CRM/index]] for the full contact list.
 | Name | Category | Relevance |
 |------|----------|-----------|
 | [[Andrew Tang-Smith]] | customer | HIGH |
+| [[Hesh Dian]] | expert | HIGH |
+| [[Reuben]] | expert | HIGH |
+
+---
+
+## Strategy notes
+
+| Page | Summary |
+|------|---------|
+| [[Drafting vs Coordination Strategy Shift]] | Working decision: sell drafting; keep coordination as engine quality, not category claim. Hesh (BIM Accelerator) public teaching stands in for his transcript base; Reuben call transcript still to drop in `raw/`. |
 
 ---
 
 ## Stats
 
-- Total pages: 12 (3 sources + 2 entities + 1 concept + 2 MEP + 1 Structural + 1 Compliance + 1 analysis/architecture ref + MEP pages)
-- CRM contacts: 1
-- Sources ingested: 3
+- Total pages: 13+ (prior catalog + strategy analysis; CRM experts Hesh + Reuben)
+- CRM contacts: 3 HIGH (Andrew, Hesh, Reuben)
+- Sources ingested: 3 (Hesh YouTube guides already filed; private Reuben/Hesh call transcripts pending)
 - Last lint: _(never)_

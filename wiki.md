@@ -1,7 +1,7 @@
 ---
 title: "Wiki Home"
 type: home
-updated: 2026-06-14
+updated: 2026-07-17
 ---
 
 # Civly Brain Wiki
@@ -61,6 +61,9 @@ _(updated by the AI on every ingest)_
 
 | Date | What | Page |
 |------|------|------|
+| 2026-07-17 | Strategy: drafting vs coordination (Hesh + Reuben dilemma) | [[Drafting vs Coordination Strategy Shift]] |
+| 2026-07-17 | CRM: Hesh Dian (BIM Accelerator) | [[Hesh Dian]] |
+| 2026-07-17 | CRM: Reuben (transcript pending) | [[Reuben]] |
 | 2026-06-14 | Wiki initialized | [[wiki]] |
 
 ---
