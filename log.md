@@ -5,6 +5,14 @@ Parse recent entries with: `grep "^## \[" log.md | tail -10`
 
 ---
 
+## [2026-07-17] analysis | Drafting vs Coordination Strategy Shift
+Captured the dilemma between operator advice ([[Hesh Dian]], [[Reuben]] — coordination-first) and Civly's working wedge (drafting-first / not a coordination tool).
+Created: [[Drafting vs Coordination Strategy Shift]] (pages/analyses/).
+CRM: [[Hesh Dian]] (expert, HIGH) — public BIM Accelerator teaching used as transcript base ([[How to Learn the BIM Coordination Skillset]], [[How to Learn Revit and BIM Quickly]]).
+CRM: [[Reuben]] (expert, HIGH) — stub; private call transcript not yet in vault — drop into `raw/` to ingest.
+Updated: [[index]], [[wiki]] Recent Additions, [[CRM/index]].
+Note: `civly context/` left untouched (read-only).
+
 ## [2026-06-14] schema | Architecture-grounded relevance + Structural + Compliance folders
 Read all civly context files and synthesized actual architecture (Tapir MCP + ifc_writer + YAML rule packs + calcs) into master reference.
 Created: [[Civly Architecture Reference]] (pages/analyses/) — four implementation surfaces + relevance heuristic + discipline priority order.
