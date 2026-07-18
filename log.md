@@ -5,6 +5,10 @@ Parse recent entries with: `grep "^## \[" log.md | tail -10`
 
 ---
 
+## [2026-07-15] merge+push | Reconciled remote divergence, pushed clean structure
+`git push` was rejected — remote had diverged (automated PR #1, "drafting vs coordination strategy shift + Hesh/Reuben CRM") on the OLDER structure (still `pages/analyses/`, top-level `Competitors/`, duplicate `Hesh-Dian.md`/`Reuben.md`).
+Resolved with `merge -s ours` (kept the clean `strategy/`+`processed/` structure; remote commit preserved in history — non-destructive, no force-push). Salvaged the one unique doc → [[Drafting vs Coordination Strategy Shift]] into `strategy/` (relinked to canonical [[Hesh]] / [[Reuben Roy]]). Remote's duplicate CRM files superseded by the canonical ones (recoverable from history). Redacted phone + family PII from the repo copy before pushing.
+
 ## [2026-07-15] correction | Wiki over-narrowed Civly to "MEP-only"
 User flagged that recent notes read as if Civly = MEP drafter. Corrected in [[Civly Architecture Reference]] (Sharpened-scope callout) and [[Civly Target Dilemma — MEP Drafting vs Competition Bids]] (framing correction + Bet A rewrite). Company frame per `civly context/`: **sketch / CAD / project brief → coordinated LOD ~250 BIM across all five disciplines** (arch + structural shipped, mechanical MEP is the current vertical slice, electrical + plumbing to follow). MEP is one discipline of Civly, not the product. Hesh remains a strong expert data point for the MEP slice, not an ICP redefinition. Filed as analysis: yes.
 

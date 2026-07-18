@@ -94,6 +94,7 @@ Curated pages distilling MEP knowledge for Civly product development. Only HIGH-
 | [[Data Partnership Outreach Strategy]] | 30-day playbook + ready copy (LinkedIn/email/phone) to land MEP-consultancy data partnerships | 2026-06-18 |
 | [[LinkedIn & Content Strategy]] | Civly brand plan: first demo post, launch video, content pillars, 2-week post calendar | 2026-06-18 |
 | [[Pitch Copy Library]] | Reusable, rule-compliant application answers (Z Fellows 2026 set) + per-funder tailoring + submission log | 2026-06-25 |
+| [[Drafting vs Coordination Strategy Shift]] | Why Civly sells drafting not coordination, despite Hesh/Reuben pushing coordination; GTM + messaging stance | 2026-07-17 |
 | [[Advisor List & Question Routing]] | The advisor bench + process for routing open questions to the right person (Hassaan) | 2026-06-18 |
 | [[To-Do — Hassaan]] | Hassaan's list: advisors, outreach, data partnerships, funding | 2026-06-18 |
 | [[To-Do — Yash]] | Yash's list: AI BIM drafter, MEP generation, ML/data pipeline, research questions | 2026-06-18 |
