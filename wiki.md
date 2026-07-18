@@ -1,7 +1,7 @@
 ---
 title: "Wiki Home"
 type: home
-updated: 2026-06-14
+updated: 2026-07-14
 ---
 
 # Civly Brain Wiki
@@ -26,7 +26,7 @@ This wiki grows every time you add a source or ask a question worth keeping. Ins
 |---|---|
 | Add a new article/doc/note | Drop it in `raw/`, tell the AI: `"Ingest raw/filename.md"` |
 | Ask a question | Just ask — AI reads [[index]] first, then relevant pages |
-| Keep a good answer permanently | Ask AI to file it as an analysis in `pages/analyses/` |
+| Keep a good answer permanently | Ask AI to file it as a strategy/analysis page in `strategy/` |
 | Health-check the wiki | Tell the AI: `"Lint the wiki"` |
 | See what's been added | Check [[log]] |
 
@@ -49,9 +49,8 @@ _(none yet)_
 Summaries of ingested documents → `pages/sources/`
 _(none yet)_
 
-### Analyses
-Comparisons, syntheses, answered questions → `pages/analyses/`
-_(none yet)_
+### Strategy & To-Do
+Strategy, analyses, syntheses, roadmaps, GTM plans, pitch copy, and all to-do lists → `strategy/`
 
 ---
 
@@ -61,6 +60,13 @@ _(updated by the AI on every ingest)_
 
 | Date | What | Page |
 |------|------|------|
+| 2026-07-14 | Ingested Reuben + reconciled both expert calls against current build | [[Reuben Roy Call — Competition Bids vs BIM Drafting]] · [[Civly Target Dilemma — MEP Drafting vs Competition Bids]] · [[Reuben Roy]] |
+| 2026-06-25 | Ingested Z Fellows application → reusable pitch copy + founder profiles | [[Pitch Copy Library]] · [[Hassaan Shamshiri]] · [[Yash]] |
+| 2026-06-18 | Ingested BIM mentor call → drafting-first pivot, LOD scope, data moat | [[BIM Mentor Call — Drafting vs Coordination & Data Moat]] |
+| 2026-06-18 | Strategic direction synthesis + advisor bench | [[Civly Direction — Drafting-First Pivot (Jun 2026)]] · [[Advisor List & Question Routing]] |
+| 2026-06-18 | Split to-do into per-owner lists | [[To-Do — Hassaan]] · [[To-Do — Yash]] |
+| 2026-06-18 | MEP core path + concept pages | [[MEP Drafting — Schematic to LOD 200]] · [[BIM Drafting vs Coordination]] · [[Level of Development (LOD)]] · [[Data Partnership Moat]] |
+| 2026-06-18 | Added BIM mentor (Hesh) to CRM as advisor | [[Hesh]] |
 | 2026-06-14 | Wiki initialized | [[wiki]] |
 
 ---
@@ -73,13 +79,15 @@ Civly Brain/
 ├── wiki.md                 ← this file (human home page)
 ├── index.md                ← machine-facing page catalog
 ├── log.md                  ← operation history
-├── raw/                    ← your source documents (immutable)
-│   └── assets/
-└── pages/
+├── raw/                    ← unprocessed incoming sources
+├── processed/              ← sources move here after ingest
+├── strategy/               ← all strategy, analyses + to-do lists
+├── CRM/                    ← contacts
+└── pages/                  ← knowledge
+    ├── sources/
     ├── entities/
     ├── concepts/
-    ├── sources/
-    └── analyses/
+    ├── MEP/  Structural/  Compliance/  Competitors/
 ```
 
 ---

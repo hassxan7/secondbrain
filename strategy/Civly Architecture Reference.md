@@ -3,11 +3,22 @@ title: "Civly Architecture Reference"
 type: analysis
 tags: [civly, architecture, MCP, IFC, tapir, archicad, reference]
 created: 2026-06-14
-updated: 2026-06-14
-sources: 0
+updated: 2026-06-18
+sources: 1
 ---
 
 The definitive reference for evaluating source and contact relevance. Every relevance score in this wiki must be grounded in whether the knowledge can be translated into one of the four implementation surfaces below. Read this before scoring anything.
+
+> [!important] Sharpened scope (18 Jun 2026, clarified 15 Jul 2026) — read with this lens
+> After the [[BIM Mentor Call — Drafting vs Coordination & Data Moat]] the wedge is sharper. The four surfaces below are unchanged; only the *priority of what to build and ingest* changed.
+> - **Civly = the AI BIM drafter.** Sketch / CAD / project brief → first-draft coordinated BIM at **LOD 0 → ~250**, across **all disciplines** (architecture, structural, MEP, electrical, plumbing), then hand off. Scope is **drafting, not coordination**. [[BIM Drafting vs Coordination]] · [[Level of Development (LOD)]].
+> - **Already shipping** through Tapir MCP + Archicad: architecture + structural (Sydney Class 2 Apartments MVP). **Current vertical slice = mechanical MEP** — the next discipline to finish the multi-discipline product, not a redefinition of Civly.
+> - MEP slice detail: read an **MEP schematic (CAD)** → route + size → LOD 200 model. Duct sizing is automatable (velocity/pressure-drop formulas, no engineer intuition) → work for Surfaces 3 (`rules/`, AS 1668.2) + 4 (`calcs/`). [[MEP Drafting — Schematic to LOD 200]].
+> - ⚠️ **MEP is one discipline of Civly, not the whole product.** Do not narrow the pitch, GTM, or ICP to MEP-only. Hesh is one important expert data point for the MEP slice; he is not Civly's ICP.
+> - **Buyer = anyone in the LOD 0 → 250 drafting process** — architectural draftspersons, BIM drafters/technicians, mixed practices, *and* MEP consultancies _(decided 18 Jun; not architects-vs-MEP either/or)_.
+> - **The moat = proprietary input → output-BIM training data** (~100k pairs via partnerships), not the code. [[Data Partnership Moat]].
+> - **Liability:** human signs off; Civly never authors design. Keep the mandatory approval step. [[Civly - Design vs Engineering Decisions]].
+> - **Live costing:** ship to Michael, then wrap up — low value otherwise _(decided 18 Jun)_. Full analysis: [[Civly Direction — Drafting-First Pivot (Jun 2026)]].
 
 ---
 

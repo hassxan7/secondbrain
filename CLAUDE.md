@@ -10,21 +10,29 @@ You are a disciplined wiki maintainer. This document defines the structure, conv
 Civly Brain/
 ├── CLAUDE.md          ← this file (schema for Claude Code)
 ├── AGENTS.md          ← same schema for other agents (Codex, OpenCode, etc.)
-├── civly context/     ← Civly company context files (read-only, never modify)
-├── raw/               ← incoming source documents (YouTube transcripts, articles)
-│   ├── assets/        ← images downloaded from clipped articles
-│   └── processed/     ← sources moved here after ingestion
-├── pages/
-│   ├── entities/      ← named things: people, organizations, products, places
+├── civly context/     ← Civly company context files (read-only, never modify the .md content)
+├── raw/               ← UNPROCESSED incoming sources ONLY (YouTube transcripts, articles, clips)
+│   └── assets/        ← images downloaded from clipped articles
+├── processed/         ← sources move here after ingest/summarization (top-level, NOT under raw/)
+├── pages/             ← KNOWLEDGE pages only
+│   ├── sources/       ← one summary page per ingested source
+│   ├── entities/      ← named things: people, organizations, products, places (incl. founders)
 │   ├── concepts/      ← ideas, techniques, frameworks, theories
-│   ├── sources/       ← one summary page per raw source
-│   ├── analyses/      ← comparison tables, syntheses, answers worth keeping
-│   └── MEP/           ← curated MEP knowledge pages (HIGH-relevance MEP sources only)
+│   ├── MEP/           ← curated MEP knowledge pages (HIGH-relevance MEP sources only)
+│   ├── Structural/    ← curated structural knowledge
+│   ├── Compliance/    ← curated building-code / NCC knowledge
+│   └── Competitors/   ← competitor profiles
+├── strategy/          ← ALL strategy, analyses, syntheses, AND to-do lists (flat folder)
 ├── CRM/               ← one page per person, indexed at CRM/index.md
 ├── wiki.md            ← human-facing home page (you update Recent Additions)
 ├── index.md           ← machine-facing page catalog (you maintain this)
 └── log.md             ← append-only chronological record (you maintain this)
 ```
+
+> [!important] Streamlined routing (where new files go)
+> - **Incoming source** → lands in `raw/`. After you ingest/summarize it, **move the source file to `processed/`** (top-level). `raw/` only ever holds things not yet processed.
+> - **Source summary page** → `pages/sources/`. **Entity/concept/MEP/Structural/Compliance/Competitor knowledge** → the matching `pages/` subfolder.
+> - **Anything strategic** — analyses, syntheses, comparisons, roadmaps, GTM/outreach plans, pitch copy, **and every to-do list** → `strategy/` (flat). Strategy and to-dos do NOT go in `pages/`.
 
 ---
 
@@ -114,7 +122,7 @@ Sections: Definition · Why it matters · Variants/Related · Examples · Critiq
 **Source page** (`pages/sources/`): summary of one raw document.
 Sections: TL;DR · Key claims · Notable quotes · Entities mentioned · Concepts mentioned · What changed in the wiki
 
-**Analysis page** (`pages/analyses/`): a comparison, synthesis, or answer worth keeping.
+**Analysis / strategy page** (`strategy/`): a comparison, synthesis, roadmap, GTM/outreach plan, pitch copy, or answer worth keeping. **All to-do lists also live in `strategy/`.**
 Sections: Question/Prompt · Methodology · Findings · Limitations · Related pages
 
 ---
@@ -145,7 +153,7 @@ When answering a question:
 
 1. Read `index.md` to find relevant pages.
 2. Read those pages and synthesize an answer with `[[page]]` citations.
-3. Ask: is this answer worth keeping as a permanent analysis? If yes (or if the user wants it), create a page in `pages/analyses/`.
+3. Ask: is this answer worth keeping as a permanent analysis? If yes (or if the user wants it), create a page in `strategy/`.
 4. Append to `log.md`:
    ```
    ## [YYYY-MM-DD] query | <Question summary>
@@ -225,12 +233,12 @@ Do NOT write a brief summary — write comprehensive study notes.>
 
 6. Update or create entity/concept pages for key things introduced.
 7. Update `index.md` and `wiki.md` Recent Additions.
-8. **Move the source file** from `raw/` to `raw/processed/` (rename the file path).
+8. **Move the source file** from `raw/` to `processed/` (top-level; rename the file path).
 9. Append to `log.md`:
    ```
    ## [YYYY-MM-DD] ingest | <Video Title>
    Civly relevance: HIGH/MEDIUM/LOW. Pages touched: [[page1]], [[page2]], ...
-   Moved to raw/processed/.
+   Moved to processed/.
    ```
 8. Report back with the relevance score and reasoning.
 

@@ -1,6 +1,6 @@
 ---
 title: "Wiki Index"
-updated: 2026-06-14
+updated: 2026-07-14
 ---
 
 # Wiki Index
@@ -11,11 +11,14 @@ Catalog of all pages. Updated on every ingest. Read this first when answering qu
 
 ## Sources (`pages/sources/`)
 
-| Page | Civly Relevance | Channel | Date |
+| Page | Civly Relevance | Channel / Type | Date |
 |------|----------------|---------|------|
-| [[Revit MEP Tutorial for Complete Beginners]] | HIGH | SourceCAD | 2024-06-23 |
-| [[How to Learn the BIM Coordination Skillset]] | HIGH | BIM Accelerator | 2024-07-03 |
-| [[How to Learn Revit and BIM Quickly]] | MEDIUM | BIM Accelerator | 2024-06-19 |
+| [[Reuben Roy Call — Competition Bids vs BIM Drafting]] | HIGH | Expert interview — Reuben Roy (architecture/BVN experience) | 2026-06-25 |
+| [[BIM Mentor Call — Drafting vs Coordination & Data Moat]] | HIGH | Expert interview — Hesh (BIM Accelerator) | 2026-06-16 |
+| [[Revit MEP Tutorial for Complete Beginners]] | HIGH | SourceCAD (YouTube) | 2024-06-23 |
+| [[How to Learn the BIM Coordination Skillset]] | HIGH | BIM Accelerator (YouTube) | 2024-07-03 |
+| [[How to Learn Revit and BIM Quickly]] | MEDIUM | BIM Accelerator (YouTube) | 2024-06-19 |
+| [[Plumbing in Revit MEP Beginner Tutorial 2]] | LOW | YouTube (auto-ingested) | 2026-06-16 |
 
 ---
 
@@ -23,6 +26,9 @@ Catalog of all pages. Updated on every ingest. Read this first when answering qu
 
 | Page | Type | Summary | Sources |
 |------|------|---------|---------|
+| [[Hassaan Shamshiri]] | Founder | Co-founder (business/GTM); FarmVillage exit, achievements, drivers, bio for applications | 1 |
+| [[Yash]] | Founder | Co-founder (technical lead); AI engineer, ex-Anthrobyte, UNSW | 1 |
+| [[Navisworks]] | Tool | Autodesk clash-detection/coordination tool; downstream of Civly's drafting scope | 1 |
 | [[video-use]] | Tool | AI video editing Claude skill — transcribe, cut, grade, subtitle, animate | 2 |
 | [[HyperFrames]] | Tool | HTML-to-video motion graphics renderer — write HTML, render MP4 | 2 |
 
@@ -32,6 +38,9 @@ Catalog of all pages. Updated on every ingest. Read this first when answering qu
 
 | Page | Summary | Sources |
 |------|---------|---------|
+| [[BIM Drafting vs Coordination]] | The two scopes; why Civly attacks drafting (earlier, higher value) not coordination | 1 |
+| [[Level of Development (LOD)]] | LOD 0→500 ladder; Civly's window is brief/0 → ~200 | 1 |
+| [[Data Partnership Moat]] | Proprietary input-CAD → output-BIM training data as Civly's durable moat | 1 |
 | [[video-editing-pipeline]] | Full pipeline: raw video → filler removal → motion graphics → final.mp4 | 2 |
 
 ---
@@ -42,14 +51,13 @@ Curated pages distilling MEP knowledge for Civly product development. Only HIGH-
 
 | Page | Summary |
 |------|---------|
+| [[MEP Drafting — Schematic to LOD 200]] | Civly's core wedge: MEP schematic (CAD) → routed LOD-200 model; duct-sizing calcs |
 | [[Revit MEP Five-Discipline Coordination Model]] | How five discipline files link into one coordination model — maps to Civly's IFC multi-discipline output |
 | [[MEP Coordination Requirements]] | The four coordination types (services, plant room, facade, precast) as Civly product requirements |
 
 ---
 
 ## Structural Knowledge (`pages/Structural/`)
-
-Curated pages for structural engineering knowledge relevant to Civly's Tapir MCP calls and IFC writer.
 
 | Page | Summary |
 |------|---------|
@@ -59,19 +67,38 @@ Curated pages for structural engineering knowledge relevant to Civly's Tapir MCP
 
 ## Compliance Knowledge (`pages/Compliance/`)
 
-Curated pages for building code knowledge relevant to Civly's YAML rule packs and calc functions.
-
 | Page | Summary |
 |------|---------|
 | [[NCC 2022 Overview for Civly]] | NCC volume structure, key rates (ventilation, parking, sanitary, egress), YAML rule pack format, gaps |
 
 ---
 
-## Analyses (`pages/analyses/`)
+## Competitors (`pages/Competitors/`)
 
-| Page | Question | Date |
+| Page | Summary |
+|------|---------|
+| [[Snaptrude]] | Sketch-to-BIM; expects firms to switch software, weak on compliance |
+| [[Archilabs]] | Most direct competitor; geometrical, bare-bones |
+| [[Finch]] | Floor-plan generation, residential; stops at architecture (potential integration partner) |
+
+---
+
+## Strategy & To-Do (`strategy/`)
+
+| Page | Question / Purpose | Date |
 |------|---------|------|
-| [[Civly Architecture Reference]] | Master reference: architecture, four implementation surfaces, relevance scoring heuristic | 2026-06-14 |
+| [[Civly Target Dilemma — MEP Drafting vs Competition Bids]] | Reconciles Hesh and Reuben; recommends MEP build now + competition discovery track | 2026-07-14 |
+| [[Civly Architecture Reference]] | Master reference: architecture, four implementation surfaces, relevance heuristic (+ 18 Jun sharpened scope) | 2026-06-18 |
+| [[Civly Direction — Drafting-First Pivot (Jun 2026)]] | Strategic synthesis after the BIM mentor call; what direction changed / what's now stale | 2026-06-18 |
+| [[Technical Roadmap — What to Build First]] | Ordered build plan (Phase 0 spec → duct calcs → LOD-200 IFC → data pipeline); unblocks the 18 Jun blocker | 2026-06-18 |
+| [[Data Partnership Outreach Strategy]] | 30-day playbook + ready copy (LinkedIn/email/phone) to land MEP-consultancy data partnerships | 2026-06-18 |
+| [[LinkedIn & Content Strategy]] | Civly brand plan: first demo post, launch video, content pillars, 2-week post calendar | 2026-06-18 |
+| [[Pitch Copy Library]] | Reusable, rule-compliant application answers (Z Fellows 2026 set) + per-funder tailoring + submission log | 2026-06-25 |
+| [[Advisor List & Question Routing]] | The advisor bench + process for routing open questions to the right person (Hassaan) | 2026-06-18 |
+| [[To-Do — Hassaan]] | Hassaan's list: advisors, outreach, data partnerships, funding | 2026-06-18 |
+| [[To-Do — Yash]] | Yash's list: AI BIM drafter, MEP generation, ML/data pipeline, research questions | 2026-06-18 |
+| [[Civly To-Do — Jun 2 to Jun 16]] | Historical master to-do (now split by owner) | 2026-06-18 |
+| [[NFC Review Cards — Surry Hills Target List]] | *(Non-Civly side hustle)* Curated door-knock list + walk route + pitch cheat-sheet for tap-to-review card sales | 2026-07-04 |
 
 ---
 
@@ -81,13 +108,19 @@ See [[CRM/index]] for the full contact list.
 
 | Name | Category | Relevance |
 |------|----------|-----------|
+| [[Reuben Roy]] | expert (architecture workflow) | HIGH |
+| [[Hesh]] | expert (advisor) | HIGH |
+| [[Dhanjeet Sah]] | expert (advisor) | HIGH |
+| [[Michael Westerlund]] | design-partner | HIGH |
 | [[Andrew Tang-Smith]] | customer | HIGH |
+| [[Leo Chan]] | connector | MEDIUM |
+| [[Farzana Khan]] | other | LOW |
 
 ---
 
 ## Stats
 
-- Total pages: 12 (3 sources + 2 entities + 1 concept + 2 MEP + 1 Structural + 1 Compliance + 1 analysis/architecture ref + MEP pages)
-- CRM contacts: 1
-- Sources ingested: 3
+- Total pages: 35 (6 sources + 5 entities + 4 concepts + 3 MEP + 1 Structural + 1 Compliance + 3 Competitors + 12 strategy)
+- CRM contacts: 7
+- Sources ingested: 6
 - Last lint: _(never)_
