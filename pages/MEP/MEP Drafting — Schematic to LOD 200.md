@@ -66,4 +66,4 @@ The mentor is explicit: **no engineer's intuition is required** — drafters alr
 - Where exactly does Civly's LOD 200 output need to sit so a subcontractor will accept it as a starting point rather than remodel from scratch?
 
 ## Related
-[[BIM Mentor Call — Drafting vs Coordination & Data Moat]] · [[MEP Coordination Requirements]] · [[Revit MEP Five-Discipline Coordination Model]] · [[Level of Development (LOD)]] · [[Civly Architecture Reference]]
+[[BIM Mentor Call — Drafting vs Coordination & Data Moat]] · [[MEP Coordination Requirements]] · [[Revit MEP Five-Discipline Coordination Model]] · [[Level of Development (LOD)]] · [[Civly Architecture Reference]] · [[Engineering Drawing and Documentation (MEP Engineer Course)]]

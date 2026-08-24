@@ -25,3 +25,6 @@ See [[processed/Plumbing in Revit MEP Beginner Tutorial 2.md]] for full notes.
 - Created this source page
 - Injected comprehensive notes into raw file
 - Moved source to `processed/`
+
+## Related
+[[Plumbing in Revit MEP Beginner Tutorial 1]] — prequel video in the same Balkan Architect series (also LOW).

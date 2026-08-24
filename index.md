@@ -1,6 +1,6 @@
 ---
 title: "Wiki Index"
-updated: 2026-07-14
+updated: 2026-08-24
 ---
 
 # Wiki Index
@@ -19,6 +19,11 @@ Catalog of all pages. Updated on every ingest. Read this first when answering qu
 | [[How to Learn the BIM Coordination Skillset]] | HIGH | BIM Accelerator (YouTube) | 2024-07-03 |
 | [[How to Learn Revit and BIM Quickly]] | MEDIUM | BIM Accelerator (YouTube) | 2024-06-19 |
 | [[Plumbing in Revit MEP Beginner Tutorial 2]] | LOW | YouTube (auto-ingested) | 2026-06-16 |
+| [[Engineering Drawing and Documentation (MEP Engineer Course)]] | MEDIUM | Elevify — MEP Engineer Course | 2026-08-24 |
+| [[Plumbing in Revit MEP Beginner Tutorial 1]] | LOW | Balkan Architect (YouTube) | 2018-05-27 |
+| [[REVIT 2023 FOR MEP - Lesson 1 Getting Started with an MEP Project]] | LOW | Learning With Rich (YouTube) | 2022-09-29 |
+| [[Lecture 14 HVAC Modelling in Progress 1 (Revit MEP Full Course)]] | LOW | Engineering Academy — Mohamed Gamal (YouTube) | 2023-09-27 |
+| [[Autodesk Revit - Full Beginner Course (Complete Project, Start to Finish)]] | NOT | Balkan Architect (YouTube) | 2024-09-11 |
 
 ---
 
@@ -94,6 +99,7 @@ Curated pages distilling MEP knowledge for Civly product development. Only HIGH-
 | [[Data Partnership Outreach Strategy]] | 30-day playbook + ready copy (LinkedIn/email/phone) to land MEP-consultancy data partnerships | 2026-06-18 |
 | [[LinkedIn & Content Strategy]] | Civly brand plan: first demo post, launch video, content pillars, 2-week post calendar | 2026-06-18 |
 | [[Pitch Copy Library]] | Reusable, rule-compliant application answers (Z Fellows 2026 set) + per-funder tailoring + submission log | 2026-06-25 |
+| [[PFC Pitch — Deck, Scripts & Prompts]] | PFC deck rebuild handoff: design language, Business Model/Timeline/Ask slides + scripts, on-brand Nano Banana prompts, Canva workflow | 2026-07-15 |
 | [[Drafting vs Coordination Strategy Shift]] | Why Civly sells drafting not coordination, despite Hesh/Reuben pushing coordination; GTM + messaging stance | 2026-07-17 |
 | [[Advisor List & Question Routing]] | The advisor bench + process for routing open questions to the right person (Hassaan) | 2026-06-18 |
 | [[To-Do — Hassaan]] | Hassaan's list: advisors, outreach, data partnerships, funding | 2026-06-18 |
@@ -121,7 +127,7 @@ See [[CRM/index]] for the full contact list.
 
 ## Stats
 
-- Total pages: 35 (6 sources + 5 entities + 4 concepts + 3 MEP + 1 Structural + 1 Compliance + 3 Competitors + 12 strategy)
+- Total pages: 41 (11 sources + 5 entities + 4 concepts + 3 MEP + 1 Structural + 1 Compliance + 3 Competitors + 13 strategy)
 - CRM contacts: 7
-- Sources ingested: 6
+- Sources ingested: 11
 - Last lint: _(never)_

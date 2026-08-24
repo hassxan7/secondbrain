@@ -14,6 +14,14 @@ Yash's list — **technical: the AI BIM drafter, MEP generation, the ML/data pip
 > [!note] Reconciled from WhatsApp chat — 14 Jul 2026
 > **Option A still locked.** Sharath (6 Jul): can't share office files but happy to help → Hassaan to ask for an **office-side NDA intro**. Fable extended again (to ~19 Jul; may stick). Confirmed build focus (**14 Jul**): **the stronger Tapir-style Archicad MCP is the product path**, including schematic-driven MEP creation; direct IFC generation is not a parallel priority. Reddit r/BIM pain-point scan done (7 Jul) — useful for outreach hooks.
 
+## 🆕 From the SF / Sasha meeting (14 Jul)
+> Context + decisions: [[Data & Credibility — Core Problem & Open Decisions (SF, 14 Jul)]]. Data + credibility is the make-or-break; your side is the **credibility demo** and the **data-collection tooling**.
+- [ ] **Ship the architect-intuitive demo (~10 days)** — the stronger MCP is ~**90% done (~40 tools, 4x prior)** and "1–2 days from controlling the software fully". Turn it into a **sharp, pinpointed demo → YouTube link + pin on Hassaan's LinkedIn.** This is the #1 near-term **credibility** unlock per Sasha (resolves "who is this guy?").
+- [ ] **Evaluate/build the "single mass-change" web tool** as a data-collection funnel — a genuinely useful free utility (make one change across a whole model) with **T&Cs granting training rights** (data used only to improve the model, never resold). Hair-on-fire capture, ChatGPT-style. Flag: noisy data + rides the data-privacy backlash.
+- [ ] **Data cleaning / organising layer** — the "largest scan library" and family libs are bulk but disorganised/noisy; need a system that **organises + fixes data first** before training.
+- [ ] **Corruption training method** — build the pipeline that takes finished models, removes elements, and trains on **before/after chunks** (materials/concrete are building-wide, so element choices must be learned in context). "Building the system is fine; the data is the hard part."
+- [ ] **File the paid schematics** — Civly "paid for schematics at larger scale" (got some); confirm what they are and whether they form the first usable input→output pair for the mechanical slice.
+
 ## 🔴 This week — Jul 14–20
 - [ ] **Build / extend Archicad MCP for MEP** — use Fable window; "teach MCP mechanical LOD 250" rather than jumping straight to ML (Hassaan ask 6–13 Jul). Better Tapir-style toolset with MEP features.
 - [ ] **Ship one mechanical vertical slice through the MCP** — CAD/DXF schematic → application-neutral routing graph/sizes → native Archicad MEP elements → LOD 100/200 IFC exchange model/viewer. Still blocked on real paired files.

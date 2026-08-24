@@ -5,6 +5,20 @@ Parse recent entries with: `grep "^## \[" log.md | tail -10`
 
 ---
 
+## [2026-08-24] ingest | Scheduled auto-ingest — 7 raw sources
+Automated scheduled ingest (`vault-ingest-organise`) processed everything sitting directly in `raw/`:
+- **[[Engineering Drawing and Documentation (MEP Engineer Course)]]** (Elevify course lesson) — Civly relevance MEDIUM. Teaches drawing-set organization, symbol/legend conventions, equipment tag→schedule cross-referencing, and the revision/as-built lifecycle. No formulas or code values, but the tag→schedule→property model is analogous to what Civly's schematic parser and `ifc_writer` reconstruct. Cross-linked into [[MEP Drafting — Schematic to LOD 200]].
+- **[[Plumbing in Revit MEP Beginner Tutorial 1]]** (Balkan Architect) — LOW. Revit UI plumbing workflow; prequel to the already-ingested [[Plumbing in Revit MEP Beginner Tutorial 2]], now cross-linked both ways.
+- **[[REVIT 2023 FOR MEP - Lesson 1 Getting Started with an MEP Project]]** (Learning With Rich) — LOW. Pure Revit project-setup/administration (templates, units, shared parameters, browser organization).
+- **[[Lecture 14 HVAC Modelling in Progress 1 (Revit MEP Full Course)]]** (Engineering Academy — Mohamed Gamal) — LOW. Revit UI ductwork placement; dimensions are model-specific, not general sizing rules.
+- **[[Autodesk Revit - Full Beginner Course (Complete Project, Start to Finish)]]** (Balkan Architect) — NOT. General architectural Revit course (walls/stairs/floors/roof), no MEP/structural/compliance content — the exact excluded category per the wiki's own relevance rubric.
+- **Andrew Tang-Smith.md** and **Dhanjeet Sah.md** (raw LinkedIn clippings) — verified against existing CRM pages [[Andrew Tang-Smith]] and [[Dhanjeet Sah]] (both already HIGH-relevance, created Jun 2026) and found to be the *original* clipped source material those pages were already built from, word-for-word (same job history, projects, certifications, awards). No new information to ingest. Treated as cleanup: moved to `processed/` (suffixed "(LinkedIn clipping)") rather than re-ingested, since re-creating CRM pages from identical source data would be redundant. CRM pages themselves were left untouched (no new facts to add).
+Updated: [[index]], [[wiki]], [[MEP Drafting — Schematic to LOD 200]] (added cross-link).
+Personal OS vault: checked `raw/` (excl. `whatsapp/`) — nothing new to ingest.
+
+## [2026-07-15] doc | PFC Pitch — Deck, Scripts & Prompts
+Created [[PFC Pitch — Deck, Scripts & Prompts]] in `strategy/` — self-contained handoff for rebuilding the PFC deck (esp. for a fresh chat + Canva). Captures: the real design language (matte black, white Helvetica sentence-case headlines, cream stat pills, orange connectors, orange-outlined skewed cards), PFC-box coverage map + 15-slide order, the three new slides (Business Model / Timeline / Ask) with on-slide copy + scripts, business model @ **A$1,999/seat/mo** with TAM/SAM/SOM (US$40B / A$1.8B / A$6M), on-brand Nano Banana Pro prompts, two thin-box script patches, deck fixes (traction 3 LOIs+1 pilot+10 signups, exit-figure inconsistency, typos), a 3-min timing budget, and Canva MCP workflow notes. Confirmed Canva connector is live in-session.
+
 ## [2026-07-15] merge+push | Reconciled remote divergence, pushed clean structure
 `git push` was rejected — remote had diverged (automated PR #1, "drafting vs coordination strategy shift + Hesh/Reuben CRM") on the OLDER structure (still `pages/analyses/`, top-level `Competitors/`, duplicate `Hesh-Dian.md`/`Reuben.md`).
 Resolved with `merge -s ours` (kept the clean `strategy/`+`processed/` structure; remote commit preserved in history — non-destructive, no force-push). Salvaged the one unique doc → [[Drafting vs Coordination Strategy Shift]] into `strategy/` (relinked to canonical [[Hesh]] / [[Reuben Roy]]). Remote's duplicate CRM files superseded by the canonical ones (recoverable from history). Redacted phone + family PII from the repo copy before pushing.
@@ -22,6 +36,12 @@ Pages created: [[Reuben Roy Call — Competition Bids vs BIM Drafting]], [[Reube
 
 ## [2026-07-14] crm | Reuben Roy
 Category: expert. Relevance: HIGH. Action: created. Architecture workflow and competition-bid advisor; follow-up is an anonymised brief/submission pair, boutique-principal validation, and a later BVN technology-lead introduction.
+
+## [2026-07-14] strategy | SF / Sasha meeting — formalised data+credibility problem
+Ingested the Sasha (SF program manager) strategy call. Her verdict: **data-partnership + credibility is the brick wall; everything else is above-and-beyond for PFC; no company until it's cracked or a pivot is found.**
+Created [[Data & Credibility — Core Problem & Open Decisions (SF, 14 Jul)]] in `strategy/` — formalises: Problem A data-acquisition avenues (8, with trade-off table + corruption training note), Problem B credibility unlocks, Problem C Hesh = bounty-per-partnership not champion/equity, Problem D advisor equity hygiene (0% advisors; Michael 0% unless data), Problem E funding (protect VC-ability; no data-for-equity on cap table), Problem F product sequencing (parallel: north-star + door-opening sub-feature). Plus 5 decisions to make, Sasha's two intro leads (Plannerverse founder + ADA PhD student), and PFC pitch fixes.
+Updated [[To-Do — Hassaan]] (new SF section: blurb-for-intros, headshots, Michael-as-champion, Hesh bounty, new data avenues, customer-vs-data allocation, pitch fixes, funding guardrail) and [[To-Do — Yash]] (credibility demo via stronger MCP → YouTube/LinkedIn; mass-change data-collection tool; data-cleaning layer; corruption training; file paid schematics).
+Created CRM [[Sasha]] (accelerator PM / connector, HIGH). New facts: MCP ~90% done / ~40 tools; Civly paid for schematics at scale; Andrew Tang-Smith earmarked customer-stream not data.
 
 ## [2026-07-14] reconcile | To-do vs WhatsApp chat (through 13–14 Jul)
 Read `WhatsApp Chat - Yash (1).zip` / `_chat.txt` and updated [[To-Do — Hassaan]] + [[To-Do — Yash]].

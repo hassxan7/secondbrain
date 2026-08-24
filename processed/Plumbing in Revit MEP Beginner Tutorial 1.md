@@ -9,7 +9,44 @@ description: "Complete Revit Courses: https://balkan-architect.teachable.com/p/b
 tags:
   - "clippings"
 ---
-![](https://www.youtube.com/watch?v=Mvb-lu6ivq0)
+
+> [!tip] Civly Relevance — **LOW**
+> Revit UI plumbing workflow (view setup, family loading, manual pipe placement/slope) for a bathroom's supply + waste system. No sizing formula or code reference given. Civly doesn't operate inside Revit. Sibling video: [[Plumbing in Revit MEP Beginner Tutorial 2]].
+
+## Notes
+
+### Starting Project with MEP Template
+- Plumbing is done from the Mechanical template in Revit (plumbing tools live alongside HVAC in that template).
+- Links in a separate host project (a small "auto repair shop" bathroom built in an earlier ventilation/HVAC tutorial) via Insert → Link Revit.
+
+### Create and Set Up Views
+- Deletes the template's default plumbing floor plans (considered awkwardly set up) and instead duplicates the Mechanical view, renames it, and sets its Properties → Discipline to Mechanical with Sub-Discipline changed from HVAC to Plumbing.
+- Creates a callout scoped tightly around the bathroom (rather than showing the whole linked floor plan) via View → Callout.
+- On the callout view: Sub-Discipline set to Plumbing; View Template set to "none" (not the Mechanical Plan template) so the discipline override takes effect; main Discipline stays Mechanical.
+- Visibility/Graphics (VG) checked to confirm MEP/ducting categories are visible or hidden as desired, and Filters checked/enabled specifically for plumbing element visibility.
+
+### Load MEP Plumbing Families
+- Plumbing Fixtures category starts empty; families loaded via Insert → Load Family → metric (or imperial) library → Plumbing → MEP → Fixtures → Connectors, loading all connector families at once.
+
+### Adding Plumbing System Elements (Supply)
+- A "domestic cold water" connector (no hot water needed for a water closet) is placed with "Place on Face" selected, positioned on the wall face behind the toilet.
+- Elevation set to 500mm; pipe size reduced from a 30mm default down to 20mm.
+- Pipe drawn from the connector, dropped through the floor via a negative vertical offset (−1000mm) to represent connection to an underground source.
+- View Range temporarily set to "Unlimited" (both top and bottom) so below-floor piping remains visible while routing.
+- A second water closet's connector is placed by copying the first connector to its endpoint and connecting a new pipe segment to the existing supply line.
+
+### Loading Pipe Families / Adding Sewage System Elements
+- PVC pipe fitting families loaded via Insert → Load Family → metric/imperial → Pipe → Fittings → PVC → Schedule (sockets type) — loads multiple fitting families at once.
+- A new Pipe Type is duplicated from "Standard" and renamed "PVC," then its Routing Preferences are edited so every fitting category (elbow/junction/cap/flange) resolves to the matching PVC Schedule-40 component; junction type left as "Tee."
+- A "sanitary" connector is placed on the wall (same technique as the supply connector) at elevation 0mm (vs. 500mm for the supply connector).
+- PVC waste pipe diameter set manually (e.g. 80mm); slope changed from "Off" to "Down" at a percentage value (e.g. 2%) — necessary because waste flow (unlike pressurized supply) relies on gravity, so Revit calculates the actual slope from the entered percentage.
+- Pipe dropped via a −1000mm offset to run underneath the house and away from the building.
+- The sanitary connector + pipe run is copied to the second bathroom, connected into the existing run at a 45° angle; presenter notes pipe diameter must be checked against fitting curvature — an oversized pipe may not leave room for the required fittings.
+- Detail Level switched to "Fine" and visual style toggled between Wireframe/Realistic during modeling to inspect connections and catch fitting/space conflicts.
+
+## Civly Relevance
+See callout above — LOW.
+
 
 ## Transcript
 

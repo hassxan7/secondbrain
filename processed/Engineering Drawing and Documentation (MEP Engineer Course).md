@@ -8,6 +8,49 @@ description:
 tags:
   - "clippings"
 ---
+
+> [!tip] Civly Relevance — **MEDIUM**
+> Teaches how MEP drawing sets, symbols, legends, equipment schedules, and revisions/as-builts work — the tag→schedule→property data model this describes is analogous to what Civly's schematic parser and IFC writer have to reconstruct. No formulas, no code values, so not HIGH.
+
+## Notes
+
+### Course Structure (Elevify "MEP Engineer Course")
+- 44h workload course; this lesson is Chapter 1, Lesson 1: "Engineering Drawing and Documentation," within Module 1 "Foundations of MEP Engineering."
+- Course modules: Foundations → Mechanical (HVAC) → Plumbing → Electrical (Power) → Electrical (Lighting/Low Voltage) → MEP Coordination & BIM → Energy Efficiency/Sustainability → Project Delivery & Construction Administration.
+
+### Why Drawing Literacy Matters
+- An MEP drawing is treated as a legal contract expressed in lines/symbols. Misreading a symbol can mean the wrong pipe size gets installed; missing a note can mean a critical clearance is ignored.
+
+### Organizing Drawing Sets
+- Fixed discipline order across virtually all firms/projects: General (drawing index + project-wide legends) → Architectural → Mechanical → Plumbing → Electrical.
+- MEP engineers work mostly in M/P/E sheets but must cross-reference Architectural sheets constantly — walls, ceilings, floor elevations directly constrain system routing.
+- Sheet numbering logic: letter prefix = discipline, first digit = floor/category, last two digits = sequence within that group. Example: "M-201" = mechanical, second floor.
+- Title block (usually bottom-right) is the sheet's ID card: project name, drawing title, sheet number, scale, revision history, firm name, date, and the engineer-of-record's stamp/signature (this is what makes it a legal document). Always check the title block first to confirm correct sheet/revision.
+- Three view types, used together: **plan** (top-down equipment/system locations per floor), **section** (vertical cut — elevations, clearances, how systems stack), **detail** (zoomed-in specific connection/assembly).
+
+### Reading MEP Symbols and Legends
+- MEP drawings overlay several systems on one sheet (ductwork, chilled water piping, domestic water, electrical conduit); symbols are what keeps that readable.
+- Example symbols: circle with a cross = supply air diffuser; dashed line = concealed pipe; triangle with a number = panel.
+- Symbols are discipline-specific: mechanical uses line weights/annotations to distinguish supply vs. return ducts and their sizes; plumbing uses solid lines for pressure piping vs. dashed for drainage; electrical uses home-run arrows for circuit direction plus specific panel/fixture icons.
+- Every project has its own legend sheet (usually first in each discipline group) defining every symbol used on that project. Firms customize/tweak standard symbols — never assume a symbol means the same thing across projects. Read the legend before reading the plans.
+
+### Using Equipment Schedules and General Notes
+- Symbols show *where* equipment sits; schedules show *what* it is — capacities, voltages, flow rates, model numbers, notes.
+- Each schedule row corresponds to one tag on the plan (e.g. "AHU-1"). Cross-referencing tag ↔ schedule row is a constant workflow.
+- General notes set discipline-wide baseline rules: applicable codes, installation standards, contractor testing requirements. A note referencing "see specification section" links to the full written specifications (drawings + specs form one package).
+
+### Revisions and As-Built Drawings
+- Drawing lifecycle: for-coordination-only → issued-for-construction (contractors build from this) → revision (if changes occur).
+- A **revision cloud** is drawn around the changed area; a numbered triangle keys to the title block's revision history (number + date + description).
+- **As-built drawings** capture what was actually constructed, not what was designed — contractors red-line the issued-for-construction set for every field deviation (pipe rerouted around a beam, panel relocated, duct resized). These markups become the permanent record, essential for future maintenance/renovation/troubleshooting.
+
+### Practical 5-Step Reading Sequence
+1. Title block — confirm correct sheet + revision.
+2. Legend — decode symbols.
+3. General notes — project-wide rules.
+4. Cross-reference equipment tags against the schedule.
+5. Scan for revision clouds before reading the design itself.
+
 My courses
 
 Go Premium

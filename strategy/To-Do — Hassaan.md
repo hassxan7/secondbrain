@@ -14,6 +14,17 @@ Hassaan's list — **business: advisors, outreach, partnerships (data moat), fun
 > [!note] Reconciled from WhatsApp chat — 14 Jul 2026
 > Chat through **13–14 Jul**. Top of stack this week: **(1)** rewrite pitch deck + practice before Georgia (15 Jul); **(2)** polish LinkedIn profile; **(3)** reply to Sharath (ask office NDA intro); **(4)** prep Latitude 37 interview. TapReview Surry Hills door-knock happened 4 Jul. ~10 SF MEP BIM managers contacted 6 Jul.
 
+## 🆕 From the SF / Sasha meeting (14 Jul)
+> Full formalisation of the strategic decisions: [[Data & Credibility — Core Problem & Open Decisions (SF, 14 Jul)]]. Sasha's verdict: **data + credibility is the brick wall — crack it and you have a company; everything else is above-and-beyond for PFC.**
+- [ ] **Send Sasha a 1–2 sentence blurb + the website** → she double-opt-in intros **Howdger (Plannerverse founder, ex-Dial consulting)** and a **PhD student (ADA, built environment, 3D→code)**. Quick, high-value — do first.
+- [ ] **Update PFC headshots** — current ones "look like you're 12"; use current photos of both founders (ideally together, with growth/technical/next labels).
+- [ ] **Formalise Michael as 0% equity onboarded advisor** (equity only *if* he provides data) and **ask him directly: "what would you need to see to vouch for us / be our industry champion?"**
+- [ ] **Decide Hesh structure** → **bounty of $X per data partnership he actually secures**, once there's cash. No equity, no standing retainer. (He's confident MEP consultants share schematics freely; he gave one contact.)
+- [ ] **New data avenues to work** (beyond direct firm partnerships): **BIM coordinators as aggregators** (they receive data from 10+ consultancies — Hesh's clients); **retiring architects / architecture-council ex-presidents / advisory boards** (best networks); **academics/professors** (data + credibility).
+- [ ] **Allocate warm contacts: customer-stream vs data-stream.** Andrew Tang-Smith (friend's brother, Perth Airport, Studio Tangara) = **customer**, not data. Sort Michael, Leo, the rest.
+- [ ] **Pitch fixes (your slides):** compress the compliance explanation (get to the wow faster); keep the coding-analogy hook; explain the price as **"one $199 seat replaces 4–5 drafters"**; add the undercover-research/traction proof but cut something to fit; do **not** touch the "AI replacing jobs" angle.
+- [ ] **Funding guardrail:** protect VC-ability — **no data-for-equity on the cap table** (revenue-share/credits only if ever used). See Problem E in the formalisation doc.
+
 ## 🔴 This week — Jul 14–20 (PFC crunch)
 - [ ] **Polish LinkedIn profile (personal + Civly company page)** — *added 14 Jul.* Fix "Enngineers" typo; rewrite headline / about / banner so it reads founder-grade (not student/generic); pin launch film or best demo; one-liner that matches current wedge (MEP schematic → LOD ~200 / design intent → model). Needed before more InMail / SF follow-ups. See [[LinkedIn & Content Strategy]].
 - [ ] **Rewrite pitch deck + practice** — call with Yash **14 Jul evening** to rewrite (agreed 13 Jul). Practice before **Georgia Lyons pitch practice 15 Jul 2pm** (online, booked). Incorporate Slobodan notes (MRR math, Seed vs Series A, rename "Spikes", team→problem transition).

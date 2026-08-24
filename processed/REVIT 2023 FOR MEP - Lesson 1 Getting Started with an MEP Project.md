@@ -9,7 +9,42 @@ description: "Thanks for watching guys.You can check out my YouTube channel at:h
 tags:
   - "clippings"
 ---
-![](https://www.youtube.com/watch?v=PoH11nX72U4)
+
+> [!tip] Civly Relevance — **LOW**
+> Pure Revit administration/setup (template choice, units dialog, project info fields, shared parameters, browser organization). No engineering content; Civly doesn't operate inside Revit.
+
+## Notes
+
+### Starting an MEP Project
+- New project started from the "Systems" template, which bundles Mechanical + Electrical + Plumbing into one project (vs. selecting a single-discipline template if disciplines are meant to be modeled separately).
+
+### Setting MEP Units
+- Project Units dialog opened via the `UN` keyboard shortcut or Manage tab → Settings → Units.
+- Units are configured **per discipline** — Common, HVAC, Electrical, Piping, etc. — each with its own set of measurable properties (density, illuminance, apparent power, coefficient of heat transfer, etc.).
+- Example changes made: HVAC density set to kg/m³ (metric) then switched to lbm/in³ (imperial) to show both; Electrical illuminance switched from lux to foot-candles; Electrical apparent power set to BTU/second; Piping density set to lbm/in³; Piping energy set to a coefficient-of-heat-transfer unit (BTU/hr·ft²·°F).
+- Each unit field also has a decimal-place rounding setting.
+
+### Setting Project Information
+- Manage tab → Settings → Project Information holds: organization name, building name, author, project issue date, project status, client name, project address (multi-line), project name, and project number.
+- A separate "Energy Settings" link exists from the same panel for room/analysis settings — left at default in this lesson.
+
+### Creating Project Parameters (Shared Parameters)
+- Motivation: not every parameter needed is available on an element's built-in instance/type properties — custom ones must be created as **project parameters**, and to reuse them across projects/teams they should be **shared parameters**.
+- Workflow: Manage → Shared Parameters → Create a shared-parameter file (stored somewhere a team can access, typically controlled solely by the BIM manager) → within that file, create a new **Group** (e.g. "Greenhouse Gas") → within the group, create a new **Parameter** (e.g. "Carbon Footprint Factor," Discipline = Energy, Type = Energy).
+- Creating the shared parameter file/parameter alone does not make it usable — it must then be explicitly added via Manage → Settings → Project Parameters → New → "Shared parameter" → select it → choose whether it's an **Instance** parameter (visible per selected object) or **Type** parameter (visible only via Edit Type) → assign it to a target category (e.g. Project Information).
+- Once bound, the parameter appears as an editable field on its target category (e.g. entering "12000" for Carbon Footprint Factor under Project Information).
+
+### Project Location
+- Manage → Project Information → Location: choose "Internet Mapping Service" (requires live internet, uses a Google Maps-style picker) or "Default City List" (offline city selection) to set the project's site location.
+
+### Project Browser Organization
+- Right-click the Project Browser → Browser Organization, or View tab → User Interface → Browser Organization.
+- Default organization groups/sorts views by Discipline → Sub-discipline → Family and Type; can be changed (e.g. to Family/Type → Discipline) via editing the existing scheme.
+- Custom organizations can be created from scratch (e.g. a project-specific "Office Space MEP" organization: group by Discipline then Family/Type, sort views alphabetically by name) and applied to change how the browser tree displays.
+
+## Civly Relevance
+See callout above — LOW.
+
 
 Thanks for watching guys.  
   
