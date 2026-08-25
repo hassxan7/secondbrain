@@ -302,3 +302,16 @@ CREATE TABLE IF NOT EXISTS invites (
   last_nudge_at TEXT,
   UNIQUE (group_id, member_id)
 );
+
+-- ── The pot: pre-funded stakes so fines are enforceable ──────────────────────
+-- Everyone stakes a buy-in at the start of a period; fines deduct from the
+-- stake rather than being invoiced after the fact. See src/banksia/pot.ts.
+CREATE TABLE IF NOT EXISTS pot_stakes (
+  group_id     TEXT NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
+  member_id    TEXT NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+  period_start TEXT NOT NULL,
+  opening_cents INTEGER NOT NULL,
+  fined_cents  INTEGER NOT NULL DEFAULT 0,
+  paid_in      INTEGER NOT NULL DEFAULT 0,  -- has the buy-in actually been collected
+  PRIMARY KEY (group_id, member_id, period_start)
+);

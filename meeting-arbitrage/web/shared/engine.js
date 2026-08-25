@@ -1665,20 +1665,141 @@ function buildAgenda(args) {
 function formatMoney(cents) {
   return `$${(cents / 100).toFixed(2)}`;
 }
+
+// src/banksia/pot.ts
+var DEFAULT_POT_CONFIG = {
+  buyInCents: 4e3,
+  // $40 stake
+  finePerMissedTaskCents: 500,
+  // $5 per task short — see recommendPot() on $100
+  distribution: "split-clean"
+};
+function openPot(memberIds, config) {
+  return memberIds.map((memberId) => ({
+    memberId,
+    openingCents: config.buyInCents,
+    finedCents: 0
+  }));
+}
+function applyWeekFines(stakes, finesByMember) {
+  return stakes.map((stake) => {
+    const fine = Math.max(0, finesByMember[stake.memberId] ?? 0);
+    return { ...stake, finedCents: stake.finedCents + fine };
+  });
+}
+function potState(stakes) {
+  const states = stakes.map((stake) => {
+    const capped = Math.min(stake.finedCents, stake.openingCents);
+    const overflowCents = Math.max(0, stake.finedCents - stake.openingCents);
+    return {
+      ...stake,
+      remainingCents: stake.openingCents - capped,
+      overflowCents,
+      clean: stake.finedCents === 0,
+      exhausted: stake.finedCents >= stake.openingCents
+    };
+  });
+  return {
+    totalCents: stakes.reduce((sum, s) => sum + s.openingCents, 0),
+    stakes: states,
+    surplusCents: states.reduce((sum, s) => sum + (s.openingCents - s.remainingCents), 0),
+    overflows: states.filter((s) => s.overflowCents > 0).map((s) => ({ memberId: s.memberId, overflowCents: s.overflowCents }))
+  };
+}
+function distributePot(stakes, config) {
+  const state = potState(stakes);
+  const clean = state.stakes.filter((s) => s.clean);
+  const base = state.stakes.map((s) => ({
+    memberId: s.memberId,
+    stakeBackCents: s.remainingCents,
+    bonusCents: 0,
+    totalCents: s.remainingCents,
+    owesCents: s.overflowCents
+  }));
+  const money = (cents) => `$${(cents / 100).toFixed(2)}`;
+  if (config.distribution === "split-clean" && clean.length > 0 && state.surplusCents > 0) {
+    const share = Math.floor(state.surplusCents / clean.length);
+    const remainder = state.surplusCents - share * clean.length;
+    const cleanIds = new Set(clean.map((s) => s.memberId));
+    let first = true;
+    for (const payout of base) {
+      if (!cleanIds.has(payout.memberId))
+        continue;
+      payout.bonusCents = share + (first ? remainder : 0);
+      payout.totalCents = payout.stakeBackCents + payout.bonusCents;
+      first = false;
+    }
+    return {
+      payouts: base,
+      houseFundCents: 0,
+      rolloverCents: 0,
+      summary: `${money(state.surplusCents)} in fines split among ${clean.length} clean ${clean.length === 1 ? "housemate" : "housemates"} \u2014 ${money(share)} each.`
+    };
+  }
+  if (config.distribution === "house-fund") {
+    return {
+      payouts: base,
+      houseFundCents: state.surplusCents,
+      rolloverCents: 0,
+      summary: `${money(state.surplusCents)} of fines into the house fund.`
+    };
+  }
+  if (config.distribution === "roll-over") {
+    return {
+      payouts: base,
+      houseFundCents: 0,
+      rolloverCents: state.surplusCents,
+      summary: `${money(state.surplusCents)} of fines rolled into next period.`
+    };
+  }
+  return {
+    payouts: base,
+    houseFundCents: state.surplusCents,
+    rolloverCents: 0,
+    summary: state.surplusCents > 0 ? `Nobody finished clean \u2014 ${money(state.surplusCents)} to the house fund.` : "Everyone clean. Full stakes back, no fines."
+  };
+}
+function recommendPot(config, tasksRequired = 4) {
+  const worstWeeklyFine = config.finePerMissedTaskCents * tasksRequired;
+  const weeks = worstWeeklyFine > 0 ? Math.floor(config.buyInCents / worstWeeklyFine) : Infinity;
+  const money = (cents) => `$${(cents / 100).toFixed(0)}`;
+  if (weeks >= 3) {
+    return {
+      weeksOfRunway: weeks,
+      ok: true,
+      note: `A ${money(config.buyInCents)} stake absorbs ${weeks} bad weeks before it's gone. Healthy.`
+    };
+  }
+  if (weeks >= 1) {
+    return {
+      weeksOfRunway: weeks,
+      ok: true,
+      note: `A bad week costs up to ${money(worstWeeklyFine)}, so the ${money(config.buyInCents)} stake lasts about ${weeks} of them. Steep but workable \u2014 expect top-ups.`
+    };
+  }
+  return {
+    weeksOfRunway: 0,
+    ok: false,
+    note: `A single bad week (${money(worstWeeklyFine)}) wipes the ${money(config.buyInCents)} stake, so the pot can't enforce past week one. Either raise the buy-in or lower the fine \u2014 a $100 fine wants a stake nearer ${money(worstWeeklyFine * 3)}.`
+  };
+}
 export {
   ACTIVITIES,
   ACTIVITY_BY_ID,
   DEFAULT_CHORE_CONFIG,
   DEFAULT_CONFIG,
   DEFAULT_HANGOUT_CONFIG,
+  DEFAULT_POT_CONFIG,
   SUBURBS,
   addSuggestion,
+  applyWeekFines,
   buildAgenda,
   buildBrief,
   buildItinerary,
   centroid,
   collidesWithStandingConflict,
   describeIssueOutcome,
+  distributePot,
   estimateTravelMinutes,
   evaluateRefix,
   fetchEventMeta,
@@ -1692,6 +1813,7 @@ export {
   mergeRippleEvents,
   offenderTable,
   openBallots,
+  openPot,
   outstandingAsks,
   parseEventUrl,
   participants,
@@ -1699,10 +1821,12 @@ export {
   patternLabel,
   pendingAsksFor,
   platformLabel,
+  potState,
   rankActivities,
   rankBallots,
   rankHubs,
   recommendAnchor,
+  recommendPot,
   recordAnswers,
   renderChatMessage,
   resolveDisputes,

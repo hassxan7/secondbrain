@@ -1,52 +1,58 @@
 /* Banksia house dashboard.
-   Deliberately plain next to Ripple: this is a tool people open for forty
-   seconds to tick a chore or answer a poll, not something to be charmed by.
-   Theme-aware, dense, high-contrast. */
+   A warm, earthy identity — beige paper and banksia-leaf green, named after
+   the plant and the house. Still a tool people open for forty seconds, so it
+   stays dense and high-contrast; the warmth is in the palette, not in flourish.
+   Kept theme-aware, but the dark variant stays warm (green-brown, not cold
+   slate) so the identity holds in a kitchen at night. */
 
 :root {
-  --bg: #ffffff;
-  --surface: #f6f7f9;
-  --surface-2: #eceef2;
-  --ink: #14161a;
-  --muted: #5a6270;
-  --faint: #878e9b;
-  --line: #dfe3e9;
-  --accent: #1f6feb;
-  --good: #1a7f4b;
-  --warn: #b45309;
-  --bad: #c02f2f;
+  --bg: #F3ECDD;          /* warm paper beige */
+  --surface: #FBF7EF;     /* lighter card */
+  --surface-2: #ECE3D0;
+  --ink: #23261C;         /* warm near-black, faint green bias */
+  --muted: #6A6853;
+  --faint: #9A9680;
+  --line: #E2D9C5;
+  --accent: #3F6B44;      /* banksia leaf green */
+  --accent-ink: #2E5333;  /* darker green for text on beige */
+  --good: #4A7C4E;
+  --warn: #A96A1E;        /* warm amber */
+  --bad: #B23A2E;         /* terracotta red, not a cold alarm red */
   --radius: 12px;
   --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --serif: "Playfair Display", Georgia, "Times New Roman", serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0e1116;
-    --surface: #161b22;
-    --surface-2: #1f2630;
-    --ink: #e8ebf0;
-    --muted: #9aa4b2;
-    --faint: #6e7889;
-    --line: #2a323d;
-    --accent: #5b9cff;
-    --good: #3fb950;
-    --warn: #d29922;
-    --bad: #f85149;
+    --bg: #1B1E16;
+    --surface: #242820;
+    --surface-2: #2E3327;
+    --ink: #ECE7D8;
+    --muted: #A9A794;
+    --faint: #7C7A66;
+    --line: #373C2D;
+    --accent: #83A986;
+    --accent-ink: #9CBE9F;
+    --good: #83B187;
+    --warn: #D6A25A;
+    --bad: #D97B6C;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0e1116;
-  --surface: #161b22;
-  --surface-2: #1f2630;
-  --ink: #e8ebf0;
-  --muted: #9aa4b2;
-  --faint: #6e7889;
-  --line: #2a323d;
-  --accent: #5b9cff;
-  --good: #3fb950;
-  --warn: #d29922;
-  --bad: #f85149;
+  --bg: #1B1E16;
+  --surface: #242820;
+  --surface-2: #2E3327;
+  --ink: #ECE7D8;
+  --muted: #A9A794;
+  --faint: #7C7A66;
+  --line: #373C2D;
+  --accent: #83A986;
+  --accent-ink: #9CBE9F;
+  --good: #83B187;
+  --warn: #D6A25A;
+  --bad: #D97B6C;
 }
 
 * { box-sizing: border-box; }
@@ -74,7 +80,11 @@ header.bar {
   max-width: 760px; margin: 0 auto; padding: 0 16px;
   display: flex; align-items: baseline; gap: 10px;
 }
-.logo { font-weight: 800; font-size: 17px; letter-spacing: -.02em; }
+.logo {
+  font-family: var(--serif);
+  font-weight: 800; font-size: 23px; letter-spacing: -.01em;
+  color: var(--accent-ink);
+}
 .standing { color: var(--muted); font-size: 13px; }
 .standing b { color: var(--ink); }
 
@@ -88,7 +98,7 @@ nav.tabs button {
   color: var(--muted); font: inherit; font-weight: 600; font-size: 14px;
   padding: 9px 12px; cursor: pointer; white-space: nowrap;
 }
-nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+nav.tabs button[aria-selected="true"] { color: var(--accent-ink); border-bottom-color: var(--accent); }
 
 h2 { font-size: 15px; margin: 26px 0 10px; letter-spacing: -.01em; }
 h2:first-child { margin-top: 18px; }
@@ -192,3 +202,6 @@ tr:last-child td { border-bottom: 0; }
 .agenda-item .t { font-weight: 600; font-size: 14px; }
 .agenda-item .d { font-size: 13px; color: var(--muted); }
 .empty { color: var(--faint); font-size: 13.5px; font-style: italic; padding: 10px 0; }
+
+/* Range sliders (the pot controls) pick up the leaf green rather than the OS blue. */
+input[type="range"] { accent-color: var(--accent); }

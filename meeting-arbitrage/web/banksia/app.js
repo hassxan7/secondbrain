@@ -13,6 +13,7 @@ import {
   settleWeek, resolveDisputes, resolveIssue, offenderTable, buildAgenda,
   describeIssueOutcome,
   formatMoney, DEFAULT_CHORE_CONFIG,
+  openPot, applyWeekFines, potState, distributePot, recommendPot,
 } from '../shared/engine.js';
 
 const TZ = 'Australia/Sydney';
@@ -58,6 +59,9 @@ const state = {
   issueAnswers: {},
   refixNote: null,
   veto: Object.fromEntries(HOUSE.map((p) => [p.id, { used: p.id === 'pete' ? 2 : 0, budget: 2 }])),
+  // The pot. Buy-in and fine are what the user tunes; distribution is how the
+  // surplus is shared when the period closes.
+  pot: { buyInCents: 4000, finePerMissedTaskCents: 500, distribution: 'split-clean' },
 };
 
 function mondayOf(date) {
@@ -513,6 +517,103 @@ function renderAll() {
   if (state.tab === 'chores') renderChores();
   if (state.tab === 'issues') renderIssues();
   if (state.tab === 'ledger') renderLedger();
+  if (state.tab === 'pot') renderPot();
+}
+
+/**
+ * The pot. Seeds each stake with the buy-in, deducts this week's fines from the
+ * chore ledger, and previews the end-of-period split — so the mechanic that
+ * makes a fine collectable-without-chasing is visible before it's deployed.
+ */
+function renderPot() {
+  const wrap = $('#panel-pot');
+  wrap.replaceChildren();
+
+  const cfg = state.pot;
+  const money = (cents) => `$${(cents / 100).toFixed(2)}`;
+
+  // Fines come straight from the chore board — same numbers as the Ledger tab.
+  const settlements = settleWeek({
+    weekOf: WEEK, participantIds: HOUSE.map((p) => p.id),
+    claims: state.claims, config: { ...CHORE_CONFIG, finePerMissedTaskCents: cfg.finePerMissedTaskCents },
+  });
+  const finesByMember = Object.fromEntries(settlements.map((s) => [s.participantId, s.fineCents]));
+
+  let stakes = openPot(HOUSE.map((p) => p.id), cfg);
+  stakes = applyWeekFines(stakes, finesByMember);
+  const state_ = potState(stakes);
+  const dist = distributePot(stakes, cfg);
+  const advice = recommendPot(cfg, CHORE_CONFIG.tasksRequired);
+
+  wrap.appendChild(el('h2', { text: 'The pot' }));
+  wrap.appendChild(el('p', { class: 'hint' },
+    'Everyone stakes a buy-in up front. Fines come out of the stake — nobody sends anyone '
+    + 'an invoice. What’s left is yours; the fines get shared out when the term closes.'));
+
+  // Controls: buy-in and fine, with the runway warning.
+  const controls = el('div', { class: 'card' }, [
+    el('div', { class: 'rows' }, [
+      potSlider('Buy-in per person', cfg.buyInCents, 1000, 30000, 1000, (v) => { cfg.buyInCents = v; renderPot(); }),
+      potSlider('Fine per task missed', cfg.finePerMissedTaskCents, 100, 10000, 100, (v) => { cfg.finePerMissedTaskCents = v; renderPot(); }),
+    ]),
+    el('div', {
+      class: `card ${advice.ok ? 'good' : 'bad'}`,
+      style: 'margin:10px 0 0',
+    }, [el('p', { text: advice.note })]),
+  ]);
+  wrap.appendChild(controls);
+
+  wrap.appendChild(el('h2', { text: `This week — pot holds ${money(state_.totalCents)}` }));
+  const people = el('div', { class: 'progress-people' });
+  for (const s of state_.stakes) {
+    const pct = Math.round((s.remainingCents / s.openingCents) * 100);
+    people.appendChild(el('div', { class: 'pp', 'data-short': s.clean ? null : '' }, [
+      el('span', { text: nameOf(s.memberId) }),
+      el('span', { class: 'track' }, el('i', { style: `width:${pct}%` })),
+      el('span', { class: 'n', text: s.overflowCents > 0 ? `-${money(s.overflowCents)}!` : money(s.remainingCents) }),
+    ]));
+  }
+  wrap.appendChild(people);
+
+  if (state_.overflows.length) {
+    wrap.appendChild(el('p', { class: 'hint' },
+      `${state_.overflows.map((o) => nameOf(o.memberId)).join(', ')} `
+      + `${state_.overflows.length === 1 ? 'has' : 'have'} been fined past the stake — that part is a real `
+      + `debt the pot can’t cover. This is exactly the case a $100 fine on a small buy-in creates.`));
+  }
+
+  wrap.appendChild(el('h2', { text: 'If the term closed now' }));
+  wrap.appendChild(el('div', { class: 'card good' }, [el('p', { text: dist.summary })]));
+  wrap.appendChild(el('div', { class: 'scroll-x' }, el('table', {}, [
+    el('thead', {}, el('tr', {}, [
+      el('th', { text: 'Who' }), el('th', { class: 'num', text: 'Stake back' }),
+      el('th', { class: 'num', text: 'Bonus' }), el('th', { class: 'num', text: 'Gets' }),
+    ])),
+    el('tbody', {}, dist.payouts.map((p) => el('tr', {}, [
+      el('td', { text: nameOf(p.memberId) }),
+      el('td', { class: 'num', text: money(p.stakeBackCents) }),
+      el('td', { class: 'num', text: p.bonusCents ? `+${money(p.bonusCents)}` : '—' }),
+      el('td', { class: 'num', text: money(p.totalCents) }),
+    ]))),
+  ])));
+
+  wrap.appendChild(el('p', { class: 'hint' },
+    'Distribution: fines go to whoever finished the week clean — the tidy housemates are '
+    + 'literally paid out of the messy ones, and no one had to ask for a cent. Switch it to a '
+    + 'house fund (a dinner, the bond) if that feels friendlier.'));
+}
+
+function potSlider(label, valueCents, minCents, maxCents, stepCents, onInput) {
+  const out = el('span', { class: 'v', text: `$${(valueCents / 100).toFixed(0)}` });
+  const input = el('input', {
+    type: 'range', min: String(minCents), max: String(maxCents), step: String(stepCents),
+    value: String(valueCents), style: 'width:140px',
+    oninput: (e) => onInput(Number(e.target.value)),
+  });
+  return el('div', { class: 'row' }, [
+    el('span', { class: 'k', text: label }),
+    el('span', { style: 'display:flex;align-items:center;gap:10px' }, [input, out]),
+  ]);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -46,3 +46,9 @@ export {
   settleWeek, resolveDisputes, resolveIssue, offenderTable, buildAgenda,
   describeIssueOutcome, formatMoney, DEFAULT_CHORE_CONFIG,
 } from './banksia/accountability.ts';
+
+export {
+  openPot, applyWeekFines, potState, distributePot, recommendPot,
+  DEFAULT_POT_CONFIG,
+} from './banksia/pot.ts';
+export type { PotConfig, Stake, StakeState, PotState, Distribution } from './banksia/pot.ts';
