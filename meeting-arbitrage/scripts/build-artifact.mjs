@@ -36,12 +36,22 @@ let app = readFileSync(join(root, 'web/ripple/app.js'), 'utf8');
 const page = readFileSync(join(root, 'web/ripple/index.html'), 'utf8');
 
 // Swap the ES import for a destructure off the IIFE global.
-const importRe = /^import\s*\{[\s\S]*?\}\s*from\s*['"][^'"]+['"];\s*$/m;
-if (!importRe.test(app)) throw new Error('could not find the engine import in app.js');
-app = app.replace(importRe, `const {
-  generateGrid, formatSlot, scoreSlots, SUBURBS, rankHubs,
-  mergeRippleEvents, rankActivities, buildItinerary, buildBrief, renderChatMessage,
-} = RippleEngine;`);
+//
+// The binding list is read out of the import itself rather than restated here.
+// A hardcoded list silently goes stale the moment app.js imports something new:
+// the build still succeeds, the standalone page throws on first render, and the
+// only symptom is a screen where nothing responds.
+const importRe = /^import\s*\{([\s\S]*?)\}\s*from\s*['"][^'"]+['"];\s*$/m;
+const importMatch = app.match(importRe);
+if (!importMatch) throw new Error('could not find the engine import in app.js');
+
+const bindings = importMatch[1]
+  .split(',')
+  .map((name) => name.trim())
+  .filter(Boolean);
+if (bindings.length === 0) throw new Error('engine import names nothing');
+
+app = app.replace(importRe, `const {\n  ${bindings.join(',\n  ')},\n} = RippleEngine;`);
 
 // Reuse the served markup so the two versions stay identical.
 const bodyMatch = page.match(/<body>([\s\S]*?)<\/body>/);
