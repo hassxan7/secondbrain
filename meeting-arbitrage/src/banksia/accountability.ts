@@ -296,6 +296,42 @@ export function resolveIssue(
   };
 }
 
+/**
+ * Render an issue outcome with real names, for the group chat or the UI.
+ *
+ * `resolveIssue` deals in participant ids because it is pure and has no name
+ * table. Callers previously regex-substituted ids inside the finished summary
+ * sentence, which only worked while ids happened not to collide with English
+ * words. This builds the sentence from the structured fields instead.
+ */
+export function describeIssueOutcome(
+  outcome: IssueOutcome, nameOf: (id: string) => string,
+): string {
+  const names = (ids: string[]) => ids.map(nameOf);
+
+  switch (outcome.status) {
+    case 'owned':
+      return `${nameOf(outcome.owners[0])} owned it. Closed, no meeting time needed.`;
+
+    case 'shared': {
+      const owners = names(outcome.owners);
+      const last = owners.pop();
+      return `${owners.join(', ')} and ${last} both owned it. Closed.`;
+    }
+
+    case 'no-owner':
+      return 'Everyone answered "not me". Going on the agenda as unresolved.';
+
+    case 'unresolved-silence':
+      if (outcome.silent.length === 0) {
+        const waiting = outcome.denied.length;
+        return `Still open. ${waiting} said not me.`;
+      }
+      return `Nobody owned this. Everyone answered except: `
+        + `${names(outcome.silent).join(', ')}. Going on the agenda.`;
+  }
+}
+
 /* ------------------------------------------------------------------ *
  * Repeat offenders and the agenda.
  * ------------------------------------------------------------------ */

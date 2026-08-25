@@ -32,5 +32,5 @@ export type { EventBrief } from './ripple/brief.ts';
 
 export {
   settleWeek, resolveDisputes, resolveIssue, offenderTable, buildAgenda,
-  formatMoney, DEFAULT_CHORE_CONFIG,
+  describeIssueOutcome, formatMoney, DEFAULT_CHORE_CONFIG,
 } from './banksia/accountability.ts';

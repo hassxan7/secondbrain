@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   settleWeek, resolveDisputes, resolveIssue, offenderTable, buildAgenda,
-  formatMoney, DEFAULT_CHORE_CONFIG,
+  describeIssueOutcome, formatMoney, DEFAULT_CHORE_CONFIG,
   type ChoreClaim, type ChoreConfig, type IssueResponse, type Issue,
 } from '../src/banksia/accountability.ts';
 
@@ -229,5 +229,75 @@ describe('offenderTable and agenda', () => {
     assert.ok(kinds.includes('repeat-offender'));
     assert.ok(kinds.includes('ledger'), 'the ledger is always read out');
     assert.match(agenda.find((a) => a.kind === 'dispute')!.title, /ROSS is contesting a \$20\.00 fine/);
+  });
+});
+
+describe('describeIssueOutcome', () => {
+  const NAMES: Record<string, string> = {
+    hassaan: 'Hassaan', isaac: 'Isaac', kez: 'Kez', ross: 'Ross',
+    eyong: 'Eyong', pete: 'Pete', manan: 'Manan',
+  };
+  const nameOf = (id: string) => NAMES[id] ?? id;
+
+  const issue: Issue = {
+    id: 'i1', raisedBy: 'hassaan', description: 'sink blocked',
+    createdAt: '2026-08-24T09:00:00Z', closesAt: '2026-08-24T21:00:00Z',
+  };
+  const AFTER = '2026-08-25T09:00:00Z';
+  const answer = (participantId: string, a: 'was-me' | 'not-me'): IssueResponse =>
+    ({ issueId: 'i1', participantId, answer: a, at: '2026-08-24T10:00:00Z' });
+
+  test('names a single owner', () => {
+    const out = resolveIssue(issue, [answer('pete', 'was-me')], HOUSE, AFTER);
+    assert.equal(describeIssueOutcome(out, nameOf), 'Pete owned it. Closed, no meeting time needed.');
+  });
+
+  test('names shared owners', () => {
+    const out = resolveIssue(issue, [answer('pete', 'was-me'), answer('ross', 'was-me')], HOUSE, AFTER);
+    const text = describeIssueOutcome(out, nameOf);
+    assert.match(text, /Ross and Pete both owned it/);
+  });
+
+  test('names everyone who stayed silent', () => {
+    const responses = ['isaac', 'kez', 'ross', 'eyong'].map((p) => answer(p, 'not-me'));
+    const out = resolveIssue(issue, responses, HOUSE, AFTER);
+    assert.equal(
+      describeIssueOutcome(out, nameOf),
+      'Nobody owned this. Everyone answered except: Pete, Manan. Going on the agenda.',
+    );
+  });
+
+  test('works with real ids that look nothing like words', () => {
+    // The previous implementation regex-substituted ids inside the finished
+    // sentence, which quietly broke for ids that are not lowercase words.
+    const ids = ['mem_9f2a10', 'mem_44bc01', 'mem_77de92'];
+    const table: Record<string, string> = {
+      mem_9f2a10: 'Hassaan', mem_44bc01: 'Pete', mem_77de92: 'Kez',
+    };
+    const out = resolveIssue(
+      { ...issue, raisedBy: 'mem_9f2a10' },
+      [{ issueId: 'i1', participantId: 'mem_44bc01', answer: 'was-me', at: 'x' }],
+      ids, AFTER,
+    );
+    assert.equal(describeIssueOutcome(out, (id) => table[id] ?? id),
+      'Pete owned it. Closed, no meeting time needed.');
+  });
+
+  test('every outcome status produces a sentence', () => {
+    const statuses = new Set<string>();
+    const cases = [
+      [answer('pete', 'was-me')],
+      [answer('pete', 'was-me'), answer('ross', 'was-me')],
+      HOUSE.filter((p) => p !== 'hassaan').map((p) => answer(p, 'not-me')),
+      [answer('kez', 'not-me')],
+    ];
+    for (const responses of cases) {
+      const out = resolveIssue(issue, responses, HOUSE, AFTER);
+      statuses.add(out.status);
+      const text = describeIssueOutcome(out, nameOf);
+      assert.ok(text.length > 0, `no sentence for ${out.status}`);
+      assert.ok(!/\bmem_|undefined/.test(text), `leaked an id: ${text}`);
+    }
+    assert.ok(statuses.size >= 3, 'exercised several statuses');
   });
 });

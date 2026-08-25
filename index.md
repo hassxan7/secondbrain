@@ -106,6 +106,7 @@ Curated pages distilling MEP knowledge for Civly product development. Only HIGH-
 | [[To-Do — Yash]] | Yash's list: AI BIM drafter, MEP generation, ML/data pipeline, research questions | 2026-06-18 |
 | [[Civly To-Do — Jun 2 to Jun 16]] | Historical master to-do (now split by owner) | 2026-06-18 |
 | [[NFC Review Cards — Surry Hills Target List]] | *(Non-Civly side hustle)* Curated door-knock list + walk route + pitch cheat-sheet for tap-to-review card sales | 2026-07-04 |
+| [[Meeting Arbitrage — Banksia & Ripple]] | Shared availability-arbitrage engine for the Banksia house meeting and Ripple hangout links; design decisions and limitations | 2026-08-25 |
 
 ---
 

@@ -164,3 +164,10 @@ Wiki scaffolded from Karpathy's LLM Wiki pattern (https://gist.github.com/karpat
 Vault: `C:\Users\hassa\OneDrive\Documents\Civly Brain`
 Structure: raw/, pages/entities/, pages/concepts/, pages/sources/, pages/analyses/
 CLAUDE.md, AGENTS.md, wiki.md, index.md, and log.md initialized.
+
+## [2026-08-25] build | Meeting arbitrage engine — Banksia & Ripple
+Built a shared availability-arbitrage engine serving two use cases: the Banksia house standing meeting with chore/fine accountability, and Ripple Social hangout-planning links. Cloudflare Workers + D1, WhatsApp group bot (whatsapp-web.js), Google Calendar free/busy, Google Places. 96 tests, tsc clean, engine is fully deterministic — no model decides a time or a fine.
+Key design: scheduling weight decreases with absenteeism; a declared recurring clash is free and permanent while ad-hoc excuses spend a budget; the fixed time has hysteresis; disputes are heard only from people at the meeting; silence on an issue poll gets named.
+Code: `meeting-arbitrage/` on branch `claude/banksia-meeting-arbitrage-odscrq`. Prototype published as an artifact.
+Pages touched: [[Meeting Arbitrage — Banksia & Ripple]], index.md.
+Open: need Ripple's real brand hexes from Isaac.

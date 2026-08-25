@@ -11,6 +11,7 @@ import {
   generateGrid, formatSlot, scoreSlots, recommendAnchor, evaluateRefix,
   collidesWithStandingConflict,
   settleWeek, resolveDisputes, resolveIssue, offenderTable, buildAgenda,
+  describeIssueOutcome,
   formatMoney, DEFAULT_CHORE_CONFIG,
 } from '../shared/engine.js';
 
@@ -435,10 +436,7 @@ function renderIssues() {
     class: `card ${issueOutcome.escalate ? 'bad' : 'good'}`,
   }, [
     el('h3', { text: issueOutcome.status.replace(/-/g, ' ') }),
-    el('p', {
-      text: issueOutcome.summary
-        .replace(/\b[a-z]+\b/g, (m) => (HOUSE.some((p) => p.id === m) ? nameOf(m) : m)),
-    }),
+    el('p', { text: describeIssueOutcome(issueOutcome, nameOf) }),
   ]));
 
   if (issueOutcome.silent.length) {

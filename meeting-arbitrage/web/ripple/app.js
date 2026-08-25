@@ -396,28 +396,34 @@ function renderResult() {
       el('i', { style: `width:${Math.round((chosenHeads / members.length) * 100)}%` }),
     ]),
     plan.timing.nonResponders.length
-      ? el('p', { class: 'why' }, [
-          raw(`${plan.timing.nonResponders.length} ${plan.timing.nonResponders.length === 1 ? 'person has' : 'people have'} `
-            + `not answered. A slot nobody confirms counts as a no, so chasing them can still change this.`),
-        ])
+      ? el('p', { class: 'why' },
+          `${plan.timing.nonResponders.length} `
+          + `${plan.timing.nonResponders.length === 1 ? 'person has' : 'people have'} not answered. `
+          + `A slot nobody confirms counts as a no, so chasing them can still change this.`)
       : null,
   ]);
   wrap.appendChild(timeCard);
 
   // Why this plan, and not the runner-up activity.
   const second = ranked.filter((r) => !itinerary.stops.some((s) => s.activity.id === r.activity.id))[0];
+  // Composed from nodes rather than an HTML string: activity labels come from
+  // the ripple_events table in production, and interpolating a database value
+  // into innerHTML is an injection waiting to happen.
   const why = el('div', { class: 'card' }, [
     el('p', { class: 'section-label', text: 'Why this' }),
     el('p', { class: 'why' }, [
-      raw(`Capped at <b>$${itinerary.budgetCeilingAud}</b> because that is the lowest budget among the `
-        + `${attending.length} people who can make it — not the average, so nobody is quietly priced out. `
-        + `<b>${hub.name}</b> won on travel across everyone actually coming.`),
+      'Capped at ',
+      el('b', { text: `$${itinerary.budgetCeilingAud}` }),
+      ` because that is the lowest budget among the ${attending.length} people who can `
+        + `make it — not the average, so nobody is quietly priced out. `,
+      el('b', { text: hub.name }),
+      ' won on travel across everyone actually coming.',
     ]),
     second ? el('p', { class: 'why' }, [
-      raw(second.pricedOut.length
-        ? `<b>${second.activity.label}</b> lost because it prices out `
-          + `${second.pricedOut.length} of the group.`
-        : `<b>${second.activity.label}</b> was the runner-up on votes.`),
+      el('b', { text: second.activity.label }),
+      second.pricedOut.length
+        ? ` lost because it prices out ${second.pricedOut.length} of the group.`
+        : ' was the runner-up on votes.',
     ]) : null,
   ]);
   wrap.appendChild(why);
@@ -462,12 +468,6 @@ function row(k, v) {
     el('span', { class: 'k', text: k }),
     el('span', { class: 'v', text: v }),
   ]);
-}
-
-function raw(html) {
-  const span = document.createElement('span');
-  span.innerHTML = html;
-  return span;
 }
 
 /* ── Nav gating ───────────────────────────────────────────────────────────── */

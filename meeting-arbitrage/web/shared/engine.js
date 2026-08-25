@@ -1239,6 +1239,26 @@ function resolveIssue(issue, responses, participantIds, now) {
     escalate: true
   };
 }
+function describeIssueOutcome(outcome, nameOf) {
+  const names = (ids) => ids.map(nameOf);
+  switch (outcome.status) {
+    case "owned":
+      return `${nameOf(outcome.owners[0])} owned it. Closed, no meeting time needed.`;
+    case "shared": {
+      const owners = names(outcome.owners);
+      const last = owners.pop();
+      return `${owners.join(", ")} and ${last} both owned it. Closed.`;
+    }
+    case "no-owner":
+      return 'Everyone answered "not me". Going on the agenda as unresolved.';
+    case "unresolved-silence":
+      if (outcome.silent.length === 0) {
+        const waiting = outcome.denied.length;
+        return `Still open. ${waiting} said not me.`;
+      }
+      return `Nobody owned this. Everyone answered except: ${names(outcome.silent).join(", ")}. Going on the agenda.`;
+  }
+}
 function offenderTable(args) {
   return args.participantIds.map((participantId) => {
     const ownedIssues = args.outcomes.filter((o) => o.owners.includes(participantId)).length;
@@ -1311,6 +1331,7 @@ export {
   buildItinerary,
   centroid,
   collidesWithStandingConflict,
+  describeIssueOutcome,
   estimateTravelMinutes,
   evaluateRefix,
   formatMoney,

@@ -17,7 +17,7 @@ import { generateGrid, formatSlot } from '../core/slots.ts';
 import { DEFAULT_CONFIG, type ArbitrageConfig, type AvailabilityValue } from '../core/types.ts';
 import {
   settleWeek, resolveDisputes, resolveIssue, offenderTable, buildAgenda,
-  formatMoney, DEFAULT_CHORE_CONFIG,
+  describeIssueOutcome, formatMoney, DEFAULT_CHORE_CONFIG,
   type ChoreClaim, type ChoreTask, type IssueResponse, type Dispute,
 } from './accountability.ts';
 
@@ -581,10 +581,12 @@ export async function closeIssue(env: Env, issueId: string): Promise<Response> {
     responses, Object.keys(names), new Date().toISOString(),
   );
 
+  const nameOf = (id: string) => names[id] ?? id;
   const readable = {
     ...outcome,
-    owners: outcome.owners.map((id) => names[id] ?? id),
-    silent: outcome.silent.map((id) => names[id] ?? id),
+    summary: describeIssueOutcome(outcome, nameOf),
+    owners: outcome.owners.map(nameOf),
+    silent: outcome.silent.map(nameOf),
   };
 
   await env.DB.prepare(
@@ -592,8 +594,7 @@ export async function closeIssue(env: Env, issueId: string): Promise<Response> {
   ).bind(JSON.stringify(outcome), issueId).run();
 
   await enqueue(env, issue.group_id, 'whatsapp', 'group',
-    `🧽 "${issue.description}"\n${readable.summary.replace(
-      /\b([a-z0-9_]+)\b/gi, (m) => names[m] ?? m)}`);
+    `🧽 "${issue.description}"\n${readable.summary}`);
 
   return json({ outcome: readable });
 }
