@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080C18">
+<title>Ripple — Plan a hangout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./app.css">
+</head>
+<body>
+
+<main class="phone">
+  <header class="top">
+    <span class="mark" aria-hidden="true">R</span>
+    <span class="wordmark">Ripple</span>
+    <span class="spacer"></span>
+    <span class="step-count" id="step-count"></span>
+  </header>
+  <div class="progress"><i id="progress-bar"></i></div>
+
+  <div class="screens">
+
+    <!-- 0 · Welcome -->
+    <section class="screen" data-active>
+      <p class="eyebrow">Making Sydney social</p>
+      <h1>Someone wants to hang.<br>When are you free?</h1>
+      <p class="sub">
+        Six questions, about forty seconds. We work out the time that suits the most
+        people, what you all actually want to do, and where that lands so nobody
+        does an hour each way.
+      </p>
+      <div class="card">
+        <div class="rows">
+          <div class="row"><span class="k">🗓️ Time</span><span class="v">Most people, not first reply</span></div>
+          <div class="row"><span class="k">🎯 Plan</span><span class="v">What the group voted for</span></div>
+          <div class="row"><span class="k">💸 Budget</span><span class="v">Set by the tightest wallet</span></div>
+          <div class="row"><span class="k">📍 Spot</span><span class="v">Fair travel for everyone</span></div>
+        </div>
+      </div>
+      <p class="demo-note">
+        Demo mode: five friends across Sydney have already answered. You are the
+        sixth, and the plan is computed by the real engine from whatever you enter.
+      </p>
+      <div class="actions">
+        <button class="btn" type="button" data-next id="next-0">Start</button>
+      </div>
+    </section>
+
+    <!-- 1 · Name -->
+    <section class="screen">
+      <p class="eyebrow">Step one</p>
+      <h1>What should we call you?</h1>
+      <p class="sub">Goes on the plan so people know who is coming.</p>
+      <input class="field" id="name-input" type="text" placeholder="Your name"
+             autocomplete="given-name" enterkeyhint="next" maxlength="40">
+      <div class="actions row">
+        <button class="btn ghost" type="button" data-back>Back</button>
+        <button class="btn" type="button" data-next id="next-1" disabled>Next</button>
+      </div>
+    </section>
+
+    <!-- 2 · Suburb -->
+    <section class="screen">
+      <p class="eyebrow">Step two</p>
+      <h1>Where do you come from?</h1>
+      <p class="sub">
+        Sydney is wide. This is how we stop picking a spot that is ten minutes for
+        four people and an hour for you.
+      </p>
+      <input class="field" id="suburb-search" type="search" placeholder="Search suburbs"
+             autocomplete="off" enterkeyhint="search">
+      <div class="suburb-list" id="suburb-list"></div>
+      <div class="actions row">
+        <button class="btn ghost" type="button" data-back>Back</button>
+        <button class="btn" type="button" data-next id="next-2" disabled>Next</button>
+      </div>
+    </section>
+
+    <!-- 3 · Budget -->
+    <section class="screen">
+      <p class="eyebrow">Step three</p>
+      <h1>What are you happy to spend?</h1>
+      <div class="budget-figure" id="budget-figure">$50</div>
+      <input type="range" id="budget-range" min="0" max="150" step="5" value="50"
+             aria-label="Budget per person in dollars">
+      <div class="budget-hint" id="budget-hint"></div>
+      <div class="actions row">
+        <button class="btn ghost" type="button" data-back>Back</button>
+        <button class="btn" type="button" data-next id="next-3">Next</button>
+      </div>
+    </section>
+
+    <!-- 4 · Vibe -->
+    <section class="screen">
+      <p class="eyebrow">Step four</p>
+      <h1>What are you up for?</h1>
+      <p class="sub" id="vibe-count">Pick anything you would say yes to</p>
+      <div id="vibe-list"></div>
+      <div class="actions row">
+        <button class="btn ghost" type="button" data-back>Back</button>
+        <button class="btn" type="button" data-next id="next-4" disabled>Next</button>
+      </div>
+    </section>
+
+    <!-- 5 · When -->
+    <section class="screen">
+      <p class="eyebrow">Step five</p>
+      <h1>When works?</h1>
+      <p class="sub" id="when-count">Tap the times that work</p>
+      <div class="grid-legend">
+        <span><i style="background:var(--gradient)"></i>Yes</span>
+        <span><i style="background:color-mix(in srgb, var(--brand-secondary) 40%, transparent)"></i>If needed</span>
+        <span><i style="background:var(--line-strong)"></i>No</span>
+        <span>Tap again to cycle</span>
+      </div>
+      <div id="when-grid"></div>
+      <div class="actions row">
+        <button class="btn ghost" type="button" data-back>Back</button>
+        <button class="btn" type="button" data-next id="next-5" disabled>See the plan</button>
+      </div>
+    </section>
+
+    <!-- 6 · Result -->
+    <section class="screen">
+      <p class="eyebrow">The plan</p>
+      <div id="result-body"></div>
+    </section>
+
+  </div>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

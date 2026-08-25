@@ -7,3 +7,4 @@ bot/.wwebjs_auth/
 bot/.wwebjs_cache/
 bot/session/
 *.log
+.drive.mjs
