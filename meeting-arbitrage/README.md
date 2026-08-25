@@ -142,9 +142,12 @@ generated from `web/ripple/` so it cannot drift from the deployed page.
   Half that gap is closed by venue density in `places.ts` (a clubbing plan finds
   nothing in Burwood); the other half needs the Google Directions API in place of
   `estimateTravelMinutes`.
-- **Ripple's brand colours are a placeholder.** ripplesocial.me was unreachable
-  from the build environment. All six hexes sit in one marked block at the top of
-  `web/ripple/app.css`; replacing them re-themes everything.
+- **The Ripple palette is sampled, not licensed.** Tokens were read pixel-by-pixel
+  off screenshots of the shipped iOS app — ground `#F2F1F6`, accent `#709ACC`,
+  semantics `#5DB359` / `#F19E49` — and sit in one marked block at the top of
+  `web/ripple/app.css`. Type is SF Pro on Apple hardware (what the app itself
+  uses) with Inter as the metric fallback, and Playfair Display for the wordmark,
+  which is a close stand-in rather than Ripple's actual logo face.
 - **Calendar screenshot parsing is not built.** Deferred in favour of Google
   Calendar free/busy, which is free, exact, and needs no vision model.
 - **Calendar tokens are stored as issued.** Fine for a share house. Encrypt them

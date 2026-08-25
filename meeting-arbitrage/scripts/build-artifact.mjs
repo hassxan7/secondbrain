@@ -50,10 +50,15 @@ const markup = bodyMatch[1]
   .replace(/\s*<script[\s\S]*?<\/script>/g, '')
   .trim();
 
+// Lift the font links straight out of the page, so a typeface change in
+// index.html cannot leave the standalone build silently rendering a fallback.
+const fontLinks = [...page.matchAll(/<link[^>]*fonts\.(?:googleapis|gstatic)\.com[^>]*>/g)]
+  .map((m) => m[0])
+  .join('\n');
+if (!fontLinks) throw new Error('no Google Fonts links found in index.html');
+
 const html = `<title>Ripple Hangout Planner</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+${fontLinks}
 <style>
 ${css}
 </style>

@@ -125,6 +125,8 @@ function go(step) {
   });
 
   $('#progress-bar').style.width = `${(state.step / (STEPS.length - 1)) * 100}%`;
+  const onQuestion = state.step > 0 && state.step < STEPS.length - 1;
+  $('.progress').toggleAttribute('data-hidden', !onQuestion);
   // Only the question screens are numbered — the welcome and the result are not
   // steps you are "on N of" and counting them produced "6 of 5".
   const lastQuestion = STEPS.length - 2;
@@ -372,7 +374,7 @@ function renderResult() {
   for (const name of brief.attendees) people.appendChild(el('span', { class: 'pill', text: name }));
   for (const name of brief.absent) people.appendChild(el('span', { class: 'pill out', text: name }));
   wrap.appendChild(el('div', { class: 'card' }, [
-    el('p', { class: 'section-label', text: `${brief.attendees.length} of ${members.length} in` }),
+    el('p', { class: 'section-label', text: `Guest list · ${brief.attendees.length} of ${members.length} in` }),
     people,
   ]));
 

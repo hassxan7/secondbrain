@@ -49,7 +49,7 @@ The itinerary ceiling is the **minimum** budget among attendees, not the average
 ## Limitations
 
 - **Straight-line distance, not rail topology.** A spread-out Sydney group scores best around Burwood/Strathfield — genuinely the geographic middle, though such groups usually end up in the city. Half the gap closes via venue density (a clubbing plan finds nothing in Burwood); the other half needs the Google Directions API.
-- **Ripple's brand colours are a placeholder** — ripplesocial.me was unreachable from the build environment. All six hexes sit in one marked block. **Open action: get the real palette from Isaac.**
+- **Ripple's palette is sampled from screenshots of the shipped app**, not from a brand file: ground `#F2F1F6`, accent `#709ACC`, semantics `#5DB359` / `#F19E49`, serif wordmark, SF Pro body. Close enough to read as Ripple; the wordmark face is a stand-in. **Open action: get the real logo font and any brand file from Isaac.**
 - **`whatsapp-web.js` is unofficial** and against WhatsApp's terms; the bot account can be banned. Use a spare number. The official Cloud API cannot post to groups at all, which is the only reason this path exists.
 - **Calendar screenshot parsing was dropped** in favour of Google Calendar free/busy — free, exact, and no vision model.
 - Cost estimates are static; enough to keep a plan inside a budget, not enough to quote.
