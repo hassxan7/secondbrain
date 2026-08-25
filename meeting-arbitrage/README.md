@@ -111,6 +111,13 @@ BANKSIA_GROUP_ID=... node index.js
 Scan the QR code. Send `!whereami` in the group to get its chat id, then set
 `WHATSAPP_CHAT_ID` and restart.
 
+Put each housemate's number on their `members.phone` row in international
+format (`+61400000000`) — that is how a reply in the group chat gets matched to
+a person. An answer from a number that is not on file is *not* dropped: it comes
+back as `needsLink`, and the bot tells the sender their answer has not counted
+yet. Silently discarding a real answer would be the worst possible failure in a
+system that names people for not answering.
+
 > **whatsapp-web.js is unofficial.** It drives a real WhatsApp Web session, and
 > automating an account is against WhatsApp's terms of service — the account can
 > be banned. Use a spare number, keep the volume low (this bot sends a handful of

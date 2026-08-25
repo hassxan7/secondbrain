@@ -263,24 +263,32 @@ route('POST', '/api/bot/inbox', async (request, env) => {
     : null;
 
   let handledAs: string | null = null;
+  let needsLink = false;
 
   const answer = /^(was me|wasme|it was me|yeah that was me|my bad)$/.test(text) ? 'was-me'
     : /^(not me|notme|wasn'?t me|nah not me)$/.test(text) ? 'not-me'
     : null;
 
-  if (answer && member) {
+  if (answer) {
     const issue = await env.DB.prepare(
       `SELECT id FROM issues WHERE group_id = ? AND status = 'open'
         ORDER BY created_at DESC LIMIT 1`,
     ).bind(body.groupId).first<{ id: string }>();
 
-    if (issue) {
+    if (issue && member) {
       await env.DB.prepare(
         `INSERT INTO issue_responses (issue_id, member_id, answer) VALUES (?, ?, ?)
          ON CONFLICT(issue_id, member_id) DO UPDATE SET
            answer = excluded.answer, answered_at = datetime('now')`,
       ).bind(issue.id, member.id, answer).run();
       handledAs = `issue:${issue.id}:${answer}`;
+    } else if (issue && !member) {
+      // Somebody answered but their number is not on any member row, usually
+      // because it was never filled in. Dropping this silently is the worst
+      // possible outcome for a system whose whole point is that silence costs
+      // something: they would be named for not answering when they did.
+      handledAs = `unlinked-sender:${answer}`;
+      needsLink = true;
     }
   }
 
@@ -289,7 +297,7 @@ route('POST', '/api/bot/inbox', async (request, env) => {
      VALUES (?, ?, ?, ?, ?, ?)`,
   ).bind(newId('in'), body.groupId, member?.id ?? null, body.from ?? '', body.body, handledAs).run();
 
-  return json({ ok: true, handledAs });
+  return json({ ok: true, handledAs, needsLink });
 });
 
 /* ── Dispatch ─────────────────────────────────────────────────────────────── */

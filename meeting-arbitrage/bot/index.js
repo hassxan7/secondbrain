@@ -191,6 +191,13 @@ client.on('message', async (message) => {
 
     if (result.handledAs?.startsWith('issue:')) {
       await message.react('✅');
+    } else if (result.needsLink) {
+      // Never let a real answer vanish because a phone number was not on file.
+      await message.reply(
+        'Got that, but I don\u2019t know which housemate this number belongs to, '
+        + 'so it has not been counted yet. Open '
+        + `${CONFIG.apiBase}/h/${CONFIG.groupId} once and it will link up.`,
+      );
     }
   } catch (error) {
     console.error('inbound failed:', error.message);
