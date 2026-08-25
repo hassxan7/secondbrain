@@ -12,7 +12,7 @@
  */
 
 import type {
-  ArbitrageConfig, AvailabilityValue, Participant, ResponseMap, Slot,
+  ArbitrageConfig, AvailabilityValue, Participant, ResponseMap, Slot, WeeklyPattern,
 } from './types.ts';
 import { DEFAULT_CONFIG } from './types.ts';
 import { localParts } from './slots.ts';
@@ -21,12 +21,7 @@ const WEEKDAY_NAMES = [
   'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday',
 ];
 
-export interface WeeklyPattern {
-  /** 0 = Sunday .. 6 = Saturday, in the group's timezone. */
-  weekday: number;
-  /** Local start time, `HH:MM`. */
-  time: string;
-}
+export type { WeeklyPattern };
 
 export interface AnchorCandidate {
   pattern: WeeklyPattern;

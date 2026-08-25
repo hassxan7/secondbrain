@@ -1,0 +1,29 @@
+name = "meeting-arbitrage"
+main = "src/index.ts"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "arbitrage"
+# Replace with the id printed by: wrangler d1 create arbitrage
+database_id = "REPLACE_ME"
+
+[assets]
+directory = "web"
+binding = "ASSETS"
+
+# Nudges, poll closing, and weekly settlement. Times are UTC.
+# 08:00 UTC = 6pm Sydney (AEST) / 7pm (AEDT).
+[triggers]
+crons = ["0 8 * * *", "0 23 * * 0"]
+
+[vars]
+DEFAULT_TIMEZONE = "Australia/Sydney"
+
+# Secrets — set with `wrangler secret put <NAME>`, never in this file:
+#   GOOGLE_PLACES_KEY    optional, live venue search
+#   ANTHROPIC_API_KEY    optional, event-brief prose
+#   GOOGLE_OAUTH_ID      optional, calendar free/busy sync
+#   GOOGLE_OAUTH_SECRET  optional
+#   BOT_TOKEN            required, shared secret for the WhatsApp bot

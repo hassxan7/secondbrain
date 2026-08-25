@@ -52,11 +52,25 @@ export interface Participant {
 /** responses[participantId][slotId] — absent keys mean "did not answer". */
 export type ResponseMap = Record<string, Record<string, AvailabilityValue>>;
 
+/**
+ * A recurring weekly slot, e.g. `{ weekday: 1, time: '19:30' }` for Monday
+ * 7:30pm. Lives here rather than in anchor.ts because a group's persisted
+ * settings carry one, and types.ts must not import from anchor.ts.
+ */
+export interface WeeklyPattern {
+  /** 0 = Sunday .. 6 = Saturday, in the group's timezone. */
+  weekday: number;
+  /** Local start time, `HH:MM`. */
+  time: string;
+}
+
 export interface ArbitrageConfig {
   /** Minimum heads (yes + ifneed) for a slot to be viable at all. */
   quorum: number;
-  /** The incumbent fixed slot, if one is already set. */
+  /** The incumbent fixed slot for this round, if one is already set. */
   anchorSlotId?: string;
+  /** The standing weekly pattern in force, independent of any dated slot. */
+  anchorPattern?: WeeklyPattern;
   /**
    * Stability bonus, in person-units, granted to the incumbent slot.
    * This is deliberate hysteresis: a recurring meeting that drifts every week
