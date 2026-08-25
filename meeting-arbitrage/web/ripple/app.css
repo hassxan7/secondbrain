@@ -296,7 +296,7 @@ input[type="range"]::-moz-range-thumb {
 .section-label {
   font-size: 12px; font-weight: 700; letter-spacing: .08em;
   text-transform: uppercase; color: var(--faint);
-  margin: 4px 0 -4px;
+  margin: 4px 0 0;
 }
 
 /* ── Availability grid ───────────────────────────────────────────────────── */
@@ -329,20 +329,31 @@ input[type="range"]::-moz-range-thumb {
 
 /* ── Results / brief ─────────────────────────────────────────────────────── */
 
+/* Cards space their children with gap rather than per-child margins. The
+   previous version leaned on a negative margin-bottom on .section-label to
+   tighten it against a following grid, which collided with the first row of
+   any card whose body was a .rows list. */
 .card {
   background: var(--brand-surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 17px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
 }
+.card > h3,
+.card > p,
+.card > .section-label { margin: 0; }
 .card.hero {
   background: linear-gradient(150deg,
     color-mix(in srgb, var(--brand-primary) 22%, var(--brand-surface)),
     var(--brand-surface));
   border-color: color-mix(in srgb, var(--brand-primary) 40%, transparent);
 }
-.card h3 { margin: 0 0 4px; font-size: 19px; letter-spacing: -.02em; }
+.card h3 { margin: 0; font-size: 19px; letter-spacing: -.02em; }
 .card .meta { color: var(--muted); font-size: 13px; margin: 0; }
+.card.hero { gap: 4px; }
 
 .stops { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
 .stop {

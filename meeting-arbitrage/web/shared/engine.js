@@ -913,27 +913,50 @@ function rankActivities(attendees, catalogue = ACTIVITIES, config = DEFAULT_HANG
 }
 function buildItinerary(ranked, attendees, config = DEFAULT_HANGOUT_CONFIG) {
   const ceiling = attendees.length ? Math.min(...attendees.map((m) => m.budgetAud)) : 0;
-  const stops = [];
-  const usedCategories = /* @__PURE__ */ new Set();
-  let spend = 0;
-  for (const outcome of ranked) {
-    if (stops.length >= config.maxStops)
-      break;
-    if (outcome.approvals.length === 0)
-      continue;
-    if (usedCategories.has(outcome.activity.category))
-      continue;
-    if (spend + outcome.activity.estCostAud > ceiling)
-      continue;
-    stops.push({
-      activity: outcome.activity,
-      approvals: outcome.approvals,
-      estCostAud: outcome.activity.estCostAud
-    });
-    usedCategories.add(outcome.activity.category);
-    spend += outcome.activity.estCostAud;
+  const affordable = ranked.filter(
+    (o) => o.approvals.length > 0 && o.activity.estCostAud <= ceiling
+  );
+  const byCategory = /* @__PURE__ */ new Map();
+  for (const outcome of affordable) {
+    const held = byCategory.get(outcome.activity.category);
+    if (!held || outcome.score > held.score)
+      byCategory.set(outcome.activity.category, outcome);
   }
+  const candidates = [...byCategory.values()];
+  const combinations = [];
+  const walk = (start, picks) => {
+    if (picks.length > 0)
+      combinations.push([...picks]);
+    if (picks.length >= config.maxStops)
+      return;
+    for (let i = start; i < candidates.length; i++) {
+      picks.push(candidates[i]);
+      walk(i + 1, picks);
+      picks.pop();
+    }
+  };
+  walk(0, []);
+  const costOf = (picks) => picks.reduce((sum, p) => sum + p.activity.estCostAud, 0);
+  const approvalsOf = (picks) => picks.reduce((sum, p) => sum + p.approvals.length, 0);
+  const chosen = combinations.filter((picks) => costOf(picks) <= ceiling).reduce((bestSoFar, picks) => {
+    if (bestSoFar.length === 0)
+      return picks;
+    const a = approvalsOf(picks);
+    const b = approvalsOf(bestSoFar);
+    if (a !== b)
+      return a > b ? picks : bestSoFar;
+    if (picks.length !== bestSoFar.length) {
+      return picks.length > bestSoFar.length ? picks : bestSoFar;
+    }
+    return costOf(picks) < costOf(bestSoFar) ? picks : bestSoFar;
+  }, []);
+  const stops = chosen.map((outcome) => ({
+    activity: outcome.activity,
+    approvals: outcome.approvals,
+    estCostAud: outcome.activity.estCostAud
+  }));
   stops.sort((a, b) => a.activity.sequenceRank - b.activity.sequenceRank);
+  const spend = stops.reduce((sum, s) => sum + s.estCostAud, 0);
   const totalMins = stops.reduce((sum, s) => sum + s.activity.durationMins, 0);
   const pricedOut = attendees.filter((m) => m.budgetAud < spend).map((m) => m.id);
   return {

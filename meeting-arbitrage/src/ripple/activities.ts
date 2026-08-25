@@ -223,12 +223,20 @@ export interface Itinerary {
 }
 
 /**
- * Chain the top-approved activities into a night that fits the tightest budget.
+ * Chain activities into the best night that fits the tightest budget.
  *
  * The ceiling is the *minimum* budget among attendees, not the average. Using
  * an average silently prices out whoever is broke this fortnight, which is the
  * exact failure this is meant to prevent. One stop per category so the night
  * has a shape, ordered by `sequenceRank` so food lands before the club.
+ *
+ * Chosen by search rather than greedily. Taking the highest-scoring activity
+ * first and then whatever still fits is provably worse: on a $40 ceiling it
+ * takes a $28 dinner four people voted for and then nothing else fits, when a
+ * $15 and a $20 stop would have fit and carried six votes between them. The
+ * candidate set is small (one activity per category, a handful of categories),
+ * so an exhaustive search over combinations is cheap and always finds the
+ * night with the most approvals the group can actually afford.
  */
 export function buildItinerary(
   ranked: ActivityOutcome[],
@@ -239,27 +247,63 @@ export function buildItinerary(
     ? Math.min(...attendees.map((m) => m.budgetAud))
     : 0;
 
-  const stops: ItineraryStop[] = [];
-  const usedCategories = new Set<ActivityCategory>();
-  let spend = 0;
+  // Only activities somebody actually wants and the group can afford at all.
+  const affordable = ranked.filter(
+    (o) => o.approvals.length > 0 && o.activity.estCostAud <= ceiling,
+  );
 
-  for (const outcome of ranked) {
-    if (stops.length >= config.maxStops) break;
-    if (outcome.approvals.length === 0) continue;
-    if (usedCategories.has(outcome.activity.category)) continue;
-    if (spend + outcome.activity.estCostAud > ceiling) continue;
-
-    stops.push({
-      activity: outcome.activity,
-      approvals: outcome.approvals,
-      estCostAud: outcome.activity.estCostAud,
-    });
-    usedCategories.add(outcome.activity.category);
-    spend += outcome.activity.estCostAud;
+  // Keep the strongest candidate per category — two dinners is not a night out,
+  // and this collapses the search space to a handful of options.
+  const byCategory = new Map<ActivityCategory, ActivityOutcome>();
+  for (const outcome of affordable) {
+    const held = byCategory.get(outcome.activity.category);
+    if (!held || outcome.score > held.score) byCategory.set(outcome.activity.category, outcome);
   }
+  const candidates = [...byCategory.values()];
+
+  // Enumerate every combination of up to maxStops candidates. One candidate per
+  // category caps this at a few dozen combinations, so exhaustive is free.
+  const combinations: ActivityOutcome[][] = [];
+  const walk = (start: number, picks: ActivityOutcome[]) => {
+    if (picks.length > 0) combinations.push([...picks]);
+    if (picks.length >= config.maxStops) return;
+    for (let i = start; i < candidates.length; i++) {
+      picks.push(candidates[i]);
+      walk(i + 1, picks);
+      picks.pop();
+    }
+  };
+  walk(0, []);
+
+  const costOf = (picks: ActivityOutcome[]) =>
+    picks.reduce((sum, p) => sum + p.activity.estCostAud, 0);
+  // Approvals summed per stop: a night of two things two people each wanted
+  // beats one thing three people wanted.
+  const approvalsOf = (picks: ActivityOutcome[]) =>
+    picks.reduce((sum, p) => sum + p.approvals.length, 0);
+
+  const chosen = combinations
+    .filter((picks) => costOf(picks) <= ceiling)
+    .reduce<ActivityOutcome[]>((bestSoFar, picks) => {
+      if (bestSoFar.length === 0) return picks;
+      const a = approvalsOf(picks);
+      const b = approvalsOf(bestSoFar);
+      if (a !== b) return a > b ? picks : bestSoFar;
+      // Same enthusiasm: prefer more stops, then the cheaper night.
+      if (picks.length !== bestSoFar.length) {
+        return picks.length > bestSoFar.length ? picks : bestSoFar;
+      }
+      return costOf(picks) < costOf(bestSoFar) ? picks : bestSoFar;
+    }, []);
+  const stops: ItineraryStop[] = chosen.map((outcome) => ({
+    activity: outcome.activity,
+    approvals: outcome.approvals,
+    estCostAud: outcome.activity.estCostAud,
+  }));
 
   stops.sort((a, b) => a.activity.sequenceRank - b.activity.sequenceRank);
 
+  const spend = stops.reduce((sum, s) => sum + s.estCostAud, 0);
   const totalMins = stops.reduce((sum, s) => sum + s.activity.durationMins, 0);
   const pricedOut = attendees.filter((m) => m.budgetAud < spend).map((m) => m.id);
 

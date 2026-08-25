@@ -277,9 +277,18 @@ function renderWhen() {
 /* ── The actual arbitration ───────────────────────────────────────────────── */
 
 function computePlan() {
+  // Distinguish the viewer when their name matches someone already answering,
+  // otherwise the attendee list shows the same name twice and reads as a bug.
+  const entered = (state.name || 'You').trim();
+  const collides = DEMO_FRIENDS.some(
+    (f) => f.name.toLowerCase() === entered.toLowerCase(),
+  );
   const me = {
-    id: 'you', name: state.name || 'You', suburb: state.suburb,
-    budgetAud: state.budget, approvals: [...state.approvals],
+    id: 'you',
+    name: collides ? `${entered} (you)` : entered,
+    suburb: state.suburb,
+    budgetAud: state.budget,
+    approvals: [...state.approvals],
   };
   const members = [...DEMO_FRIENDS, me];
 
@@ -383,11 +392,11 @@ function renderResult() {
           )
         : null,
     ].filter(Boolean)),
-    el('div', { class: 'bar', style: 'margin-top:10px' }, [
+    el('div', { class: 'bar' }, [
       el('i', { style: `width:${Math.round((chosenHeads / members.length) * 100)}%` }),
     ]),
     plan.timing.nonResponders.length
-      ? el('p', { class: 'why', style: 'margin-top:10px' }, [
+      ? el('p', { class: 'why' }, [
           raw(`${plan.timing.nonResponders.length} ${plan.timing.nonResponders.length === 1 ? 'person has' : 'people have'} `
             + `not answered. A slot nobody confirms counts as a no, so chasing them can still change this.`),
         ])
@@ -404,7 +413,7 @@ function renderResult() {
         + `${attending.length} people who can make it — not the average, so nobody is quietly priced out. `
         + `<b>${hub.name}</b> won on travel across everyone actually coming.`),
     ]),
-    second ? el('p', { class: 'why', style: 'margin-top:10px' }, [
+    second ? el('p', { class: 'why' }, [
       raw(second.pricedOut.length
         ? `<b>${second.activity.label}</b> lost because it prices out `
           + `${second.pricedOut.length} of the group.`

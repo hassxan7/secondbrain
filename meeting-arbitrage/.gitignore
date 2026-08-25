@@ -9,3 +9,4 @@ bot/session/
 *.log
 .drive.mjs
 .drive-banksia.mjs
+.drive-artifact.mjs

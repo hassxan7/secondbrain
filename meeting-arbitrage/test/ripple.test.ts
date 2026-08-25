@@ -212,6 +212,43 @@ describe('itinerary — multiple stops, tightest budget wins', () => {
     assert.equal(new Set(categories).size, categories.length);
   });
 
+  test('searches combinations rather than taking the best thing first', () => {
+    // The greedy failure case, concretely. Ceiling is $40. Casual eats ($28,
+    // food) is the single most-approved option, but taking it leaves $12 and
+    // nothing else fits. Pool ($15, games) plus trivia ($25, drinks) costs
+    // exactly $40 and carries six votes against four. Greedy returns one stop;
+    // the search returns two. The three must sit in different categories, or
+    // the one-per-category rule decides it before budget ever gets a say.
+    const group: HangoutMember[] = [
+      member('a', 'newtown', 40, ['eats-casual', 'pool', 'trivia']),
+      member('b', 'redfern', 40, ['eats-casual', 'pool', 'trivia']),
+      member('c', 'glebe', 40, ['eats-casual', 'pool', 'trivia']),
+      member('d', 'enmore', 40, ['eats-casual']),
+    ];
+
+    const it = buildItinerary(rankActivities(group), group);
+    const ids = it.stops.map((s) => s.activity.id);
+
+    assert.ok(it.stops.length >= 2, `expected a multi-stop night, got ${it.summary}`);
+    assert.ok(it.totalCostAud <= 40, 'still inside the ceiling');
+
+    const greedyApprovals = 4;                       // casual eats alone
+    const chosenApprovals = it.stops.reduce((sum, s) => sum + s.approvals.length, 0);
+    assert.ok(chosenApprovals > greedyApprovals,
+      `search should beat greedy on approvals, got ${chosenApprovals} from ${ids.join('+')}`);
+  });
+
+  test('never exceeds the ceiling just to add another stop', () => {
+    const group: HangoutMember[] = [
+      member('a', 'newtown', 30, ['eats-casual', 'pool', 'clubbing', 'cocktails']),
+      member('b', 'redfern', 30, ['eats-casual', 'pool', 'clubbing', 'cocktails']),
+      member('c', 'glebe', 30, ['eats-casual', 'pool', 'clubbing', 'cocktails']),
+    ];
+    const it = buildItinerary(rankActivities(group), group);
+    assert.ok(it.totalCostAud <= 30, `spent $${it.totalCostAud} against a $30 cap`);
+    assert.deepEqual(it.pricedOut, []);
+  });
+
   test('raising the tightest budget genuinely unlocks a bigger night', () => {
     const richer = attendees.map((m) => ({ ...m, budgetAud: 120 }));
     const before = buildItinerary(rankActivities(attendees), attendees);
