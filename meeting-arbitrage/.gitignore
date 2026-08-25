@@ -1,0 +1,9 @@
+node_modules/
+.wrangler/
+.dev.vars
+dist/
+# whatsapp-web.js session — contains a live login to the bot's WhatsApp account
+bot/.wwebjs_auth/
+bot/.wwebjs_cache/
+bot/session/
+*.log

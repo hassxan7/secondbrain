@@ -1,0 +1,19 @@
+{
+  "name": "meeting-arbitrage",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Multi-person availability arbitrage. Powers the Banksia house meeting and Ripple Social hangout planning.",
+  "engines": { "node": ">=22.18" },
+  "scripts": {
+    "test": "node --test test/*.test.ts",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:local": "wrangler d1 execute arbitrage --local --file=./schema.sql",
+    "db:remote": "wrangler d1 execute arbitrage --remote --file=./schema.sql",
+    "bot": "node bot/index.js"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  }
+}
