@@ -8,8 +8,11 @@
 
 import {
   type Env, json, notFound, badRequest, unauthorized, newId, weekOf, enqueue,
-  loadMemberNames,
+  loadMemberNames, memberFromToken, getPoll, slotsOf,
 } from './db.ts';
+import {
+  buildAuthUrl, exchangeCode, refreshAccessToken, fetchBusy, suggestFromBusy,
+} from './integrations/google-calendar.ts';
 import * as banksia from './banksia/routes.ts';
 import * as ripple from './ripple/routes.ts';
 
@@ -91,6 +94,120 @@ route('POST', '/api/ripple/hangouts/:pollId/join', (req, env, _ctx, [pollId]) =>
 
 route('POST', '/api/ripple/hangouts/:pollId/lock', (req, env, _ctx, [pollId]) =>
   ripple.lockHangout(req, env, pollId));
+
+/* ── Google Calendar (optional) ───────────────────────────────────────────── */
+
+function oauthConfig(env: Env, request: Request) {
+  if (!env.GOOGLE_OAUTH_ID || !env.GOOGLE_OAUTH_SECRET) return null;
+  return {
+    clientId: env.GOOGLE_OAUTH_ID,
+    clientSecret: env.GOOGLE_OAUTH_SECRET,
+    redirectUri: new URL('/api/calendar/callback', request.url).toString(),
+  };
+}
+
+route('GET', '/api/calendar/connect', async (request, env) => {
+  const config = oauthConfig(env, request);
+  if (!config) return badRequest('calendar sync is not configured on this deployment');
+
+  const token = new URL(request.url).searchParams.get('token');
+  if (!token) return badRequest('missing token');
+  if (!await memberFromToken(env, token)) return unauthorized();
+
+  // The share-link token doubles as the OAuth state, so the callback knows who
+  // came back without a session cookie.
+  return Response.redirect(buildAuthUrl(config, token), 302);
+});
+
+route('GET', '/api/calendar/callback', async (request, env) => {
+  const config = oauthConfig(env, request);
+  if (!config) return badRequest('calendar sync is not configured');
+
+  const url = new URL(request.url);
+  const code = url.searchParams.get('code');
+  const state = url.searchParams.get('state');
+  if (!code || !state) return badRequest('missing code or state');
+
+  const identity = await memberFromToken(env, state);
+  if (!identity) return unauthorized('that link expired mid-connect — open it again');
+
+  try {
+    const tokens = await exchangeCode(config, code);
+    await env.DB.prepare(
+      `INSERT INTO calendar_tokens (member_id, access_token, refresh_token, expires_at)
+       VALUES (?, ?, ?, ?)
+       ON CONFLICT(member_id) DO UPDATE SET
+         access_token = excluded.access_token,
+         refresh_token = COALESCE(excluded.refresh_token, calendar_tokens.refresh_token),
+         expires_at = excluded.expires_at`,
+    ).bind(
+      identity.memberId, tokens.accessToken, tokens.refreshToken ?? null, tokens.expiresAt,
+    ).run();
+  } catch (error) {
+    console.error('calendar connect failed', error);
+    return json({ error: 'could not connect that calendar' }, 502);
+  }
+
+  return Response.redirect(new URL('/?calendar=connected', request.url).toString(), 302);
+});
+
+/**
+ * GET /api/calendar/suggest/:pollId — prefill suggestions for one person.
+ *
+ * Returns `no` for clashing slots and nothing for free ones. Never `yes`: an
+ * empty calendar is not consent to be booked.
+ */
+route('GET', '/api/calendar/suggest/:pollId', async (request, env, _ctx, [pollId]) => {
+  const config = oauthConfig(env, request);
+  const token = new URL(request.url).searchParams.get('token');
+  if (!token) return badRequest('missing token');
+
+  const identity = await memberFromToken(env, token);
+  if (!identity) return unauthorized();
+  if (!config) return json({ suggestions: {}, connected: false });
+
+  const stored = await env.DB.prepare(
+    'SELECT access_token, refresh_token, expires_at FROM calendar_tokens WHERE member_id = ?',
+  ).bind(identity.memberId).first<{
+    access_token: string; refresh_token: string | null; expires_at: string;
+  }>();
+  if (!stored) return json({ suggestions: {}, connected: false });
+
+  const poll = await getPoll(env, pollId);
+  if (!poll) return notFound('no such poll');
+
+  let accessToken = stored.access_token;
+  if (Date.parse(stored.expires_at) <= Date.now()) {
+    if (!stored.refresh_token) return json({ suggestions: {}, connected: false, expired: true });
+    try {
+      const refreshed = await refreshAccessToken(config, stored.refresh_token);
+      accessToken = refreshed.accessToken;
+      await env.DB.prepare(
+        'UPDATE calendar_tokens SET access_token = ?, expires_at = ? WHERE member_id = ?',
+      ).bind(refreshed.accessToken, refreshed.expiresAt, identity.memberId).run();
+    } catch {
+      return json({ suggestions: {}, connected: false, expired: true });
+    }
+  }
+
+  const slots = slotsOf(poll);
+  if (slots.length === 0) return json({ suggestions: {}, connected: true });
+
+  const starts = slots.map((s) => Date.parse(s.startUtc));
+  const timeMin = new Date(Math.min(...starts)).toISOString();
+  const timeMax = new Date(
+    Math.max(...starts) + slots[0].durationMins * 60_000,
+  ).toISOString();
+
+  try {
+    const busy = await fetchBusy(accessToken, timeMin, timeMax);
+    return json({ suggestions: suggestFromBusy(slots, busy), connected: true });
+  } catch (error) {
+    console.error('freeBusy failed', error);
+    // A calendar outage must not block someone answering by hand.
+    return json({ suggestions: {}, connected: true, error: 'calendar unavailable' });
+  }
+});
 
 /* ── Bot queue ────────────────────────────────────────────────────────────── */
 

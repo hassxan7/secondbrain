@@ -231,3 +231,15 @@ CREATE TABLE IF NOT EXISTS inbox (
   handled_as  TEXT,
   received_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- ── Optional Google Calendar connection ──────────────────────────────────────
+-- Free/busy scope only. Tokens are stored as issued; if you run this for a
+-- group beyond a share house, encrypt them at rest or move them to a KV
+-- namespace with restricted bindings.
+CREATE TABLE IF NOT EXISTS calendar_tokens (
+  member_id     TEXT PRIMARY KEY REFERENCES members(id) ON DELETE CASCADE,
+  access_token  TEXT NOT NULL,
+  refresh_token TEXT,
+  expires_at    TEXT NOT NULL,
+  connected_at  TEXT NOT NULL DEFAULT (datetime('now'))
+);
