@@ -8,3 +8,4 @@ bot/.wwebjs_cache/
 bot/session/
 *.log
 .drive.mjs
+.drive-banksia.mjs

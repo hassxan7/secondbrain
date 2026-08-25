@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Banksia — house</title>
+<link rel="stylesheet" href="./app.css">
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-inner">
+    <span class="logo">Banksia</span>
+    <span class="standing" id="standing"></span>
+  </div>
+  <nav class="tabs">
+    <button data-tab="meeting" aria-selected="true">Meeting</button>
+    <button data-tab="chores"  aria-selected="false">Chores</button>
+    <button data-tab="issues"  aria-selected="false">Issues</button>
+    <button data-tab="ledger"  aria-selected="false">Ledger</button>
+  </nav>
+</header>
+
+<div class="wrap">
+  <div class="who-am-i">
+    <label for="me">You are</label>
+    <select id="me"></select>
+    <span>— switch to see the rules from someone else’s side.</span>
+  </div>
+  <p class="demo-banner">
+    Demo mode with the real house seeded in: Isaac has football every Monday at 7:30,
+    Pete has answered almost nothing and has already spent both ad-hoc moves. Everything
+    below is computed by the same engine the deployed Worker runs.
+  </p>
+
+  <section class="panel" id="panel-meeting" data-active></section>
+  <section class="panel" id="panel-chores"></section>
+  <section class="panel" id="panel-issues"></section>
+  <section class="panel" id="panel-ledger"></section>
+</div>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>
