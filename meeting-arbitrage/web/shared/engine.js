@@ -1783,15 +1783,112 @@ function recommendPot(config, tasksRequired = 4) {
     note: `A single bad week (${money(worstWeeklyFine)}) wipes the ${money(config.buyInCents)} stake, so the pot can't enforce past week one. Either raise the buy-in or lower the fine \u2014 a $100 fine wants a stake nearer ${money(worstWeeklyFine * 3)}.`
   };
 }
+
+// src/banksia/anonymous.ts
+var DEFAULT_ANON_CONFIG = {
+  minWeightForAgenda: 2,
+  coolingHours: 24,
+  maxNoteLength: 240
+};
+var ISSUE_AREAS = [
+  { id: "kitchen", label: "Kitchen & dishes" },
+  { id: "bathroom", label: "Bathroom" },
+  { id: "common", label: "Common areas" },
+  { id: "bins", label: "Bins & recycling" },
+  { id: "noise", label: "Noise & sleep" },
+  { id: "guests", label: "Guests & overnight" },
+  { id: "bills", label: "Bills & shared costs" },
+  { id: "other", label: "Something else" }
+];
+var AREA_LABEL = new Map(ISSUE_AREAS.map((a) => [a.id, a.label]));
+function softenNote(note, houseNames, config = DEFAULT_ANON_CONFIG) {
+  let out = note.trim();
+  for (const name of houseNames) {
+    if (!name)
+      continue;
+    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    out = out.replace(new RegExp(`\\b${escaped}\\b`, "gi"), "someone");
+  }
+  const letters = out.replace(/[^a-z]/gi, "");
+  if (letters.length > 6 && letters === letters.toUpperCase()) {
+    out = out.toLowerCase();
+    out = out.charAt(0).toUpperCase() + out.slice(1);
+  }
+  out = out.replace(/([!?.])\1{1,}/g, "$1");
+  if (out.length > config.maxNoteLength) {
+    out = `${out.slice(0, config.maxNoteLength - 1).trimEnd()}\u2026`;
+  }
+  return out;
+}
+function raiseAnonymous(issues, input) {
+  const trimmedNote = input.note?.trim() || void 0;
+  const existing = issues.find((i) => i.area === input.area);
+  const contribution = {
+    author: input.author,
+    note: trimmedNote,
+    at: input.now
+  };
+  if (!existing) {
+    return [...issues, {
+      id: `anon-${input.area}-${input.now.slice(0, 10)}`,
+      area: input.area,
+      contributions: [contribution],
+      createdAt: input.now
+    }];
+  }
+  return issues.map((issue) => {
+    if (issue !== existing)
+      return issue;
+    const others = issue.contributions.filter((c) => c.author !== input.author);
+    return { ...issue, contributions: [...others, contribution] };
+  });
+}
+function weightOf(issue) {
+  return new Set(issue.contributions.map((c) => c.author)).size;
+}
+function resolveAnonymous(issue, houseNames, now, config = DEFAULT_ANON_CONFIG) {
+  const weight = weightOf(issue);
+  const label = AREA_LABEL.get(issue.area) ?? "Something else";
+  const ageHours = (Date.parse(now) - Date.parse(issue.createdAt)) / 36e5;
+  const isConsensus = weight >= config.minWeightForAgenda;
+  const cooled = ageHours >= config.coolingHours;
+  const onAgenda = isConsensus || cooled;
+  const notes = issue.contributions.map((c) => c.note).filter((n) => Boolean(n)).map((n) => softenNote(n, houseNames, config));
+  let summary;
+  if (isConsensus) {
+    summary = `${weight} housemates quietly flagged ${label.toLowerCase()}. Worth a calm word as a house.`;
+  } else if (onAgenda) {
+    summary = `Someone raised ${label.toLowerCase()}. Not urgent \u2014 just worth airing.`;
+  } else {
+    const wait = Math.max(1, Math.ceil(config.coolingHours - ageHours));
+    summary = `One quiet flag on ${label.toLowerCase()}. Held ${wait}h in case it's the heat of the moment; surfaces on its own, sooner if anyone else agrees.`;
+  }
+  return {
+    id: issue.id,
+    area: issue.area,
+    areaLabel: label,
+    weight,
+    status: onAgenda ? "agenda" : "building",
+    onAgenda,
+    notes,
+    summary
+  };
+}
+function anonymousAgenda(issues, houseNames, now, config = DEFAULT_ANON_CONFIG) {
+  return issues.map((issue) => resolveAnonymous(issue, houseNames, now, config)).filter((o) => o.onAgenda).sort((a, b) => b.weight - a.weight);
+}
 export {
   ACTIVITIES,
   ACTIVITY_BY_ID,
+  DEFAULT_ANON_CONFIG,
   DEFAULT_CHORE_CONFIG,
   DEFAULT_CONFIG,
   DEFAULT_HANGOUT_CONFIG,
   DEFAULT_POT_CONFIG,
+  ISSUE_AREAS,
   SUBURBS,
   addSuggestion,
+  anonymousAgenda,
   applyWeekFines,
   buildAgenda,
   buildBrief,
@@ -1822,6 +1919,7 @@ export {
   pendingAsksFor,
   platformLabel,
   potState,
+  raiseAnonymous,
   rankActivities,
   rankBallots,
   rankHubs,
@@ -1829,11 +1927,14 @@ export {
   recommendPot,
   recordAnswers,
   renderChatMessage,
+  resolveAnonymous,
   resolveDisputes,
   resolveIssue,
   schedulingWeight,
   scorePlan,
   scoreSlots,
   settleWeek,
-  toDirectorySubmission
+  softenNote,
+  toDirectorySubmission,
+  weightOf
 };

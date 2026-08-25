@@ -14,6 +14,7 @@ import {
   describeIssueOutcome,
   formatMoney, DEFAULT_CHORE_CONFIG,
   openPot, applyWeekFines, potState, distributePot, recommendPot,
+  raiseAnonymous, resolveAnonymous, anonymousAgenda, ISSUE_AREAS,
 } from '../shared/engine.js';
 
 const TZ = 'Australia/Sydney';
@@ -62,6 +63,19 @@ const state = {
   // The pot. Buy-in and fine are what the user tunes; distribution is how the
   // surplus is shared when the period closes.
   pot: { buyInCents: 4000, finePerMissedTaskCents: 500, distribution: 'split-clean' },
+  // Anonymous issues. Seeded so both states are visible: the kitchen has two
+  // quiet raisers (consensus → on the agenda) and noise has one fresh raiser
+  // (still cooling). Authors are opaque here, exactly as the house would see it.
+  anon: [
+    { id: 'anon-kitchen', area: 'kitchen', createdAt: new Date(Date.now() - 30 * 3600_000).toISOString(),
+      contributions: [
+        { author: 'x1', note: 'Pans keep getting left in the sink overnight', at: new Date(Date.now() - 30 * 3600_000).toISOString() },
+        { author: 'x2', at: new Date(Date.now() - 5 * 3600_000).toISOString() },
+      ] },
+    { id: 'anon-noise', area: 'noise', createdAt: new Date(Date.now() - 2 * 3600_000).toISOString(),
+      contributions: [{ author: 'x3', note: 'Weeknight noise past midnight has been rough', at: new Date(Date.now() - 2 * 3600_000).toISOString() }] },
+  ],
+  anonArea: 'kitchen',
 };
 
 function mondayOf(date) {
@@ -447,6 +461,83 @@ function renderIssues() {
     wrap.appendChild(el('p', { class: 'hint' },
       `Silence is not an exit: ${issueOutcome.silent.map(nameOf).join(', ')} `
       + `${issueOutcome.silent.length === 1 ? 'is' : 'are'} named, and it goes on the agenda.`));
+  }
+
+  renderAnonymous(wrap);
+}
+
+/**
+ * The anonymous channel. Built to surface shared problems calmly, not to be a
+ * weapon — it's about an area not a person, it aggregates into consensus, a lone
+ * raise waits out a cooling window, and the house never sees who said anything.
+ */
+function renderAnonymous(wrap) {
+  const houseNames = HOUSE.map((p) => p.name);
+  const now = new Date().toISOString();
+
+  wrap.appendChild(el('h2', { text: 'Raise something quietly' }));
+  wrap.appendChild(el('p', { class: 'hint' },
+    'Anonymous to the house. It’s about an area, never a person — and a lone flag waits a '
+    + 'day before it surfaces, so it can’t be a heat-of-the-moment jab. If others quietly '
+    + 'agree, it becomes a house conversation instead of a snipe.'));
+
+  // Pick an area.
+  const areas = el('div', { class: 'chore-grid', style: 'grid-template-columns:1fr 1fr' });
+  for (const area of ISSUE_AREAS) {
+    areas.appendChild(el('button', {
+      class: 'btn', type: 'button',
+      style: state.anonArea === area.id
+        ? 'border-color:var(--accent);color:var(--accent-ink)' : '',
+      onclick: () => { state.anonArea = area.id; renderIssues(); },
+    }, area.label));
+  }
+  wrap.appendChild(areas);
+
+  const note = el('input', {
+    class: 'field', type: 'text', id: 'anon-note',
+    placeholder: 'Optional — keep it about the thing, not the person',
+    maxlength: '240',
+    style: 'margin-top:8px',
+  });
+  wrap.appendChild(note);
+
+  wrap.appendChild(el('div', { class: 'btn-row' }, [
+    el('button', {
+      class: 'btn primary', type: 'button',
+      onclick: () => {
+        // Each viewer is one opaque author; in the demo we key it to "me" so a
+        // second raise from the same person doesn't inflate the weight.
+        state.anon = raiseAnonymous(state.anon, {
+          area: state.anonArea, author: `demo-${state.me}`,
+          note: $('#anon-note').value, now: new Date().toISOString(),
+        });
+        renderIssues();
+      },
+    }, 'Raise it anonymously'),
+  ]));
+
+  // What the house would see.
+  const agenda = anonymousAgenda(state.anon, houseNames, now);
+  const building = state.anon
+    .map((i) => resolveAnonymous(i, houseNames, now))
+    .filter((o) => !o.onAgenda);
+
+  wrap.appendChild(el('h2', { text: 'What the house sees' }));
+  if (agenda.length === 0 && building.length === 0) {
+    wrap.appendChild(el('p', { class: 'empty', text: 'Nothing raised.' }));
+  }
+  for (const outcome of agenda) {
+    wrap.appendChild(el('div', { class: 'card good' }, [
+      el('h3', { text: outcome.areaLabel }),
+      el('p', { text: outcome.summary }),
+      ...outcome.notes.map((n) => el('p', { class: 'hint', style: 'margin-top:6px', text: `“${n}”` })),
+    ]));
+  }
+  for (const outcome of building) {
+    wrap.appendChild(el('div', { class: 'card' }, [
+      el('h3', { text: outcome.areaLabel }),
+      el('p', { class: 'hint', text: outcome.summary }),
+    ]));
   }
 }
 

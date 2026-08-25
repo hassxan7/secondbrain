@@ -52,3 +52,9 @@ export {
   DEFAULT_POT_CONFIG,
 } from './banksia/pot.ts';
 export type { PotConfig, Stake, StakeState, PotState, Distribution } from './banksia/pot.ts';
+
+export {
+  raiseAnonymous, weightOf, resolveAnonymous, anonymousAgenda, softenNote,
+  ISSUE_AREAS, DEFAULT_ANON_CONFIG,
+} from './banksia/anonymous.ts';
+export type { AnonymousIssue, AnonymousOutcome, IssueArea } from './banksia/anonymous.ts';
