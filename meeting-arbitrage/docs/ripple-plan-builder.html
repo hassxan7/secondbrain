@@ -1,0 +1,561 @@
+<title>Ripple Plan Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:        #F2F1F6;
+  --surface:   #FFFFFF;
+  --surface-2: #F7F7FA;
+  --ink:       #0E111A;
+  --muted:     #5F6068;
+  --faint:     #8A8B93;
+  --line:      #E4E4E8;
+  --accent:    #4E7CB4;
+  --accent-ink:#3A6094;
+  --wash:      #EDF3F9;
+  --good:      #3F8A46;
+  --warn:      #B4761F;
+  --code-bg:   #F4F5F8;
+
+  --sans: -apple-system, BlinkMacSystemFont, "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
+  --serif: "Playfair Display", Georgia, serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:        #101219;
+    --surface:   #181B23;
+    --surface-2: #1E222C;
+    --ink:       #ECEEF3;
+    --muted:     #A2A6B0;
+    --faint:     #767B87;
+    --line:      #2A2F3A;
+    --accent:    #82AEE0;
+    --accent-ink:#A6C7EC;
+    --wash:      #1B2733;
+    --good:      #6FC078;
+    --warn:      #E0A55C;
+    --code-bg:   #12151C;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:        #101219;
+  --surface:   #181B23;
+  --surface-2: #1E222C;
+  --ink:       #ECEEF3;
+  --muted:     #A2A6B0;
+  --faint:     #767B87;
+  --line:      #2A2F3A;
+  --accent:    #82AEE0;
+  --accent-ink:#A6C7EC;
+  --wash:      #1B2733;
+  --good:      #6FC078;
+  --warn:      #E0A55C;
+  --code-bg:   #12151C;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16.5px;
+  line-height: 1.62;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 760px; margin: 0 auto; padding: 44px 22px 110px; }
+
+/* ── Masthead ─────────────────────────────────────────────────────────── */
+
+.masthead { margin-bottom: 40px; }
+.wordmark {
+  font-family: var(--serif); font-weight: 800; font-size: 40px;
+  letter-spacing: -.01em; line-height: 1; margin: 0 0 6px;
+}
+.masthead .strap { color: var(--muted); font-size: 17px; margin: 0; }
+.masthead .meta {
+  margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: 8px 22px;
+  font-size: 13.5px; color: var(--faint);
+}
+.masthead .meta b { color: var(--muted); font-weight: 600; }
+
+/* ── Sections ─────────────────────────────────────────────────────────── */
+
+h2 {
+  font-size: 15px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--accent-ink); margin: 52px 0 6px;
+}
+h2 + .lede { color: var(--muted); font-size: 16px; margin: 0 0 20px; }
+
+h3 {
+  font-size: 20px; font-weight: 800; letter-spacing: -.02em;
+  margin: 34px 0 8px;
+}
+h4 { font-size: 16px; font-weight: 700; margin: 22px 0 6px; }
+p { margin: 0 0 14px; }
+p:last-child { margin-bottom: 0; }
+
+a { color: var(--accent-ink); }
+
+/* ── Feature list ─────────────────────────────────────────────────────── */
+
+.features { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 620px) { .features { grid-template-columns: 1fr; } }
+.feature {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 15px 16px;
+}
+.feature b { display: block; font-size: 15.5px; font-weight: 700; margin-bottom: 2px; }
+.feature span { font-size: 14px; color: var(--muted); }
+
+/* ── Numbered flow ────────────────────────────────────────────────────── */
+
+ol.flow { counter-reset: step; list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+/* Content must sit in a single wrapper element. A bare text run beside the
+   marker becomes its own anonymous grid item and overflows into a new track,
+   which wraps the sentence one word per line. */
+ol.flow li {
+  counter-increment: step;
+  display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px;
+  align-items: baseline;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+}
+ol.flow li > span { min-width: 0; }
+ol.flow li:last-child { border-bottom: 0; }
+ol.flow li::before {
+  content: counter(step);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700; font-size: 13px; color: var(--accent);
+  background: var(--wash); border-radius: 7px;
+  width: 26px; height: 26px; display: grid; place-items: center;
+}
+ol.flow b { font-weight: 700; }
+
+/* ── Cards & callouts ─────────────────────────────────────────────────── */
+
+.card {
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 20px 22px;
+  margin: 18px 0;
+}
+.note {
+  border-left: 3px solid var(--accent);
+  background: var(--wash);
+  border-radius: 0 12px 12px 0;
+  padding: 14px 18px;
+  margin: 18px 0;
+  font-size: 15.5px;
+}
+.note b { font-weight: 700; }
+.note.warn { border-left-color: var(--warn); background: color-mix(in srgb, var(--warn) 10%, transparent); }
+
+/* ── Ballot matrix ────────────────────────────────────────────────────── */
+
+.matrix-wrap { overflow-x: auto; margin: 18px 0; }
+table.matrix {
+  border-collapse: collapse; width: 100%; min-width: 460px;
+  background: var(--surface); border-radius: 14px; overflow: hidden;
+  font-size: 14.5px;
+}
+table.matrix th, table.matrix td {
+  padding: 11px 12px; text-align: center; border-bottom: 1px solid var(--line);
+}
+table.matrix th:first-child, table.matrix td:first-child {
+  text-align: left; font-weight: 700; white-space: nowrap;
+}
+table.matrix thead th {
+  font-size: 12.5px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .05em;
+}
+table.matrix tbody tr:last-child td { border-bottom: 0; }
+.cell {
+  display: inline-grid; place-items: center;
+  width: 26px; height: 26px; border-radius: 8px;
+  font-size: 13px; font-weight: 700;
+}
+.cell.yes { background: color-mix(in srgb, var(--good) 18%, transparent); color: var(--good); }
+.cell.no  { background: var(--surface-2); color: var(--faint); }
+.cell.ask { background: color-mix(in srgb, var(--warn) 20%, transparent); color: var(--warn); }
+.legend { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); margin-top: 10px; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+
+/* ── Code ─────────────────────────────────────────────────────────────── */
+
+pre {
+  background: var(--code-bg);
+  border-radius: 12px;
+  padding: 15px 17px;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 16px 0;
+}
+code {
+  font-family: var(--mono); font-size: .9em;
+  background: var(--code-bg); padding: 1.5px 5px; border-radius: 5px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+
+/* ── Data model table ─────────────────────────────────────────────────── */
+
+.tbl-wrap { overflow-x: auto; margin: 16px 0; }
+table.data {
+  border-collapse: collapse; width: 100%; min-width: 520px;
+  font-size: 14.5px; background: var(--surface);
+  border-radius: 14px; overflow: hidden;
+}
+table.data th, table.data td {
+  text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+table.data thead th {
+  font-size: 12.5px; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--muted); font-weight: 700;
+}
+table.data tbody tr:last-child td { border-bottom: 0; }
+table.data td:first-child { font-family: var(--mono); font-size: 13px; white-space: nowrap; }
+
+/* ── Decisions ────────────────────────────────────────────────────────── */
+
+.decision {
+  background: var(--surface); border-radius: 16px;
+  padding: 20px 22px; margin: 14px 0;
+}
+.decision h4 { margin: 0 0 8px; font-size: 17px; }
+.decision .rec {
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);
+  font-size: 15px;
+}
+.decision .rec b { color: var(--accent-ink); }
+
+ul.tight { margin: 0 0 14px; padding-left: 20px; }
+ul.tight li { margin-bottom: 5px; }
+
+.foot {
+  margin-top: 54px; padding-top: 20px; border-top: 1px solid var(--line);
+  font-size: 14px; color: var(--faint);
+}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <h1 class="wordmark">ripple</h1>
+    <p class="strap">Plan builder — a shareable link that turns a group chat into one plan.</p>
+    <div class="meta">
+      <span><b>For</b> Isaac</span>
+      <span><b>Status</b> Working prototype + backend</span>
+      <span><b>Tests</b> 155 passing</span>
+    </div>
+  </header>
+
+  <h2>What it does</h2>
+  <p class="lede">Calendly picks a time one person already chose. This picks the whole night.</p>
+
+  <div class="features">
+    <div class="feature"><b>One link, no app</b><span>Six questions, about thirty seconds. Nothing to install to answer.</span></div>
+    <div class="feature"><b>Time by overlap</b><span>The slot that suits the most people, not whoever replied first.</span></div>
+    <div class="feature"><b>Budget-led</b><span>You set a cap, then only see what fits it.</span></div>
+    <div class="feature"><b>Multi-stop nights</b><span>Dinner then Yochi, not one thing.</span></div>
+    <div class="feature"><b>Fair meeting spot</b><span>Ranked on travel across everyone actually coming.</span></div>
+    <div class="feature"><b>Suggest mid-plan</b><span>Add something late and only the people who missed it get re-asked.</span></div>
+    <div class="feature"><b>Paste any event</b><span>Luma, Partiful, Eventbrite, Humanitix, Meetup — it becomes an option.</span></div>
+    <div class="feature"><b>Ripple events compete</b><span>Curated listings sit in the same vote, not a separate tab.</span></div>
+    <div class="feature"><b>Nudge the stragglers</b><span>Text or email, aimed at exactly who's blocking it.</span></div>
+    <div class="feature"><b>Widget</b><span>Next plan, and anything still waiting on you.</span></div>
+  </div>
+
+  <h2>How it works</h2>
+  <p class="lede">From the outside.</p>
+
+  <ol class="flow">
+    <li><span><b>Someone starts a plan</b> — adds people by number or email, optionally seeds a few ideas.</span></li>
+    <li><span><b>Everyone gets a link</b> — name, suburb, budget, what they're up for, when they're free.</span></li>
+    <li><span><b>Anyone can add to it</b> — suggest something, or paste an event link.</span></li>
+    <li><span><b>The plan computes itself</b> — time, activities, cost, and where to meet.</span></li>
+    <li><span><b>It lands in a calendar</b> — and that's where installing Ripple starts paying off.</span></li>
+  </ol>
+
+  <h2>Under the hood</h2>
+  <p class="lede">The parts that were harder than they look.</p>
+
+  <h3>1 · Scheduling</h3>
+
+  <p>Every candidate slot is scored as a weighted sum over participants. Three
+  things make it more than a headcount:</p>
+
+  <p><b>Weight falls with absenteeism.</b> Someone who never shows up moves the
+  schedule less, floored so they're never erased. The instinct is the opposite —
+  weight the no-shows more so the time suits them — but that rewards the
+  behaviour and lets one person drag a seven-person plan around indefinitely.</p>
+
+  <p><b>Silence scores zero, never a maybe.</b> An unanswered slot cannot inflate
+  a score, so the fastest way to change the answer is to go and get an answer.</p>
+
+  <p><b>A recurring slot has hysteresis.</b> An incumbent time carries a stability
+  bonus and has to be beaten by a margin before anything moves. A weekly thing
+  that relocates every week stops being a schelling point and attendance
+  collapses.</p>
+
+  <p>Timezone maths is <code>Intl</code>-only, so the same code runs in the Worker,
+  in Node and in the browser. Sydney DST goes through the IANA database rather
+  than a fixed offset — a fortnight grid straddling the October change keeps
+  7:30pm at 7:30pm while the underlying UTC instant shifts.</p>
+
+  <h3>2 · The ballot model</h3>
+
+  <p>This is the interesting one. The plan fills in asynchronously, so the third
+  person to answer can add an option the first two never saw. Three obvious
+  handlings, all wrong:</p>
+
+  <ul class="tight">
+    <li><b>Re-open the poll</b> — everyone redoes everything; completion collapses and the prompt people are punished.</li>
+    <li><b>Ignore the gap</b> — the new option only collects votes from whoever answers after it, so late options can never win and suggesting is pointless.</li>
+    <li><b>Assume approval</b> — manufactures consent for something nobody agreed to.</li>
+  </ul>
+
+  <p>The fix is to stop treating an answer as one submission and treat it as one
+  cell per option, each either <i>answered</i> or <i>pending</i>. Adding an option
+  doesn't invalidate anyone's existing answers — it opens exactly one new pending
+  cell per person.</p>
+
+  <p>Here's the state right after Ross suggests something:</p>
+
+  <div class="matrix-wrap">
+    <table class="matrix">
+      <thead>
+        <tr><th>Option</th><th>Isaac</th><th>Kez</th><th>Ross</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Pool</td>
+          <td><span class="cell yes">✓</span></td>
+          <td><span class="cell yes">✓</span></td>
+          <td><span class="cell yes">✓</span></td>
+          <td style="text-align:left;color:var(--good);font-weight:600">Eligible · 3 votes</td>
+        </tr>
+        <tr>
+          <td>Korean BBQ</td>
+          <td><span class="cell no">·</span></td>
+          <td><span class="cell yes">✓</span></td>
+          <td><span class="cell no">·</span></td>
+          <td style="text-align:left;color:var(--good);font-weight:600">Eligible · 1 vote</td>
+        </tr>
+        <tr>
+          <td>Yochi</td>
+          <td><span class="cell no">·</span></td>
+          <td><span class="cell no">·</span></td>
+          <td><span class="cell yes">✓</span></td>
+          <td style="text-align:left;color:var(--good);font-weight:600">Eligible · 1 vote</td>
+        </tr>
+        <tr>
+          <td>Night market</td>
+          <td><span class="cell ask">?</span></td>
+          <td><span class="cell ask">?</span></td>
+          <td><span class="cell yes">✓</span></td>
+          <td style="text-align:left;color:var(--warn);font-weight:600">Waiting on 2</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="legend">
+    <span><span class="cell yes">✓</span> wants it</span>
+    <span><span class="cell no">·</span> saw it, passed</span>
+    <span><span class="cell ask">?</span> never shown</span>
+  </div>
+
+  <p>Two properties fall out of this, and both matter.</p>
+
+  <p><b>Re-asking is proportional.</b> Isaac and Kez are shown exactly one
+  question — Night market — not the whole form again. A few seconds, not a
+  re-run. The API exposes this directly:</p>
+
+<pre><code>GET /api/ripple/hangouts/:id/asks?token=…
+→ { "count": 1, "asks": [{ "label": "Night market",
+                           "origin": { "kind": "suggested", "by": "ross" } }] }</code></pre>
+
+  <p><b>An option can't win before people have seen it.</b> Ranking on approval
+  <i>rate</i> would put Night market at 1/1 = 100% and beat something four of six
+  people wanted. So eligibility gates on coverage: every current participant has
+  to have been shown it. That's not a heuristic — it's the difference between a
+  group decision and one person's preference with good timing.</p>
+
+  <p>Coverage is measured over people who can make the chosen time, so someone
+  who isn't coming can't hold an option hostage. The organiser can lower the
+  threshold to break a stalemate, and the UI says so when they do.</p>
+
+  <div class="note">
+    <b>The nudge falls out for free.</b> <code>pending</code> already names exactly
+    who's blocking each option, so the reminder targets them and nobody else —
+    and it can say <i>what</i> they're blocking. Someone who's answered everything
+    is never chased.
+  </div>
+
+  <h3>3 · Building the night</h3>
+
+  <p>Once the time is settled, the itinerary is a small constrained optimisation:
+  pick up to three options, one per category, maximising total approvals subject
+  to a budget ceiling.</p>
+
+  <p><b>The ceiling is the minimum budget among attendees, not the average.</b> An
+  average silently prices out whoever's broke this fortnight — precisely the
+  failure the budget field exists to prevent, and precisely what a student won't
+  say out loud in a group chat.</p>
+
+  <p>This was greedy first, and greedy is provably wrong here. On a $40 ceiling
+  it took the $28 dinner four people voted for, then found nothing fit in the
+  remaining $12 — while pool ($15) and trivia ($25) came to exactly $40 and
+  carried six votes between them. One candidate per category caps the search at
+  a few dozen combinations, so it's now exhaustive and costs nothing.</p>
+
+  <p>Ties break on approvals, then stop count, then price, then id. Without that
+  last chain two equally-wanted options were separated by insertion order, so
+  which one won depended on which was added first.</p>
+
+  <p><code>dessert</code> is a category of its own. One stop per category is what
+  stops a night being three dinners, but dinner-then-Yochi is a real shape a
+  night takes, and collapsing the two made it unbookable.</p>
+
+  <h3>4 · Where to meet</h3>
+
+  <p>Fifty Sydney suburb centroids, a spherical centroid over the group, and
+  candidate hubs ranked by:</p>
+
+<pre><code>cost = totalTravelMinutes + 2 × (worstTrip − meanTrip)</code></pre>
+
+  <p>The fairness term is doing real work. Ranking on total alone lets a hub win
+  by being <i>somebody's doorstep</i>, handing the longest trip to whoever lives
+  furthest out — who is exactly the person who then bails. Travel time is a
+  continuous piecewise curve: walking under 2km, buses and light rail to 8km,
+  train beyond. An earlier version restarted each band from its own intercept,
+  which made 2.1km score faster than 2.0km and quietly corrupted the ranking for
+  anyone near a boundary.</p>
+
+  <div class="note warn">
+    <b>Known gap.</b> This measures geography, not rail topology, so a spread-out
+    group scores best around Burwood or Strathfield — genuinely where the middle
+    is, even though such a group usually ends up in the city. Half the gap closes
+    downstream: a clubbing plan finds no venues in Burwood and drifts to
+    Darlinghurst on its own. The other half needs the Directions API.
+  </div>
+
+  <h3>5 · Pasting an event in</h3>
+
+  <p>URL parsing is pure and network-free — platform, stable id, canonical URL
+  with tracking parameters stripped so re-pastes dedupe. Metadata fetching is
+  <i>gated on the parse succeeding</i>, and that ordering is the security
+  property, not a tidiness one.</p>
+
+  <div class="note warn">
+    <b>Why that ordering matters.</b> A server that fetches whatever URL a user
+    hands it is a server-side request forgery hole. Paste
+    <code>http://169.254.169.254/latest/meta-data/</code> and a naive implementation
+    retrieves cloud credentials and hands them back. Only allow-listed public
+    event hosts ever get a request — loopback, private ranges, IP literals,
+    lookalike hosts like <code>lu.ma.evil.com</code>, and non-http schemes are all
+    rejected structurally rather than by a blocklist.
+  </div>
+
+  <p>A pasted link lands in the directory as <code>pending_review</code>, never
+  published — anyone with a link could otherwise write to Ripple's curated
+  surface. An unreadable price falls back to the group's tightest budget rather
+  than to zero, because a ticketed event that looks free quietly blows the
+  ceiling.</p>
+
+  <p>Crawling those hosts for listings is a separate job and deliberately not
+  done here. The shape it would take: the same parser as the entry point, a
+  per-host politeness budget, conditional requests on <code>ETag</code>, and the
+  same <code>pending_review</code> gate — the ingestion contract is already
+  defined, only the discovery half is missing.</p>
+
+  <h3>6 · Delivery</h3>
+
+  <p>Outbound messages go to an <code>outbox</code> queue that senders drain,
+  rather than being pushed. That's not a preference: the WhatsApp path runs
+  <code>whatsapp-web.js</code> on a machine behind a home router with no stable
+  inbound address, so a queue is the only thing that works for both it and
+  ordinary SMS/email senders.</p>
+
+  <p>Nudges are per-person, per-reason and rate-limited. Someone who never
+  started gets "still need your times"; someone who answered but has unseen
+  options gets "one more thing on the plan: Night market". A second nudge inside
+  twelve hours is skipped and reported as skipped, so a plan can't be turned
+  into a way to spam somebody.</p>
+
+  <h3>7 · Data model</h3>
+
+  <div class="tbl-wrap">
+    <table class="data">
+      <thead><tr><th>Table</th><th>Why it's shaped that way</th></tr></thead>
+      <tbody>
+        <tr><td>plan_options</td><td>One row per option, carrying the full activity JSON so an option survives a catalogue edit unchanged.</td></tr>
+        <tr><td>option_answers</td><td>One row per (option, person). A row existing means <i>seen</i>; the column means <i>wanted</i>. A blob per person cannot express that difference, and that difference is the entire mechanism.</td></tr>
+        <tr><td>member_tokens</td><td>The link is the credential. No passwords, no accounts to answer.</td></tr>
+        <tr><td>invites</td><td>Channel, contact, response and nudge count — what the reminder logic reads.</td></tr>
+        <tr><td>directory_submissions</td><td>Unique on (platform, source_id), held for review.</td></tr>
+        <tr><td>outbox</td><td>Queue that senders drain and acknowledge.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Runs on Cloudflare Workers and D1. Everything above is deterministic —
+  <b>no model is consulted to pick a time, rank an option, or compute a cost.</b>
+  An LLM writes one optional sentence of prose on the event brief and touches
+  nothing else. If the key is missing the plan is identical, just less charming.</p>
+
+  <h2>Three calls for you</h2>
+
+  <div class="decision">
+    <h4>Gate install before onboarding?</h4>
+    <p>You asked whether requiring the app up front is worth the friction.</p>
+    <div class="rec"><b>Recommendation: no.</b> The whole reason the link travels
+    is that answering costs nothing. Gating install at the top turns a
+    thirty-second favour into an App Store trip and kills the loop that gets
+    Ripple in front of people who don't have it. Put install at the <i>end</i>,
+    where it buys something concrete — calendar sync, the reminder, and updates
+    if the plan moves. That's the screen the prototype ends on.</div>
+  </div>
+
+  <div class="decision">
+    <h4>How strict should coverage be?</h4>
+    <p>Right now an option needs <i>everyone</i> who's coming to have seen it.
+    Strictest and fairest, but one quiet person can stall a good suggestion.</p>
+    <div class="rec"><b>Recommendation: keep it strict, add a deadline.</b> Drop the
+    threshold automatically once a plan is close to its date, and say so in the
+    UI — "picked without Kez, who didn't answer in time" is honest; silently
+    lowering the bar isn't.</div>
+  </div>
+
+  <div class="decision">
+    <h4>The wordmark</h4>
+    <p>The prototype uses Playfair Display as a stand-in — close to Ripple's
+    Didone but not it.</p>
+    <div class="rec">Send the real face and it's a one-line change. Everything
+    else in the palette was sampled off screenshots of the shipped app.</div>
+  </div>
+
+  <h2>Not built</h2>
+  <ul class="tight">
+    <li><b>Nothing is deployed.</b> Needs a Cloudflare account and secrets.</li>
+    <li><b>The widget isn't compiled</b> — no macOS toolchain here. It's source to drop into Xcode, and the first build is a real step.</li>
+    <li><b>Live venue search is off</b> without a Places key. Without one it returns clearly-labelled samples with no invented ratings or prices.</li>
+    <li><b>Directory crawling</b> — only user-pasted links come in.</li>
+    <li><b>Interactive widget buttons</b> (iOS 17) would let someone clear a pending question from the home screen. Obvious next step for the delta ask.</li>
+  </ul>
+
+  <p class="foot">Deterministic engine, 155 tests, no dependencies. The scheduling
+  and ballot logic is pure and testable without a database, because its output
+  decides what a group of people does on a Friday and it should be arguable.</p>
+
+</div>

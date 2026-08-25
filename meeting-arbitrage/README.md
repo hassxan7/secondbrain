@@ -134,6 +134,43 @@ node scripts/build-artifact.mjs
 Writes one self-contained HTML file with the engine, styles and app inlined,
 generated from `web/ripple/` so it cannot drift from the deployed page.
 
+## Suggestions added mid-plan
+
+The plan fills in asynchronously, so the third person to answer can add an
+option the first two never saw. `src/ripple/suggestions.ts` handles that by
+treating an answer as one cell per option — each `answered` or `pending` —
+rather than as a single submission.
+
+Two consequences:
+
+- **Re-asking is proportional.** Someone who already answered sees only what
+  they have not seen, usually one question. `GET .../asks?token=…` returns
+  exactly that delta.
+- **An option cannot win before people have seen it.** Ranking on approval
+  *rate* would let a brand-new suggestion sit at 1/1 = 100% and beat something
+  four of six people wanted, so eligibility gates on coverage. `pending` names
+  who is holding it up, which is who `POST .../nudge` chases and nobody else.
+
+Coverage is measured over people who can make the chosen time, so someone who
+is not coming cannot hold an option hostage.
+
+## Pasting in an event
+
+`POST .../link` accepts Luma, Partiful, Eventbrite, Humanitix and Meetup URLs.
+Parsing is pure and network-free; fetching Open Graph metadata is gated on the
+parse succeeding, and that ordering is the security property — a server that
+fetches whatever URL a user hands it is an SSRF hole. Loopback, private ranges,
+IP literals, lookalike hosts and non-http schemes are rejected structurally.
+
+Pasted links are recorded in `directory_submissions` as `pending_review`.
+Anyone with a link could otherwise write to Ripple's curated directory.
+
+## The iOS widget
+
+`ios/` holds WidgetKit source for a home-screen and Lock Screen tile. Not
+compiled here — see `ios/README.md` for the Xcode target setup and the App
+Group step that fails silently when it is wrong.
+
 ## What this does not do
 
 - **Straight-line distance, not rail topology.** `geo.ts` measures geography, so
@@ -154,6 +191,9 @@ generated from `web/ripple/` so it cannot drift from the deployed page.
   at rest before pointing this at anyone else.
 - **Cost estimates are static.** Good enough to keep a plan inside a budget, not
   good enough to quote.
+- **Nothing crawls event sites.** Only links a real user pastes come in. The
+  ingestion contract is defined; the discovery half is not built.
+- **The widget is uncompiled.** No macOS toolchain in this environment.
 
 ## Layout
 
@@ -166,4 +206,6 @@ generated from `web/ripple/` so it cannot drift from the deployed page.
 | `src/index.ts` | Worker router, cron, bot queue endpoints. |
 | `web/` | Both UIs plus the shared engine bundle. |
 | `bot/` | The WhatsApp bridge. |
+| `ios/` | WidgetKit widget source (uncompiled). |
+| `docs/` | Write-up for review. |
 | `schema.sql` | D1 schema, 20 tables. |

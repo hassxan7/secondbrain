@@ -54,6 +54,16 @@ The itinerary ceiling is the **minimum** budget among attendees, not the average
 - **Calendar screenshot parsing was dropped** in favour of Google Calendar free/busy — free, exact, and no vision model.
 - Cost estimates are static; enough to keep a plan inside a budget, not enough to quote.
 
+### Late suggestions and the sequencing problem (added 25 Aug)
+
+The hardest part of the Ripple flow. People answer asynchronously, so the third person can add an option the first two never saw. Re-opening the poll punishes whoever was prompt; ignoring the gap means late options can never win; assuming approval manufactures consent.
+
+Resolved by modelling an answer as **one cell per option**, each answered or pending. Adding an option opens one new pending cell per person rather than invalidating anything. Two properties follow: re-asking is proportional (one question, not the form again), and an option cannot be chosen until every current participant has been shown it — otherwise a 1/1 suggestion at 100% approval beats one four of six people wanted. `pending` names exactly who is blocking each option, which is also the nudge list.
+
+Also shipped: pasted Luma/Partiful/Eventbrite/Humanitix/Meetup links as votable options (SSRF-safe by construction — parse before fetch, allow-listed hosts only), an organiser flow with SMS/email invites, per-person rate-limited nudges, and a WidgetKit widget whose tile leads with the same delta.
+
+**Recommendation on gating install:** do not require the app before onboarding. The link travels *because* answering costs nothing; gating install at the top turns a 30-second favour into an App Store trip. Put it at the end where it buys calendar sync, the reminder, and updates if the plan moves.
+
 ## Open Questions
 
 - Does the veto budget of two per period hold up, or does Pete simply stop engaging entirely once it is spent?

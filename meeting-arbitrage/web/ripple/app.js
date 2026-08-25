@@ -458,11 +458,11 @@ function renderResult() {
     ]),
   ]));
 
-  const ics = $('#ics-link');
-  if (ics) {
-    ics.href = `data:text/calendar;charset=utf-8,${encodeURIComponent(brief.calendar.ics)}`;
-    ics.setAttribute('download', 'ripple-plan.ics');
-  }
+  // A normal https link rather than a data: .ics download. The deployed Worker
+  // serves a real .ics file, but a page-initiated download is inert inside an
+  // embedded viewer, so the shareable prototype would hand people a dead button.
+  const gcal = $('#gcal-link');
+  if (gcal) gcal.href = brief.calendar.googleUrl;
 }
 
 function lateAskCard() {
