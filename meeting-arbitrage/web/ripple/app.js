@@ -18,6 +18,7 @@ import {
   openBallots, recordAnswers, addSuggestion, rankBallots,
   parseEventUrl, linkToActivity, platformLabel,
 } from '../shared/engine.js';
+import { RippleBridge, briefToCard } from './imessage-bridge.js';
 
 const TZ = 'Australia/Sydney';
 const TIMES = ['14:00', '18:30', '21:00'];
@@ -829,8 +830,18 @@ document.addEventListener('DOMContentLoaded', () => {
     toast(missing.length === 0 ? 'Nobody to chase' : `Nudged ${missing.length}`);
   });
 
-  $('#result-copy').addEventListener('click', async () => {
+  // In a browser the result action copies the message; inside iMessage it drops
+  // the plan straight into the thread as an interactive bubble. Same button,
+  // relabelled, so nothing downstream has to know where it's running.
+  const copyBtn = $('#result-copy');
+  if (RippleBridge.isInMessages) copyBtn.textContent = 'Add to chat';
+  copyBtn.addEventListener('click', async () => {
     if (!state.plan?.brief) return;
+    if (RippleBridge.isInMessages) {
+      const sent = RippleBridge.sendPlan(briefToCard(state.plan.brief.startUtc, state.plan.brief));
+      toast(sent ? 'Dropped into the chat' : 'Couldn’t reach Messages');
+      return;
+    }
     try {
       await navigator.clipboard.writeText(renderChatMessage(state.plan.brief));
       toast('Copied');

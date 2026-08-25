@@ -346,6 +346,11 @@ export default {
     // Pretty links straight from the group chat.
     if (url.pathname.startsWith('/r/')) return env.ASSETS.fetch(rewrite(request, '/ripple/'));
     if (url.pathname.startsWith('/h/')) return env.ASSETS.fetch(rewrite(request, '/banksia/'));
+    // The iMessage extension loads the planner from here; same page, the bridge
+    // detects the native host at runtime.
+    if (url.pathname === '/imessage' || url.pathname.startsWith('/imessage/')) {
+      return env.ASSETS.fetch(rewrite(request, '/ripple/'));
+    }
 
     return env.ASSETS.fetch(request);
   },

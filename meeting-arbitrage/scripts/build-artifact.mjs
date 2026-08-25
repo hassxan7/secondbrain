@@ -35,13 +35,20 @@ const css = readFileSync(join(root, 'web/ripple/app.css'), 'utf8');
 let app = readFileSync(join(root, 'web/ripple/app.js'), 'utf8');
 const page = readFileSync(join(root, 'web/ripple/index.html'), 'utf8');
 
-// Swap the ES import for a destructure off the IIFE global.
+// The iMessage bridge is a local, dependency-free module. Inlined here with its
+// `export` keywords stripped, it becomes plain globals the app can see — and in
+// a browser (no native handler) every method is a no-op, so the standalone
+// prototype behaves exactly as before.
+let bridge = readFileSync(join(root, 'web/ripple/imessage-bridge.js'), 'utf8');
+bridge = bridge.replace(/^export\s+/gm, '');
+
+// Swap the engine's ES import for a destructure off the IIFE global.
 //
 // The binding list is read out of the import itself rather than restated here.
 // A hardcoded list silently goes stale the moment app.js imports something new:
 // the build still succeeds, the standalone page throws on first render, and the
 // only symptom is a screen where nothing responds.
-const importRe = /^import\s*\{([\s\S]*?)\}\s*from\s*['"][^'"]+['"];\s*$/m;
+const importRe = /^import\s*\{([\s\S]*?)\}\s*from\s*['"]\.\.\/shared\/engine\.js['"];\s*$/m;
 const importMatch = app.match(importRe);
 if (!importMatch) throw new Error('could not find the engine import in app.js');
 
@@ -52,6 +59,12 @@ const bindings = importMatch[1]
 if (bindings.length === 0) throw new Error('engine import names nothing');
 
 app = app.replace(importRe, `const {\n  ${bindings.join(',\n  ')},\n} = RippleEngine;`);
+
+// Any remaining top-level imports (the bridge) are now satisfied by inlined
+// globals, so strip the statements. If an unexpected import survives, fail loud
+// rather than shipping a page that throws "Cannot use import outside a module".
+app = app.replace(/^import\s+.*?;\s*$/gm, '');
+if (/^\s*import\s/m.test(app)) throw new Error('an unhandled import survived in app.js');
 
 // Reuse the served markup so the two versions stay identical.
 const bodyMatch = page.match(/<body>([\s\S]*?)<\/body>/);
@@ -77,6 +90,9 @@ ${markup}
 
 <script>
 ${engine}
+</script>
+<script>
+${bridge}
 </script>
 <script>
 ${app}
