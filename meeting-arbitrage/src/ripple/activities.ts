@@ -19,7 +19,11 @@ import type { HubRanking, Member } from './geo.ts';
 import { rankHubs } from './geo.ts';
 
 export type ActivityCategory =
-  | 'food' | 'drinks' | 'games' | 'nightlife' | 'outdoors' | 'culture' | 'wellness';
+  | 'food' | 'dessert' | 'drinks' | 'games' | 'nightlife' | 'outdoors' | 'culture' | 'wellness';
+
+// `dessert` is separate from `food` on purpose. One stop per category is what
+// stops a night being three dinners, but dinner-then-dessert is a real shape a
+// night takes, and collapsing the two would make it unbookable.
 
 export interface Activity {
   id: string;
@@ -45,9 +49,21 @@ export interface Activity {
  * competes head-to-head with "go bowling" instead of living in a separate tab.
  */
 export const ACTIVITIES: Activity[] = [
-  { id: 'eats-casual', label: 'Casual eats', emoji: '🍜', estCostAud: 28, durationMins: 90,
+  { id: 'eats-casual', label: 'Casual eats', emoji: '🍽️', estCostAud: 28, durationMins: 90,
     category: 'food', placesQuery: 'casual restaurant', timeOfDay: 'any', sequenceRank: 1,
     tags: ['food', 'chill', 'always-works'] },
+  { id: 'ramen', label: 'Ramen', emoji: '🍜', estCostAud: 24, durationMins: 75,
+    category: 'food', placesQuery: 'ramen', timeOfDay: 'any', sequenceRank: 1,
+    tags: ['food', 'cheap'] },
+  { id: 'pizza', label: 'Pizza', emoji: '🍕', estCostAud: 25, durationMins: 90,
+    category: 'food', placesQuery: 'pizza restaurant', timeOfDay: 'any', sequenceRank: 1,
+    tags: ['food', 'group'] },
+  { id: 'thai', label: 'Thai', emoji: '🍛', estCostAud: 28, durationMins: 90,
+    category: 'food', placesQuery: 'thai restaurant', timeOfDay: 'any', sequenceRank: 1,
+    tags: ['food', 'group'] },
+  { id: 'korean-bbq', label: 'Korean BBQ', emoji: '🥩', estCostAud: 48, durationMins: 120,
+    category: 'food', placesQuery: 'korean bbq', timeOfDay: 'night', sequenceRank: 1,
+    tags: ['food', 'group', 'occasion'] },
   { id: 'eats-nice', label: 'Somewhere nicer', emoji: '🍝', estCostAud: 55, durationMins: 120,
     category: 'food', placesQuery: 'restaurant', timeOfDay: 'night', sequenceRank: 1,
     tags: ['food', 'occasion'] },
@@ -60,6 +76,16 @@ export const ACTIVITIES: Activity[] = [
   { id: 'coffee', label: 'Coffee', emoji: '☕', estCostAud: 8, durationMins: 60,
     category: 'food', placesQuery: 'cafe', timeOfDay: 'day', sequenceRank: 1,
     tags: ['cheap', 'day'] },
+
+  { id: 'yochi', label: 'Yochi', emoji: '🍦', estCostAud: 12, durationMins: 40,
+    category: 'dessert', placesQuery: 'Yochi frozen yogurt', timeOfDay: 'any', sequenceRank: 2,
+    tags: ['dessert', 'cheap', 'always-works'] },
+  { id: 'gelato', label: 'Gelato', emoji: '🍨', estCostAud: 10, durationMins: 40,
+    category: 'dessert', placesQuery: 'gelato', timeOfDay: 'any', sequenceRank: 2,
+    tags: ['dessert', 'cheap'] },
+  { id: 'dessert-bar', label: 'Dessert bar', emoji: '🍰', estCostAud: 20, durationMins: 60,
+    category: 'dessert', placesQuery: 'dessert bar', timeOfDay: 'night', sequenceRank: 2,
+    tags: ['dessert'] },
 
   { id: 'pub', label: 'Pub', emoji: '🍺', estCostAud: 35, durationMins: 120,
     category: 'drinks', placesQuery: 'pub', timeOfDay: 'night', sequenceRank: 3,

@@ -27,6 +27,18 @@ export type { Activity, HangoutMember, Itinerary, ActivityOutcome } from './ripp
 export { SUBURBS, rankHubs, haversineKm, centroid, estimateTravelMinutes, groupCentroid } from './ripple/geo.ts';
 export type { Member, HubRanking, LatLng } from './ripple/geo.ts';
 
+export {
+  openBallots, recordAnswers, addSuggestion, pendingAsksFor, outstandingAsks,
+  participants, rankBallots,
+} from './ripple/suggestions.ts';
+export type { Ballot, BallotOutcome, BallotOrigin } from './ripple/suggestions.ts';
+
+export {
+  parseEventUrl, fetchEventMeta, toActivity as linkToActivity,
+  toDirectorySubmission, platformLabel,
+} from './ripple/event-links.ts';
+export type { ParsedEventUrl, EventPlatform } from './ripple/event-links.ts';
+
 export { buildBrief, renderChatMessage } from './ripple/brief.ts';
 export type { EventBrief } from './ripple/brief.ts';
 

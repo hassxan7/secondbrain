@@ -14,10 +14,11 @@ const NOW = '2026-08-25T10:00:00Z';
 const member = (id: string, budgetAud = 60): HangoutMember =>
   ({ id, name: id, suburb: 'newtown', budgetAud, approvals: [] });
 
-const YOCHI: Activity = {
-  id: 'yochi', label: 'Yochi', emoji: '🍦', estCostAud: 12, durationMins: 45,
-  category: 'food', placesQuery: 'frozen yogurt', timeOfDay: 'any',
-  sequenceRank: 1, tags: ['cheap', 'sweet'],
+/** Deliberately NOT in the standing catalogue — this is the novel suggestion. */
+const NIGHT_MARKET: Activity = {
+  id: 'night-market', label: 'Night market', emoji: '🏮', estCostAud: 12,
+  durationMins: 90, category: 'outdoors', placesQuery: 'night market',
+  timeOfDay: 'night', sequenceRank: 1, tags: ['cheap'],
 };
 
 describe('answering', () => {
@@ -66,12 +67,12 @@ describe('the third-person-suggests problem', () => {
     ballots = recordAnswers(ballots, 'a', ALL_IDS, ['pool', 'eats-casual']);
     ballots = recordAnswers(ballots, 'b', ALL_IDS, ['pool', 'pub']);
     ballots = recordAnswers(ballots, 'c', ALL_IDS, ['pool']);
-    ballots = addSuggestion(ballots, YOCHI, 'c', NOW);
+    ballots = addSuggestion(ballots, NIGHT_MARKET, 'c', NOW);
     return ballots;
   }
 
   test('the suggester is counted as having seen and wanted it', () => {
-    const yochi = scenario().find((b) => b.activityId === 'yochi')!;
+    const yochi = scenario().find((b) => b.activityId === 'night-market')!;
     assert.deepEqual(yochi.seen, ['c']);
     assert.deepEqual(yochi.approvals, ['c']);
     assert.deepEqual(yochi.origin, { kind: 'suggested', by: 'c' });
@@ -86,25 +87,25 @@ describe('the third-person-suggests problem', () => {
 
   test('a and b are asked about exactly one thing', () => {
     const ballots = scenario();
-    const catalogue = new Map([...CATALOGUE, ['yochi', YOCHI]]);
+    const catalogue = new Map([...CATALOGUE, ['night-market', NIGHT_MARKET]]);
 
     for (const who of ['a', 'b']) {
       const asks = pendingAsksFor(ballots, who, catalogue);
       assert.equal(asks.length, 1, `${who} should have one open question`);
-      assert.equal(asks[0].id, 'yochi');
+      assert.equal(asks[0].id, 'night-market');
     }
     assert.deepEqual(pendingAsksFor(ballots, 'c', catalogue), [], 'c has nothing outstanding');
   });
 
   test('someone who never started gets the whole form, not a delta', () => {
     const ballots = scenario();
-    const catalogue = new Map([...CATALOGUE, ['yochi', YOCHI]]);
+    const catalogue = new Map([...CATALOGUE, ['night-market', NIGHT_MARKET]]);
     assert.deepEqual(pendingAsksFor(ballots, 'd', catalogue), []);
   });
 
   test('the reminder list names only the people actually holding it up', () => {
     const ballots = scenario();
-    const catalogue = new Map([...CATALOGUE, ['yochi', YOCHI]]);
+    const catalogue = new Map([...CATALOGUE, ['night-market', NIGHT_MARKET]]);
     const outstanding = outstandingAsks(ballots, catalogue);
 
     assert.deepEqual(outstanding.map((o) => o.memberId).sort(), ['a', 'b']);
@@ -113,11 +114,11 @@ describe('the third-person-suggests problem', () => {
 
   test('a fresh suggestion cannot win on a perfect rate', () => {
     const ballots = scenario();
-    const catalogue = new Map([...CATALOGUE, ['yochi', YOCHI]]);
+    const catalogue = new Map([...CATALOGUE, ['night-market', NIGHT_MARKET]]);
     const attendees = ['a', 'b', 'c'].map((id) => member(id));
     const ranked = rankBallots(ballots, catalogue, attendees);
 
-    const yochi = ranked.find((r) => r.activity.id === 'yochi')!;
+    const yochi = ranked.find((r) => r.activity.id === 'night-market')!;
     const pool = ranked.find((r) => r.activity.id === 'pool')!;
 
     // Yochi is 1-for-1. Pool is 3-for-3. Rate alone would tie them.
@@ -134,34 +135,47 @@ describe('the third-person-suggests problem', () => {
 
   test('once everyone has seen it, it competes normally and can win', () => {
     let ballots = scenario();
-    const catalogue = new Map([...CATALOGUE, ['yochi', YOCHI]]);
+    const catalogue = new Map([...CATALOGUE, ['night-market', NIGHT_MARKET]]);
 
     // a and b clear their one open cell, both saying yes.
-    ballots = recordAnswers(ballots, 'a', ['yochi'], ['yochi']);
-    ballots = recordAnswers(ballots, 'b', ['yochi'], ['yochi']);
+    ballots = recordAnswers(ballots, 'a', ['night-market'], ['night-market']);
+    ballots = recordAnswers(ballots, 'b', ['night-market'], ['night-market']);
 
     const attendees = ['a', 'b', 'c'].map((id) => member(id));
     const ranked = rankBallots(ballots, catalogue, attendees);
-    const yochi = ranked.find((r) => r.activity.id === 'yochi')!;
+    const yochi = ranked.find((r) => r.activity.id === 'night-market')!;
 
     assert.equal(yochi.eligible, true);
     assert.equal(yochi.coverage, 1);
     assert.deepEqual(yochi.approvals.sort(), ['a', 'b', 'c']);
     assert.deepEqual(yochi.pending, []);
-    assert.equal(ranked[0].activity.id, 'yochi', 'unanimous and cheap — it should win');
+    assert.equal(ranked[0].activity.id, 'night-market', 'unanimous and cheap — it should win');
   });
 
   test('clearing the cell with a no also unblocks it, without a vote', () => {
     let ballots = scenario();
-    const catalogue = new Map([...CATALOGUE, ['yochi', YOCHI]]);
-    ballots = recordAnswers(ballots, 'a', ['yochi'], []);
-    ballots = recordAnswers(ballots, 'b', ['yochi'], []);
+    const catalogue = new Map([...CATALOGUE, ['night-market', NIGHT_MARKET]]);
+    ballots = recordAnswers(ballots, 'a', ['night-market'], []);
+    ballots = recordAnswers(ballots, 'b', ['night-market'], []);
 
     const ranked = rankBallots(ballots, catalogue, ['a', 'b', 'c'].map((id) => member(id)));
-    const yochi = ranked.find((r) => r.activity.id === 'yochi')!;
+    const yochi = ranked.find((r) => r.activity.id === 'night-market')!;
 
     assert.equal(yochi.eligible, true, 'seeing it is what counts, not liking it');
     assert.deepEqual(yochi.approvals, ['c']);
+  });
+
+  test('suggesting something already in the catalogue dedupes to an approval', () => {
+    // Yochi ships in the standing catalogue. Someone typing "Yochi" into the
+    // suggest box must not create a second, competing ballot for it.
+    let ballots = scenario();
+    const before = ballots.length;
+    ballots = addSuggestion(ballots, CATALOGUE.get('yochi')!, 'a', NOW);
+
+    assert.equal(ballots.length, before, 'no duplicate Yochi ballot');
+    const yochi = ballots.find((b) => b.activityId === 'yochi')!;
+    assert.ok(yochi.approvals.includes('a'));
+    assert.equal(yochi.origin.kind, 'catalogue', 'it was always on the list');
   });
 
   test('re-suggesting something already listed is an approval, not a duplicate', () => {
@@ -180,14 +194,14 @@ describe('coverage and attendance interact', () => {
     ballots = recordAnswers(ballots, 'a', ALL_IDS, ['pool']);
     ballots = recordAnswers(ballots, 'b', ALL_IDS, ['pool']);
     ballots = recordAnswers(ballots, 'c', ALL_IDS, ['pool']);
-    ballots = addSuggestion(ballots, YOCHI, 'a', NOW);
-    ballots = recordAnswers(ballots, 'b', ['yochi'], ['yochi']);
+    ballots = addSuggestion(ballots, NIGHT_MARKET, 'a', NOW);
+    ballots = recordAnswers(ballots, 'b', ['night-market'], ['night-market']);
     // c never answers about Yochi — but c cannot make the chosen slot anyway.
 
-    const catalogue = new Map([...CATALOGUE, ['yochi', YOCHI]]);
+    const catalogue = new Map([...CATALOGUE, ['night-market', NIGHT_MARKET]]);
     const attending = [member('a'), member('b')];
     const yochi = rankBallots(ballots, catalogue, attending)
-      .find((r) => r.activity.id === 'yochi')!;
+      .find((r) => r.activity.id === 'night-market')!;
 
     assert.equal(yochi.eligible, true, 'coverage is measured over people who are coming');
     assert.deepEqual(yochi.pending, []);
@@ -196,19 +210,19 @@ describe('coverage and attendance interact', () => {
   test('a lowered threshold can break a stalemate', () => {
     let ballots = openBallots(ACTIVITIES, NOW);
     for (const who of ['a', 'b', 'c']) ballots = recordAnswers(ballots, who, ALL_IDS, ['pool']);
-    ballots = addSuggestion(ballots, YOCHI, 'a', NOW);
-    ballots = recordAnswers(ballots, 'b', ['yochi'], ['yochi']);
+    ballots = addSuggestion(ballots, NIGHT_MARKET, 'a', NOW);
+    ballots = recordAnswers(ballots, 'b', ['night-market'], ['night-market']);
     // c has gone quiet.
 
-    const catalogue = new Map([...CATALOGUE, ['yochi', YOCHI]]);
+    const catalogue = new Map([...CATALOGUE, ['night-market', NIGHT_MARKET]]);
     const attendees = ['a', 'b', 'c'].map((id) => member(id));
 
     assert.equal(
-      rankBallots(ballots, catalogue, attendees).find((r) => r.activity.id === 'yochi')!.eligible,
+      rankBallots(ballots, catalogue, attendees).find((r) => r.activity.id === 'night-market')!.eligible,
       false, 'strict by default');
     assert.equal(
       rankBallots(ballots, catalogue, attendees, { coverageThreshold: 0.6 })
-        .find((r) => r.activity.id === 'yochi')!.eligible,
+        .find((r) => r.activity.id === 'night-market')!.eligible,
       true, 'organiser can force it through');
   });
 
@@ -216,10 +230,10 @@ describe('coverage and attendance interact', () => {
     let ballots = openBallots(ACTIVITIES, NOW);
     ballots = recordAnswers(ballots, 'a', ALL_IDS, []);
     ballots = recordAnswers(ballots, 'b', ALL_IDS, []);
-    ballots = addSuggestion(ballots, { ...YOCHI, id: 'fancy', estCostAud: 90 }, 'a', NOW);
+    ballots = addSuggestion(ballots, { ...NIGHT_MARKET, id: 'fancy', estCostAud: 90 }, 'a', NOW);
     ballots = recordAnswers(ballots, 'b', ['fancy'], ['fancy']);
 
-    const catalogue = new Map([...CATALOGUE, ['fancy', { ...YOCHI, id: 'fancy', estCostAud: 90 }]]);
+    const catalogue = new Map([...CATALOGUE, ['fancy', { ...NIGHT_MARKET, id: 'fancy', estCostAud: 90 }]]);
     const outcome = rankBallots(ballots, catalogue, [member('a', 40), member('b', 40)])
       .find((r) => r.activity.id === 'fancy')!;
 

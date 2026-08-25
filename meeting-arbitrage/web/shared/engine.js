@@ -135,16 +135,16 @@ function resolveAvailability(p, slot, responses, tz) {
 }
 function scoreSlots(input) {
   const cfg = resolveConfig(input.config);
-  const { participants, responses, slots } = input;
-  const ranked = slots.map((slot) => scoreOneSlot(slot, participants, responses, cfg)).sort(compareSlotScores);
-  const nonResponders = participants.filter((p) => Object.keys(responses[p.id] ?? {}).length === 0).map((p) => p.id);
+  const { participants: participants2, responses, slots } = input;
+  const ranked = slots.map((slot) => scoreOneSlot(slot, participants2, responses, cfg)).sort(compareSlotScores);
+  const nonResponders = participants2.filter((p) => Object.keys(responses[p.id] ?? {}).length === 0).map((p) => p.id);
   return {
     ranked,
     recommendation: recommend(ranked, cfg),
     nonResponders
   };
 }
-function scoreOneSlot(slot, participants, responses, cfg) {
+function scoreOneSlot(slot, participants2, responses, cfg) {
   const attendees = [];
   const ifNeeded = [];
   const absent = [];
@@ -153,7 +153,7 @@ function scoreOneSlot(slot, participants, responses, cfg) {
   const conflicts = [];
   const reasons = [];
   let score = 0;
-  for (const p of participants) {
+  for (const p of participants2) {
     const { value, conflict } = resolveAvailability(p, slot, responses, cfg.timezone);
     const weight = schedulingWeight(p, cfg);
     if (conflict)
@@ -288,7 +288,7 @@ function patternLabel(p) {
 var NUMERIC = { yes: 1, ifneed: 0.5, no: 0 };
 function recommendAnchor(input) {
   const cfg = { ...DEFAULT_CONFIG, ...input.config };
-  const { participants, responses } = input;
+  const { participants: participants2, responses } = input;
   const groups = /* @__PURE__ */ new Map();
   for (const slot of input.slots) {
     const lp = localParts(slot.startUtc, cfg.timezone);
@@ -303,7 +303,7 @@ function recommendAnchor(input) {
     else
       groups.set(key, { pattern, slots: [slot] });
   }
-  const ranked = [...groups.values()].map(({ pattern, slots }) => scorePattern(pattern, slots, participants, responses, cfg)).sort((a, b) => b.score - a.score || b.expectedHeads - a.expectedHeads);
+  const ranked = [...groups.values()].map(({ pattern, slots }) => scorePattern(pattern, slots, participants2, responses, cfg)).sort((a, b) => b.score - a.score || b.expectedHeads - a.expectedHeads);
   const viable = ranked.filter((c) => c.viable);
   const incumbentKey = input.incumbent ? patternKey(input.incumbent) : null;
   const incumbent = incumbentKey ? ranked.find((c) => c.key === incumbentKey) ?? null : null;
@@ -323,7 +323,7 @@ function recommendAnchor(input) {
       best,
       incumbent: null,
       action: "adopt",
-      rationale: `${best.label} is the strongest standing slot (${best.expectedHeads.toFixed(1)} of ${participants.length} in a typical week).`
+      rationale: `${best.label} is the strongest standing slot (${best.expectedHeads.toFixed(1)} of ${participants2.length} in a typical week).`
     };
   }
   if (incumbent.conflicts.length > 0) {
@@ -362,7 +362,7 @@ function recommendAnchor(input) {
     rationale: `${best.label} beats ${incumbent.label} by ${margin.toFixed(2)}, clearing the ${cfg.switchMargin.toFixed(2)} margin.`
   };
 }
-function scorePattern(pattern, slots, participants, responses, cfg) {
+function scorePattern(pattern, slots, participants2, responses, cfg) {
   const conflicts = [];
   const wouldExclude = [];
   const unknown = [];
@@ -370,7 +370,7 @@ function scorePattern(pattern, slots, participants, responses, cfg) {
   let score = 0;
   let expectedHeads = 0;
   let blocked = false;
-  for (const p of participants) {
+  for (const p of participants2) {
     const clash = (p.standingConflicts ?? []).find(
       (c) => c.weekday === pattern.weekday && overlapsTime(pattern, c.startMin, c.endMin, slots)
     );
@@ -611,7 +611,7 @@ var ACTIVITIES = [
   {
     id: "eats-casual",
     label: "Casual eats",
-    emoji: "\u{1F35C}",
+    emoji: "\u{1F37D}\uFE0F",
     estCostAud: 28,
     durationMins: 90,
     category: "food",
@@ -619,6 +619,54 @@ var ACTIVITIES = [
     timeOfDay: "any",
     sequenceRank: 1,
     tags: ["food", "chill", "always-works"]
+  },
+  {
+    id: "ramen",
+    label: "Ramen",
+    emoji: "\u{1F35C}",
+    estCostAud: 24,
+    durationMins: 75,
+    category: "food",
+    placesQuery: "ramen",
+    timeOfDay: "any",
+    sequenceRank: 1,
+    tags: ["food", "cheap"]
+  },
+  {
+    id: "pizza",
+    label: "Pizza",
+    emoji: "\u{1F355}",
+    estCostAud: 25,
+    durationMins: 90,
+    category: "food",
+    placesQuery: "pizza restaurant",
+    timeOfDay: "any",
+    sequenceRank: 1,
+    tags: ["food", "group"]
+  },
+  {
+    id: "thai",
+    label: "Thai",
+    emoji: "\u{1F35B}",
+    estCostAud: 28,
+    durationMins: 90,
+    category: "food",
+    placesQuery: "thai restaurant",
+    timeOfDay: "any",
+    sequenceRank: 1,
+    tags: ["food", "group"]
+  },
+  {
+    id: "korean-bbq",
+    label: "Korean BBQ",
+    emoji: "\u{1F969}",
+    estCostAud: 48,
+    durationMins: 120,
+    category: "food",
+    placesQuery: "korean bbq",
+    timeOfDay: "night",
+    sequenceRank: 1,
+    tags: ["food", "group", "occasion"]
   },
   {
     id: "eats-nice",
@@ -667,6 +715,42 @@ var ACTIVITIES = [
     timeOfDay: "day",
     sequenceRank: 1,
     tags: ["cheap", "day"]
+  },
+  {
+    id: "yochi",
+    label: "Yochi",
+    emoji: "\u{1F366}",
+    estCostAud: 12,
+    durationMins: 40,
+    category: "dessert",
+    placesQuery: "Yochi frozen yogurt",
+    timeOfDay: "any",
+    sequenceRank: 2,
+    tags: ["dessert", "cheap", "always-works"]
+  },
+  {
+    id: "gelato",
+    label: "Gelato",
+    emoji: "\u{1F368}",
+    estCostAud: 10,
+    durationMins: 40,
+    category: "dessert",
+    placesQuery: "gelato",
+    timeOfDay: "any",
+    sequenceRank: 2,
+    tags: ["dessert", "cheap"]
+  },
+  {
+    id: "dessert-bar",
+    label: "Dessert bar",
+    emoji: "\u{1F370}",
+    estCostAud: 20,
+    durationMins: 60,
+    category: "dessert",
+    placesQuery: "dessert bar",
+    timeOfDay: "night",
+    sequenceRank: 2,
+    tags: ["dessert"]
   },
   {
     id: "pub",
@@ -999,6 +1083,268 @@ function scorePlan(args) {
   };
 }
 
+// src/ripple/suggestions.ts
+function openBallots(catalogue, now) {
+  return catalogue.map((activity) => ({
+    activityId: activity.id,
+    seen: [],
+    approvals: [],
+    origin: { kind: "catalogue" },
+    addedAt: now
+  }));
+}
+function recordAnswers(ballots, memberId, shown, approved) {
+  const shownSet = new Set(shown);
+  const approvedSet = new Set(approved.filter((id) => shownSet.has(id)));
+  return ballots.map((ballot) => {
+    if (!shownSet.has(ballot.activityId))
+      return ballot;
+    const seen = ballot.seen.includes(memberId) ? ballot.seen : [...ballot.seen, memberId];
+    const wants = approvedSet.has(ballot.activityId);
+    const approvals = wants ? ballot.approvals.includes(memberId) ? ballot.approvals : [...ballot.approvals, memberId] : ballot.approvals.filter((id) => id !== memberId);
+    return { ...ballot, seen, approvals };
+  });
+}
+function addSuggestion(ballots, activity, by, now, origin) {
+  if (ballots.some((b) => b.activityId === activity.id)) {
+    return recordAnswers(ballots, by, [activity.id], [activity.id]);
+  }
+  return [...ballots, {
+    activityId: activity.id,
+    seen: [by],
+    approvals: [by],
+    origin: origin ?? { kind: "suggested", by },
+    addedAt: now
+  }];
+}
+function pendingAsksFor(ballots, memberId, catalogue) {
+  const hasStarted = ballots.some((b) => b.seen.includes(memberId));
+  if (!hasStarted)
+    return [];
+  return ballots.filter((b) => !b.seen.includes(memberId)).map((b) => catalogue.get(b.activityId)).filter((a) => Boolean(a));
+}
+function participants(ballots) {
+  const ids = /* @__PURE__ */ new Set();
+  for (const ballot of ballots)
+    for (const id of ballot.seen)
+      ids.add(id);
+  return [...ids];
+}
+function outstandingAsks(ballots, catalogue) {
+  return participants(ballots).map((memberId) => ({ memberId, activities: pendingAsksFor(ballots, memberId, catalogue) })).filter((row) => row.activities.length > 0);
+}
+function rankBallots(ballots, catalogue, attendees, options = {}) {
+  const pricedOutPenalty = options.pricedOutPenalty ?? 1.5;
+  const coverageThreshold = options.coverageThreshold ?? 1;
+  const everyone = participants(ballots);
+  const attendeeIds = new Set(attendees.map((m) => m.id));
+  return ballots.map((ballot) => {
+    const activity = catalogue.get(ballot.activityId);
+    if (!activity)
+      return null;
+    const seen = ballot.seen.filter((id) => attendeeIds.has(id));
+    const approvals = ballot.approvals.filter((id) => attendeeIds.has(id));
+    const relevant = everyone.filter((id) => attendeeIds.has(id));
+    const pending = relevant.filter((id) => !seen.includes(id));
+    const coverage = relevant.length === 0 ? 0 : seen.length / relevant.length;
+    const pricedOut = attendees.filter((m) => m.budgetAud < activity.estCostAud).map((m) => m.id);
+    const eligible = coverage >= coverageThreshold;
+    const score = approvals.length - pricedOutPenalty * pricedOut.length;
+    const reasons = [];
+    if (!eligible) {
+      reasons.push(pending.length === 1 ? `waiting on 1 person to see it` : `waiting on ${pending.length} people to see it`);
+    }
+    if (pricedOut.length > 0) {
+      reasons.push(`over budget for ${pricedOut.length} ${pricedOut.length === 1 ? "person" : "people"}`);
+    }
+    if (ballot.origin.kind === "suggested")
+      reasons.push("suggested mid-plan");
+    if (ballot.origin.kind === "link")
+      reasons.push(`added from ${ballot.origin.platform}`);
+    if (activity.rippleEvent)
+      reasons.push("curated Ripple event");
+    return {
+      activity,
+      approvals,
+      seen,
+      pending,
+      coverage: Math.round(coverage * 100) / 100,
+      pricedOut,
+      eligible,
+      origin: ballot.origin,
+      score: Math.round(score * 1e3) / 1e3,
+      reasons
+    };
+  }).filter((o) => o !== null).sort((a, b) => {
+    if (a.eligible !== b.eligible)
+      return a.eligible ? -1 : 1;
+    if (a.score !== b.score)
+      return b.score - a.score;
+    if (a.approvals.length !== b.approvals.length)
+      return b.approvals.length - a.approvals.length;
+    if (a.activity.estCostAud !== b.activity.estCostAud) {
+      return a.activity.estCostAud - b.activity.estCostAud;
+    }
+    return a.activity.id.localeCompare(b.activity.id);
+  });
+}
+
+// src/ripple/event-links.ts
+var RULES = [
+  {
+    platform: "luma",
+    hosts: ["lu.ma", "www.lu.ma", "luma.com", "www.luma.com"],
+    // lu.ma/abc123, and luma.com/e/abc123
+    extract: (p) => {
+      const m = p.match(/^\/(?:e\/)?([A-Za-z0-9-]{3,64})\/?$/);
+      return m ? m[1] : null;
+    }
+  },
+  {
+    platform: "partiful",
+    hosts: ["partiful.com", "www.partiful.com"],
+    extract: (p) => {
+      const m = p.match(/^\/e\/([A-Za-z0-9_-]{3,64})\/?$/);
+      return m ? m[1] : null;
+    }
+  },
+  {
+    platform: "eventbrite",
+    hosts: [
+      "eventbrite.com",
+      "www.eventbrite.com",
+      "eventbrite.com.au",
+      "www.eventbrite.com.au"
+    ],
+    // .../some-event-title-tickets-1234567890
+    extract: (p) => {
+      const m = p.match(/-(\d{8,20})\/?$/);
+      return m ? m[1] : null;
+    }
+  },
+  {
+    platform: "humanitix",
+    hosts: ["humanitix.com", "www.humanitix.com", "events.humanitix.com"],
+    extract: (p) => {
+      const m = p.match(/^\/([A-Za-z0-9-]{3,120})\/?$/);
+      return m ? m[1] : null;
+    }
+  },
+  {
+    platform: "meetup",
+    hosts: ["meetup.com", "www.meetup.com"],
+    extract: (p) => {
+      const m = p.match(/^\/[^/]+\/events\/(\d{6,20})\/?$/);
+      return m ? m[1] : null;
+    }
+  }
+];
+var STRIP_PARAMS = /^(utm_|fbclid|gclid|igshid|ref|source|mc_|_ga)/i;
+function parseEventUrl(raw) {
+  let url;
+  try {
+    url = new URL(raw.trim());
+  } catch {
+    return null;
+  }
+  if (url.protocol !== "https:" && url.protocol !== "http:")
+    return null;
+  const host = url.hostname.toLowerCase();
+  const rule = RULES.find((r) => r.hosts.includes(host));
+  if (!rule)
+    return null;
+  const sourceId = rule.extract(url.pathname);
+  if (!sourceId)
+    return null;
+  const canonical = new URL(`https://${host}${url.pathname.replace(/\/$/, "")}`);
+  for (const [key, value] of url.searchParams) {
+    if (!STRIP_PARAMS.test(key))
+      canonical.searchParams.set(key, value);
+  }
+  return { platform: rule.platform, sourceId, canonicalUrl: canonical.toString() };
+}
+var OG = /<meta[^>]+(?:property|name)=["'](og:[a-z:]+|description)["'][^>]+content=["']([^"']*)["'][^>]*>/gi;
+var OG_REVERSED = /<meta[^>]+content=["']([^"']*)["'][^>]+(?:property|name)=["'](og:[a-z:]+|description)["'][^>]*>/gi;
+async function fetchEventMeta(parsed, fetchImpl = fetch) {
+  try {
+    const res = await fetchImpl(parsed.canonicalUrl, {
+      headers: { accept: "text/html" },
+      redirect: "follow"
+    });
+    if (!res.ok)
+      return {};
+    const html = (await res.text()).slice(0, 2e5);
+    const found = {};
+    for (const re of [OG, OG_REVERSED]) {
+      re.lastIndex = 0;
+      for (const m of html.matchAll(re)) {
+        const [key, value] = re === OG ? [m[1], m[2]] : [m[2], m[1]];
+        if (!found[key])
+          found[key] = decodeEntities(value);
+      }
+    }
+    const meta = {};
+    const title = found["og:title"];
+    const description = found["og:description"] ?? found.description;
+    const imageUrl = found["og:image"];
+    const startsAt = found["og:start_time"] ?? found["event:start_time"];
+    if (title)
+      meta.title = title;
+    if (description)
+      meta.description = description;
+    if (imageUrl)
+      meta.imageUrl = imageUrl;
+    if (startsAt)
+      meta.startsAt = startsAt;
+    return meta;
+  } catch {
+    return {};
+  }
+}
+function decodeEntities(s) {
+  return s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#0?39;|&apos;/g, "'").replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)));
+}
+var PLATFORM_LABEL = {
+  luma: "Luma",
+  partiful: "Partiful",
+  eventbrite: "Eventbrite",
+  humanitix: "Humanitix",
+  meetup: "Meetup"
+};
+function platformLabel(platform) {
+  return PLATFORM_LABEL[platform];
+}
+function toActivity(parsed, meta, fallbackCostAud) {
+  const title = (meta.title ?? "").trim();
+  return {
+    id: `link-${parsed.platform}-${parsed.sourceId}`,
+    label: title.length > 0 ? truncate(title, 42) : `${platformLabel(parsed.platform)} event`,
+    emoji: "\u{1F39F}\uFE0F",
+    estCostAud: Math.max(0, Math.round(fallbackCostAud)),
+    durationMins: 150,
+    category: "culture",
+    placesQuery: "",
+    timeOfDay: "night",
+    sequenceRank: 3,
+    tags: ["link", parsed.platform],
+    rippleEvent: false
+  };
+}
+function truncate(s, max) {
+  return s.length <= max ? s : `${s.slice(0, max - 1).trimEnd()}\u2026`;
+}
+function toDirectorySubmission(parsed, meta, submittedBy) {
+  return {
+    platform: parsed.platform,
+    sourceId: parsed.sourceId,
+    canonicalUrl: parsed.canonicalUrl,
+    title: (meta.title ?? `${platformLabel(parsed.platform)} event`).trim(),
+    imageUrl: meta.imageUrl,
+    submittedBy,
+    status: "pending_review"
+  };
+}
+
 // src/ripple/brief.ts
 function buildBrief(input) {
   const nameOf = (id) => input.names[id] ?? id;
@@ -1326,6 +1672,7 @@ export {
   DEFAULT_CONFIG,
   DEFAULT_HANGOUT_CONFIG,
   SUBURBS,
+  addSuggestion,
   buildAgenda,
   buildBrief,
   buildItinerary,
@@ -1334,24 +1681,35 @@ export {
   describeIssueOutcome,
   estimateTravelMinutes,
   evaluateRefix,
+  fetchEventMeta,
   formatMoney,
   formatSlot,
   generateGrid,
   groupCentroid,
   haversineKm,
+  toActivity as linkToActivity,
   localParts,
   mergeRippleEvents,
   offenderTable,
+  openBallots,
+  outstandingAsks,
+  parseEventUrl,
+  participants,
   patternKey,
   patternLabel,
+  pendingAsksFor,
+  platformLabel,
   rankActivities,
+  rankBallots,
   rankHubs,
   recommendAnchor,
+  recordAnswers,
   renderChatMessage,
   resolveDisputes,
   resolveIssue,
   schedulingWeight,
   scorePlan,
   scoreSlots,
-  settleWeek
+  settleWeek,
+  toDirectorySubmission
 };

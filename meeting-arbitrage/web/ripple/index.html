@@ -31,115 +31,227 @@
 
   <div class="screens">
 
-    <!-- 0 · Welcome -->
-    <section class="screen" data-active>
-      <p class="eyebrow">See what's on in your city</p>
-      <h1>Someone wants to hang. When are you free?</h1>
-      <p class="sub">
-        Six questions, about forty seconds. We work out the time that suits the
-        most people, what you all actually want to do, and where that lands so
-        nobody does an hour each way.
-      </p>
+    <!-- ══ Welcome ══════════════════════════════════════════════════════ -->
+    <section class="screen" id="screen-welcome" data-active>
+      <div class="screen-body">
+        <p class="eyebrow">See what's on in your city</p>
+        <h1 id="welcome-title">Hassaan wants to hang.</h1>
+        <p class="sub">Take 30 seconds. Get a plan.</p>
+        <p class="demo-note">
+          Demo: five friends have already answered. You're the sixth.
+        </p>
+      </div>
+      <div class="screen-foot">
+        <button class="btn" type="button" data-go="name">I'm in — let's go <span aria-hidden="true">→</span></button>
+        <button class="btn ghost" type="button" data-go="host-what">I'm making the plan</button>
+      </div>
+    </section>
 
-      <div class="card">
-        <div class="rows">
-          <div class="row"><span class="k">Time</span><span class="v">Most people, not first reply</span></div>
-          <div class="row"><span class="k">Plan</span><span class="v">What the group voted for</span></div>
-          <div class="row"><span class="k">Budget</span><span class="v">Set by the tightest wallet</span></div>
-          <div class="row"><span class="k">Spot</span><span class="v">Fair travel for everyone</span></div>
+    <!-- ══ Guest flow ═══════════════════════════════════════════════════ -->
+
+    <section class="screen" id="screen-name">
+      <div class="screen-body">
+        <p class="eyebrow">Step one</p>
+        <h1>What should we call you?</h1>
+        <p class="sub">Goes on the plan so people know who's coming.</p>
+        <input class="field" id="name-input" type="text" placeholder="Your name"
+               autocomplete="given-name" enterkeyhint="next" maxlength="40">
+      </div>
+      <div class="screen-foot row">
+        <button class="btn ghost" type="button" data-back>Back</button>
+        <button class="btn" type="button" data-go="suburb" id="next-name" disabled>Next <span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-suburb">
+      <div class="screen-body">
+        <p class="eyebrow">Step two</p>
+        <h1>Where are you coming from?</h1>
+        <p class="sub">So we don't pick a spot that's an hour for you.</p>
+        <input class="field" id="suburb-search" type="search" placeholder="Search suburbs"
+               autocomplete="off" enterkeyhint="search">
+        <div class="suburb-list" id="suburb-list"></div>
+      </div>
+      <div class="screen-foot row">
+        <button class="btn ghost" type="button" data-back>Back</button>
+        <button class="btn" type="button" data-go="budget" id="next-suburb" disabled>Next <span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-budget">
+      <div class="screen-body">
+        <p class="eyebrow">Step three</p>
+        <h1>What are you happy to spend?</h1>
+        <div class="budget-figure" id="budget-figure">$50</div>
+        <input type="range" id="budget-range" min="0" max="150" step="5" value="50"
+               aria-label="Budget per person in dollars">
+        <div class="budget-hint" id="budget-hint"></div>
+      </div>
+      <div class="screen-foot row">
+        <button class="btn ghost" type="button" data-back>Back</button>
+        <button class="btn" type="button" data-go="vibe">Next <span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-vibe">
+      <div class="screen-body">
+        <p class="eyebrow">Step four</p>
+        <h1>What are you up for?</h1>
+        <p class="sub" id="vibe-count">Pick anything you'd say yes to</p>
+        <div id="pending-slot"></div>
+        <div class="suggest-row">
+          <button class="suggest-btn" type="button" id="open-suggest">
+            Suggest something<small>Not on the list</small>
+          </button>
+          <button class="suggest-btn" type="button" id="open-link">
+            Paste a link<small>Luma, Partiful…</small>
+          </button>
         </div>
+        <div id="vibe-list"></div>
       </div>
-
-      <p class="demo-note">
-        Demo mode: five friends across Sydney have already answered. You're the
-        sixth, and the plan is computed by the real engine from whatever you enter.
-      </p>
-
-      <div class="actions">
-        <button class="btn" type="button" data-next id="next-0">Start <span aria-hidden="true">→</span></button>
-      </div>
-    </section>
-
-    <!-- 1 · Name -->
-    <section class="screen">
-      <p class="eyebrow">Step one</p>
-      <h1>What should we call you?</h1>
-      <p class="sub">Goes on the plan so people know who's coming.</p>
-      <input class="field" id="name-input" type="text" placeholder="Your name"
-             autocomplete="given-name" enterkeyhint="next" maxlength="40">
-      <div class="actions row">
+      <div class="screen-foot row">
         <button class="btn ghost" type="button" data-back>Back</button>
-        <button class="btn" type="button" data-next id="next-1" disabled>Next <span aria-hidden="true">→</span></button>
+        <button class="btn" type="button" data-go="when" id="next-vibe" disabled>Next <span aria-hidden="true">→</span></button>
       </div>
     </section>
 
-    <!-- 2 · Suburb -->
-    <section class="screen">
-      <p class="eyebrow">Step two</p>
-      <h1>Where are you coming from?</h1>
-      <p class="sub">
-        Sydney's wide. This is how we stop picking a spot that's ten minutes for
-        four people and an hour for you.
-      </p>
-      <input class="field" id="suburb-search" type="search" placeholder="Search suburbs"
-             autocomplete="off" enterkeyhint="search">
-      <div class="suburb-list" id="suburb-list"></div>
-      <div class="actions row">
+    <section class="screen" id="screen-when">
+      <div class="screen-body">
+        <p class="eyebrow">Step five</p>
+        <h1>When works?</h1>
+        <p class="sub" id="when-count">Tap the times that work</p>
+        <div class="grid-legend">
+          <span><i style="background:var(--accent)"></i>Yes</span>
+          <span><i style="background:var(--accent-wash);outline:1px solid var(--accent-soft)"></i>If needed</span>
+          <span><i style="background:#DEDDE4"></i>No</span>
+        </div>
+        <div id="when-grid"></div>
+      </div>
+      <div class="screen-foot row">
         <button class="btn ghost" type="button" data-back>Back</button>
-        <button class="btn" type="button" data-next id="next-2" disabled>Next <span aria-hidden="true">→</span></button>
+        <button class="btn" type="button" data-go="result" id="next-when" disabled>See the plan <span aria-hidden="true">→</span></button>
       </div>
     </section>
 
-    <!-- 3 · Budget -->
-    <section class="screen">
-      <p class="eyebrow">Step three</p>
-      <h1>What are you happy to spend?</h1>
-      <div class="budget-figure" id="budget-figure">$50</div>
-      <input type="range" id="budget-range" min="0" max="150" step="5" value="50"
-             aria-label="Budget per person in dollars">
-      <div class="budget-hint" id="budget-hint"></div>
-      <div class="actions row">
+    <section class="screen" id="screen-result">
+      <div class="screen-body" id="result-body"></div>
+      <div class="screen-foot row">
+        <button class="btn ghost" type="button" id="result-copy">Copy</button>
+        <button class="btn" type="button" data-go="install">Add to calendar <span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-install">
+      <div class="screen-body">
+        <p class="eyebrow">One last thing</p>
+        <h1>Get it in your calendar</h1>
+        <p class="sub">And a nudge the day before, so nobody forgets.</p>
+        <div class="install">
+          <span class="mark">r</span>
+          <h3>Install Ripple</h3>
+          <p>Syncs the plan to your calendar, keeps the group in one place, and
+             shows what's on near you.</p>
+          <button class="btn" type="button" id="install-btn">Get Ripple</button>
+        </div>
+        <details class="disclosure">
+          <summary>Not now — just the calendar file</summary>
+          <div class="disclosure-body">
+            <p class="why">Downloads a one-off <b>.ics</b>. You'll get the event,
+              but not the reminder or any changes if the plan moves.</p>
+            <a class="btn ghost" id="ics-link" href="#" style="text-decoration:none">Download .ics</a>
+          </div>
+        </details>
+      </div>
+      <div class="screen-foot">
+        <button class="btn ghost" type="button" data-go="result">Back to the plan</button>
+      </div>
+    </section>
+
+    <!-- ══ Organiser flow ═══════════════════════════════════════════════ -->
+
+    <section class="screen" id="screen-host-what">
+      <div class="screen-body">
+        <p class="eyebrow">Making a plan</p>
+        <h1>What's the occasion?</h1>
+        <p class="sub">Optional. "Friday" works fine.</p>
+        <input class="field" id="plan-title" type="text" placeholder="Friday night"
+               maxlength="50" enterkeyhint="next">
+      </div>
+      <div class="screen-foot row">
+        <button class="btn ghost" type="button" data-go="welcome">Back</button>
+        <button class="btn" type="button" data-go="host-who">Next <span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-host-who">
+      <div class="screen-body">
+        <p class="eyebrow">Making a plan</p>
+        <h1>Who's coming?</h1>
+        <p class="sub" id="who-count">Number or email. They don't need the app.</p>
+        <input class="field" id="invitee-input" type="text"
+               placeholder="Name, then number or email" enterkeyhint="done">
+        <button class="btn ghost" type="button" id="add-invitee">Add</button>
+        <div class="invitees" id="invitee-list"></div>
+      </div>
+      <div class="screen-foot row">
         <button class="btn ghost" type="button" data-back>Back</button>
-        <button class="btn" type="button" data-next id="next-3">Next <span aria-hidden="true">→</span></button>
+        <button class="btn" type="button" data-go="host-options" id="next-who" disabled>Next <span aria-hidden="true">→</span></button>
       </div>
     </section>
 
-    <!-- 4 · Vibe -->
-    <section class="screen">
-      <p class="eyebrow">Step four</p>
-      <h1>What are you up for?</h1>
-      <p class="sub" id="vibe-count">Pick anything you'd say yes to</p>
-      <div id="vibe-list"></div>
-      <div class="actions row">
+    <section class="screen" id="screen-host-options">
+      <div class="screen-body">
+        <p class="eyebrow">Making a plan</p>
+        <h1>Anything in mind?</h1>
+        <p class="sub">Pick a few to start. People can add their own.</p>
+        <div id="host-options-list"></div>
+      </div>
+      <div class="screen-foot row">
         <button class="btn ghost" type="button" data-back>Back</button>
-        <button class="btn" type="button" data-next id="next-4" disabled>Next <span aria-hidden="true">→</span></button>
+        <button class="btn" type="button" data-go="host-send">Next <span aria-hidden="true">→</span></button>
       </div>
     </section>
 
-    <!-- 5 · When -->
-    <section class="screen">
-      <p class="eyebrow">Step five</p>
-      <h1>When works?</h1>
-      <p class="sub" id="when-count">Tap the times that work</p>
-      <div class="grid-legend">
-        <span><i style="background:var(--accent)"></i>Yes</span>
-        <span><i style="background:var(--accent-wash);outline:1px solid var(--accent-soft)"></i>If needed</span>
-        <span><i style="background:#DEDDE4"></i>No</span>
-        <span>Tap again to cycle</span>
-      </div>
-      <div id="when-grid"></div>
-      <div class="actions row">
+    <section class="screen" id="screen-host-send">
+      <div class="screen-body" id="host-send-body"></div>
+      <div class="screen-foot row">
         <button class="btn ghost" type="button" data-back>Back</button>
-        <button class="btn" type="button" data-next id="next-5" disabled>See the plan <span aria-hidden="true">→</span></button>
+        <button class="btn" type="button" id="send-invites">Send <span aria-hidden="true">→</span></button>
       </div>
     </section>
 
-    <!-- 6 · Result -->
-    <section class="screen">
-      <p class="eyebrow">What you're actually committed to</p>
-      <div id="result-body"></div>
+    <section class="screen" id="screen-host-track">
+      <div class="screen-body" id="host-track-body"></div>
+      <div class="screen-foot row">
+        <button class="btn ghost" type="button" data-go="welcome">Start over</button>
+        <button class="btn" type="button" id="blast-btn">Nudge who's missing</button>
+      </div>
     </section>
 
+  </div>
+
+  <!-- Sheets -->
+  <div class="sheet" id="sheet-suggest">
+    <div class="sheet-inner">
+      <h3>Suggest something</h3>
+      <p>Everyone who's already answered gets asked about just this one thing.</p>
+      <input class="field" id="suggest-name" type="text" placeholder="What is it? e.g. Yochi" maxlength="40">
+      <input class="field" id="suggest-cost" type="number" placeholder="Roughly $ each" min="0" max="500">
+      <button class="btn" type="button" id="suggest-add">Add it</button>
+      <button class="btn ghost" type="button" data-close-sheet>Cancel</button>
+    </div>
+  </div>
+
+  <div class="sheet" id="sheet-link">
+    <div class="sheet-inner">
+      <h3>Paste a link</h3>
+      <p>Luma, Partiful, Eventbrite, Humanitix or Meetup. It becomes an option
+         everyone votes on, and gets suggested to Ripple's directory.</p>
+      <input class="field" id="link-url" type="url" placeholder="https://lu.ma/…" spellcheck="false">
+      <div id="link-feedback"></div>
+      <button class="btn" type="button" id="link-add">Add it</button>
+      <button class="btn ghost" type="button" data-close-sheet>Cancel</button>
+    </div>
   </div>
 
   <nav class="tabbar" aria-label="Ripple">
@@ -149,7 +261,7 @@
     <button type="button" aria-label="Map">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="m9 4 6 2 6-2v14l-6 2-6-2-6 2V6z"/><path d="M9 4v14M15 6v14"/></svg>
     </button>
-    <button type="button" class="fab" aria-label="Create">
+    <button type="button" class="fab" aria-label="Create" data-go="host-what">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
     </button>
     <button type="button" aria-label="Friends">
