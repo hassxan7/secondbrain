@@ -243,3 +243,62 @@ CREATE TABLE IF NOT EXISTS calendar_tokens (
   expires_at    TEXT NOT NULL,
   connected_at  TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- ── Plan options and per-person answers ──────────────────────────────────────
+-- Modelled as one row per (option, person) rather than one blob per person.
+-- The distinction between "answered no" and "never shown" is what lets an
+-- option added mid-plan be re-asked to exactly the people who have not seen it,
+-- instead of re-opening the whole poll. See src/ripple/suggestions.ts.
+
+CREATE TABLE IF NOT EXISTS plan_options (
+  poll_id       TEXT NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
+  activity_id   TEXT NOT NULL,
+  -- The full Activity, so an option survives a catalogue edit unchanged.
+  activity_json TEXT NOT NULL,
+  -- {kind: catalogue | suggested | link, by?, url?, platform?}
+  origin_json   TEXT NOT NULL DEFAULT '{"kind":"catalogue"}',
+  added_by      TEXT REFERENCES members(id) ON DELETE SET NULL,
+  added_at      TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (poll_id, activity_id)
+);
+
+CREATE TABLE IF NOT EXISTS option_answers (
+  poll_id     TEXT NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
+  activity_id TEXT NOT NULL,
+  member_id   TEXT NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+  -- A row existing means "seen". This column means "wanted".
+  approved    INTEGER NOT NULL DEFAULT 0,
+  answered_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (poll_id, activity_id, member_id)
+);
+CREATE INDEX IF NOT EXISTS idx_answers_member ON option_answers(poll_id, member_id);
+
+-- Events users paste in. Held for review — anyone with a link could otherwise
+-- write to the directory. Crawling these hosts is a separate job.
+CREATE TABLE IF NOT EXISTS directory_submissions (
+  id            TEXT PRIMARY KEY,
+  platform      TEXT NOT NULL,
+  source_id     TEXT NOT NULL,
+  canonical_url TEXT NOT NULL,
+  title         TEXT NOT NULL,
+  image_url     TEXT,
+  submitted_by  TEXT REFERENCES members(id) ON DELETE SET NULL,
+  status        TEXT NOT NULL DEFAULT 'pending_review'
+                CHECK (status IN ('pending_review','published','rejected')),
+  created_at    TEXT NOT NULL DEFAULT (datetime('now')),
+  UNIQUE (platform, source_id)
+);
+
+-- Who was invited, on which channel, and whether they have been chased.
+CREATE TABLE IF NOT EXISTS invites (
+  id           TEXT PRIMARY KEY,
+  group_id     TEXT NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
+  member_id    TEXT NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+  channel      TEXT NOT NULL CHECK (channel IN ('sms','email','whatsapp')),
+  contact      TEXT NOT NULL,
+  sent_at      TEXT,
+  responded_at TEXT,
+  nudges       INTEGER NOT NULL DEFAULT 0,
+  last_nudge_at TEXT,
+  UNIQUE (group_id, member_id)
+);

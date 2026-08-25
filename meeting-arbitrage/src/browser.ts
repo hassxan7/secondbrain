@@ -22,7 +22,7 @@ export {
   ACTIVITIES, ACTIVITY_BY_ID, mergeRippleEvents, rankActivities, buildItinerary,
   scorePlan, DEFAULT_HANGOUT_CONFIG,
 } from './ripple/activities.ts';
-export type { Activity, HangoutMember, Itinerary, ActivityOutcome } from './ripple/activities.ts';
+export type { Activity, HangoutMember, Itinerary, ActivityOutcome, RankedOption } from './ripple/activities.ts';
 
 export { SUBURBS, rankHubs, haversineKm, centroid, estimateTravelMinutes, groupCentroid } from './ripple/geo.ts';
 export type { Member, HubRanking, LatLng } from './ripple/geo.ts';

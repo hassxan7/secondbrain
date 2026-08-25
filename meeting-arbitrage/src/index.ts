@@ -95,6 +95,21 @@ route('POST', '/api/ripple/hangouts/:pollId/join', (req, env, _ctx, [pollId]) =>
 route('POST', '/api/ripple/hangouts/:pollId/lock', (req, env, _ctx, [pollId]) =>
   ripple.lockHangout(req, env, pollId));
 
+route('GET', '/api/ripple/hangouts/:pollId/asks', (req, env, _ctx, [pollId]) =>
+  ripple.getAsks(req, env, pollId));
+
+route('POST', '/api/ripple/hangouts/:pollId/options', (req, env, _ctx, [pollId]) =>
+  ripple.submitOptions(req, env, pollId));
+
+route('POST', '/api/ripple/hangouts/:pollId/suggest', (req, env, _ctx, [pollId]) =>
+  ripple.suggestOption(req, env, pollId));
+
+route('POST', '/api/ripple/hangouts/:pollId/link', (req, env, _ctx, [pollId]) =>
+  ripple.addLinkOption(req, env, pollId));
+
+route('POST', '/api/ripple/hangouts/:pollId/nudge', (req, env, _ctx, [pollId]) =>
+  ripple.nudge(req, env, pollId));
+
 /* ── Google Calendar (optional) ───────────────────────────────────────────── */
 
 function oauthConfig(env: Env, request: Request) {

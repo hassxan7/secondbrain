@@ -180,14 +180,23 @@ export const DEFAULT_HANGOUT_CONFIG: HangoutConfig = {
   timezone: 'Australia/Sydney',
 };
 
-export interface ActivityOutcome {
+/**
+ * The minimum an option must carry to be built into a night.
+ *
+ * `buildItinerary` reads exactly these three fields, so anything that ranks
+ * options can feed it — including the coverage-aware `BallotOutcome` in
+ * suggestions.ts, which has no `approvalRate` and should not have to invent one.
+ */
+export interface RankedOption {
   activity: Activity;
-  /** Attendees who ticked it. */
   approvals: string[];
+  score: number;
+}
+
+export interface ActivityOutcome extends RankedOption {
   approvalRate: number;
   /** Attendees whose budget will not cover it. */
   pricedOut: string[];
-  score: number;
   reasons: string[];
 }
 
@@ -265,7 +274,7 @@ export interface Itinerary {
  * night with the most approvals the group can actually afford.
  */
 export function buildItinerary(
-  ranked: ActivityOutcome[],
+  ranked: RankedOption[],
   attendees: HangoutMember[],
   config: HangoutConfig = DEFAULT_HANGOUT_CONFIG,
 ): Itinerary {
@@ -280,7 +289,7 @@ export function buildItinerary(
 
   // Keep the strongest candidate per category — two dinners is not a night out,
   // and this collapses the search space to a handful of options.
-  const byCategory = new Map<ActivityCategory, ActivityOutcome>();
+  const byCategory = new Map<ActivityCategory, RankedOption>();
   for (const outcome of affordable) {
     const held = byCategory.get(outcome.activity.category);
     if (!held || outcome.score > held.score) byCategory.set(outcome.activity.category, outcome);
@@ -289,8 +298,8 @@ export function buildItinerary(
 
   // Enumerate every combination of up to maxStops candidates. One candidate per
   // category caps this at a few dozen combinations, so exhaustive is free.
-  const combinations: ActivityOutcome[][] = [];
-  const walk = (start: number, picks: ActivityOutcome[]) => {
+  const combinations: RankedOption[][] = [];
+  const walk = (start: number, picks: RankedOption[]) => {
     if (picks.length > 0) combinations.push([...picks]);
     if (picks.length >= config.maxStops) return;
     for (let i = start; i < candidates.length; i++) {
@@ -301,16 +310,16 @@ export function buildItinerary(
   };
   walk(0, []);
 
-  const costOf = (picks: ActivityOutcome[]) =>
+  const costOf = (picks: RankedOption[]) =>
     picks.reduce((sum, p) => sum + p.activity.estCostAud, 0);
   // Approvals summed per stop: a night of two things two people each wanted
   // beats one thing three people wanted.
-  const approvalsOf = (picks: ActivityOutcome[]) =>
+  const approvalsOf = (picks: RankedOption[]) =>
     picks.reduce((sum, p) => sum + p.approvals.length, 0);
 
   const chosen = combinations
     .filter((picks) => costOf(picks) <= ceiling)
-    .reduce<ActivityOutcome[]>((bestSoFar, picks) => {
+    .reduce<RankedOption[]>((bestSoFar, picks) => {
       if (bestSoFar.length === 0) return picks;
       const a = approvalsOf(picks);
       const b = approvalsOf(bestSoFar);

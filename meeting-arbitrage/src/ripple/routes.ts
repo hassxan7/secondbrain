@@ -21,6 +21,14 @@ import {
 import { rankHubs, SUBURBS } from './geo.ts';
 import { searchVenues, rerankHubsByVenues, type Venue } from './places.ts';
 import { buildBrief, writeBlurb } from './brief.ts';
+import {
+  type Ballot, type BallotOrigin, addSuggestion, recordAnswers,
+  pendingAsksFor, outstandingAsks, rankBallots,
+} from './suggestions.ts';
+import {
+  parseEventUrl, fetchEventMeta, toActivity as linkToActivity,
+  toDirectorySubmission, platformLabel,
+} from './event-links.ts';
 
 async function readJson<T>(request: Request): Promise<T | null> {
   try { return await request.json() as T; } catch { return null; }
@@ -56,6 +64,8 @@ export async function createHangout(request: Request, env: Env): Promise<Respons
   const body = await readJson<{
     title?: string; hostName?: string; startDate?: string; days?: number;
     times?: string[]; durationMins?: number;
+    /** Activity ids to start with. Omit for the whole standing catalogue. */
+    options?: string[];
   }>(request);
   if (!body) return badRequest('expected a JSON body');
 
@@ -71,6 +81,18 @@ export async function createHangout(request: Request, env: Env): Promise<Respons
   });
 
   const pollId = newId('poll');
+
+  // Seed the option list up front. Without this there are no ballots to answer
+  // against, and every submitted answer matches nothing and is silently
+  // discarded — the plan looks like it is working and records nothing.
+  const events = await loadRippleEvents(env, groupId);
+  const starting = mergeRippleEvents(events);
+  const chosen = body.options?.length
+    ? starting.filter((a) => body.options!.includes(a.id))
+    : starting;
+  const seedList = chosen.length > 0 ? chosen : starting;
+  const now = new Date().toISOString();
+
   await env.DB.batch([
     env.DB.prepare(
       `INSERT INTO groups (id, kind, name, timezone) VALUES (?, 'ripple', ?, ?)`,
@@ -79,9 +101,15 @@ export async function createHangout(request: Request, env: Env): Promise<Respons
       `INSERT INTO polls (id, group_id, kind, title, slots_json)
        VALUES (?, ?, 'hangout', ?, ?)`,
     ).bind(pollId, groupId, body.title ?? 'When are you free?', JSON.stringify(slots)),
+    ...seedList.map((activity) => env.DB.prepare(
+      `INSERT INTO plan_options (poll_id, activity_id, activity_json, origin_json, added_at)
+       VALUES (?, ?, ?, '{"kind":"catalogue"}', ?)`,
+    ).bind(pollId, activity.id, JSON.stringify(activity), now)),
   ]);
 
-  return json({ hangoutId: groupId, pollId, sharePath: `/r/${pollId}` });
+  return json({
+    hangoutId: groupId, pollId, sharePath: `/r/${pollId}`, options: seedList.length,
+  });
 }
 
 /**
@@ -273,8 +301,25 @@ export async function lockHangout(
   const attending = members.filter((m) => attendeeIds.includes(m.id));
   if (attending.length === 0) return badRequest('nobody is free at that time');
 
-  const catalogue = mergeRippleEvents(events);
-  const ranked = rankActivities(attending, catalogue, DEFAULT_HANGOUT_CONFIG);
+  // Prefer the ballot record when a plan has one: it knows who has actually
+  // seen each option, and an option nobody has seen is not a decision the group
+  // has made. Fall back to raw approvals for plans created before options were
+  // tracked per person.
+  const stored = await loadBallots(env, pollId);
+  let ranked;
+  let waiting: string[] = [];
+
+  if (stored.ballots.length > 0) {
+    const outcomes = rankBallots(stored.ballots, stored.catalogue, attending);
+    waiting = outcomes
+      .filter((o) => !o.eligible && o.approvals.length > 0)
+      .map((o) => o.activity.label);
+    ranked = outcomes.filter((o) => o.eligible);
+  } else {
+    const catalogueList = mergeRippleEvents(events);
+    ranked = rankActivities(attending, catalogueList, DEFAULT_HANGOUT_CONFIG);
+  }
+
   const itinerary = buildItinerary(ranked, attending, DEFAULT_HANGOUT_CONFIG);
 
   // Travel-fair hubs first, then let venue density re-order them.
@@ -327,6 +372,9 @@ export async function lockHangout(
   return json({
     locked: true,
     brief,
+    // Options with real support that nobody could pick yet, so the organiser
+    // can see what a nudge would unlock rather than wondering where it went.
+    heldBack: waiting,
     alternatives: {
       times: timing.ranked.slice(0, 4).map((r) => ({
         slotId: r.slot.id, label: formatSlot(r.slot, group.timezone),
@@ -340,4 +388,360 @@ export async function lockHangout(
       })),
     },
   });
+}
+
+
+/* ── Options, suggestions and links ───────────────────────────────────────── */
+
+/** Load the ballot set for a plan: one option per row, answers folded in. */
+async function loadBallots(env: Env, pollId: string): Promise<{
+  ballots: Ballot[]; catalogue: Map<string, Activity>;
+}> {
+  const [optionRows, answerRows] = await Promise.all([
+    env.DB.prepare(
+      'SELECT activity_id, activity_json, origin_json, added_at FROM plan_options WHERE poll_id = ?',
+    ).bind(pollId).all<{
+      activity_id: string; activity_json: string; origin_json: string; added_at: string;
+    }>(),
+    env.DB.prepare(
+      'SELECT activity_id, member_id, approved FROM option_answers WHERE poll_id = ?',
+    ).bind(pollId).all<{ activity_id: string; member_id: string; approved: number }>(),
+  ]);
+
+  const seen = new Map<string, string[]>();
+  const approved = new Map<string, string[]>();
+  const push = (map: Map<string, string[]>, key: string, value: string) => {
+    const list = map.get(key);
+    if (list) list.push(value);
+    else map.set(key, [value]);
+  };
+  for (const row of answerRows.results ?? []) {
+    push(seen, row.activity_id, row.member_id);
+    if (row.approved === 1) push(approved, row.activity_id, row.member_id);
+  }
+
+  const catalogue = new Map<string, Activity>();
+  const ballots: Ballot[] = [];
+  for (const row of optionRows.results ?? []) {
+    let activity: Activity;
+    let origin: BallotOrigin;
+    try {
+      activity = JSON.parse(row.activity_json) as Activity;
+      origin = JSON.parse(row.origin_json) as BallotOrigin;
+    } catch {
+      continue; // A malformed row must not take the whole plan down.
+    }
+    catalogue.set(activity.id, activity);
+    ballots.push({
+      activityId: row.activity_id,
+      seen: seen.get(row.activity_id) ?? [],
+      approvals: approved.get(row.activity_id) ?? [],
+      origin,
+      addedAt: row.added_at,
+    });
+  }
+
+  return { ballots, catalogue };
+}
+
+/** Persist a ballot set. Upserts only — nothing is ever silently dropped. */
+async function saveBallots(
+  env: Env, pollId: string, ballots: Ballot[], catalogue: Map<string, Activity>,
+): Promise<void> {
+  const statements: D1PreparedStatement[] = [];
+
+  for (const ballot of ballots) {
+    const activity = catalogue.get(ballot.activityId);
+    if (!activity) continue;
+
+    statements.push(env.DB.prepare(
+      `INSERT INTO plan_options (poll_id, activity_id, activity_json, origin_json, added_at)
+       VALUES (?, ?, ?, ?, ?)
+       ON CONFLICT(poll_id, activity_id) DO UPDATE SET
+         activity_json = excluded.activity_json`,
+    ).bind(
+      pollId, ballot.activityId, JSON.stringify(activity),
+      JSON.stringify(ballot.origin), ballot.addedAt,
+    ));
+
+    for (const memberId of ballot.seen) {
+      statements.push(env.DB.prepare(
+        `INSERT INTO option_answers (poll_id, activity_id, member_id, approved)
+         VALUES (?, ?, ?, ?)
+         ON CONFLICT(poll_id, activity_id, member_id) DO UPDATE SET
+           approved = excluded.approved, answered_at = datetime('now')`,
+      ).bind(pollId, ballot.activityId, memberId, ballot.approvals.includes(memberId) ? 1 : 0));
+    }
+  }
+
+  if (statements.length) await env.DB.batch(statements);
+}
+
+/**
+ * GET /api/ripple/hangouts/:pollId/asks — the delta for one person.
+ *
+ * Empty for someone who has answered everything, and empty for someone who has
+ * not started (they get the whole form). Non-empty means: here are the options
+ * added since you last looked, and nothing else.
+ */
+export async function getAsks(request: Request, env: Env, pollId: string): Promise<Response> {
+  const token = new URL(request.url).searchParams.get('token');
+  if (!token) return badRequest('missing token');
+
+  const identity = await memberFromToken(env, token);
+  if (!identity) return unauthorized();
+
+  const { ballots, catalogue } = await loadBallots(env, pollId);
+  const asks = pendingAsksFor(ballots, identity.memberId, catalogue);
+
+  return json({
+    asks: asks.map((a) => ({
+      id: a.id, label: a.label, emoji: a.emoji, estCostAud: a.estCostAud,
+      origin: ballots.find((b) => b.activityId === a.id)?.origin,
+    })),
+    count: asks.length,
+  });
+}
+
+/** POST /api/ripple/hangouts/:pollId/options — record one person's pass. */
+export async function submitOptions(
+  request: Request, env: Env, pollId: string,
+): Promise<Response> {
+  const body = await readJson<{ token: string; shown: string[]; approved: string[] }>(request);
+  if (!body?.token || !Array.isArray(body.shown)) return badRequest('need token and shown[]');
+
+  const identity = await memberFromToken(env, body.token);
+  if (!identity) return unauthorized();
+
+  const poll = await getPoll(env, pollId);
+  if (!poll || poll.group_id !== identity.groupId) return notFound();
+  if (poll.status !== 'open') return badRequest('this plan is locked');
+
+  const { ballots, catalogue } = await loadBallots(env, pollId);
+  if (ballots.length === 0) return badRequest('this plan has no options yet');
+
+  const updated = recordAnswers(
+    ballots, identity.memberId, body.shown, body.approved ?? []);
+  await saveBallots(env, pollId, updated, catalogue);
+
+  await env.DB.prepare(
+    `UPDATE invites SET responded_at = COALESCE(responded_at, datetime('now'))
+      WHERE group_id = ? AND member_id = ?`,
+  ).bind(poll.group_id, identity.memberId).run();
+
+  // Count what actually landed. Echoing back the request's own length reports
+  // success for ids that matched no option and were dropped.
+  const recorded = updated.filter((b) => b.seen.includes(identity.memberId)).length;
+  const ignored = body.shown.filter((id) => !catalogue.has(id));
+
+  return json({ ok: true, recorded, ignored });
+}
+
+/**
+ * POST /api/ripple/hangouts/:pollId/suggest — add an option mid-plan.
+ *
+ * Returns who now has to be asked, which is exactly the nudge list.
+ */
+export async function suggestOption(
+  request: Request, env: Env, pollId: string,
+): Promise<Response> {
+  const body = await readJson<{
+    token: string; label: string; estCostAud?: number; category?: string; emoji?: string;
+  }>(request);
+  if (!body?.token || !body.label?.trim()) return badRequest('need token and a label');
+
+  const identity = await memberFromToken(env, body.token);
+  if (!identity) return unauthorized();
+
+  const poll = await getPoll(env, pollId);
+  if (!poll || poll.group_id !== identity.groupId) return notFound();
+  if (poll.status !== 'open') return badRequest('this plan is locked');
+
+  const { ballots, catalogue } = await loadBallots(env, pollId);
+  const label = body.label.trim().slice(0, 60);
+
+  // Typing the name of an option already on the list must register as an
+  // approval, not create a rival ballot that splits the vote.
+  const existing = [...catalogue.values()]
+    .find((a) => a.label.toLowerCase() === label.toLowerCase());
+
+  const activity: Activity = existing ?? {
+    id: `sug-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 32)}`,
+    label,
+    emoji: body.emoji?.slice(0, 4) || '✨',
+    estCostAud: Math.max(0, Math.round(body.estCostAud ?? 0)),
+    durationMins: 90,
+    category: (body.category as Activity['category']) ?? 'culture',
+    placesQuery: label,
+    timeOfDay: 'any',
+    sequenceRank: 2,
+    tags: ['suggested'],
+  };
+
+  catalogue.set(activity.id, activity);
+  const updated = addSuggestion(ballots, activity, identity.memberId, new Date().toISOString());
+  await saveBallots(env, pollId, updated, catalogue);
+
+  const ballot = updated.find((b) => b.activityId === activity.id)!;
+  const pending = outstandingAsks(updated, catalogue)
+    .filter((row) => row.activities.some((a) => a.id === activity.id))
+    .map((row) => row.memberId);
+
+  return json({
+    ok: true,
+    activityId: activity.id,
+    deduped: Boolean(existing),
+    seen: ballot.seen.length,
+    pending,
+  });
+}
+
+/**
+ * POST /api/ripple/hangouts/:pollId/link — paste an existing event in.
+ *
+ * The URL is parsed before anything is fetched. That ordering is the SSRF
+ * guard: only an allow-listed public event host ever gets a request.
+ */
+export async function addLinkOption(
+  request: Request, env: Env, pollId: string,
+): Promise<Response> {
+  const body = await readJson<{ token: string; url: string; estCostAud?: number }>(request);
+  if (!body?.token || !body.url) return badRequest('need token and url');
+
+  const identity = await memberFromToken(env, body.token);
+  if (!identity) return unauthorized();
+
+  const parsed = parseEventUrl(body.url);
+  if (!parsed) {
+    return badRequest('that is not a Luma, Partiful, Eventbrite, Humanitix or Meetup link');
+  }
+
+  const poll = await getPoll(env, pollId);
+  if (!poll || poll.group_id !== identity.groupId) return notFound();
+  if (poll.status !== 'open') return badRequest('this plan is locked');
+
+  const { ballots, catalogue } = await loadBallots(env, pollId);
+  const meta = await fetchEventMeta(parsed);
+
+  // An unreadable price falls back to the group's tightest budget rather than
+  // to zero: a ticketed event that looks free quietly blows the ceiling.
+  const prefs = await env.DB.prepare(
+    'SELECT MIN(budget_aud) AS floor FROM poll_preferences WHERE poll_id = ?',
+  ).bind(pollId).first<{ floor: number | null }>();
+  const fallback = body.estCostAud ?? prefs?.floor ?? 40;
+
+  const activity = linkToActivity(parsed, meta, fallback);
+  catalogue.set(activity.id, activity);
+
+  const origin: BallotOrigin = {
+    kind: 'link', by: identity.memberId,
+    url: parsed.canonicalUrl, platform: parsed.platform,
+  };
+  const updated = addSuggestion(
+    ballots, activity, identity.memberId, new Date().toISOString(), origin);
+  await saveBallots(env, pollId, updated, catalogue);
+
+  // Feed Ripple's own directory, held for review rather than published.
+  const submission = toDirectorySubmission(parsed, meta, identity.memberId);
+  await env.DB.prepare(
+    `INSERT INTO directory_submissions
+       (id, platform, source_id, canonical_url, title, image_url, submitted_by, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 'pending_review')
+     ON CONFLICT(platform, source_id) DO NOTHING`,
+  ).bind(
+    newId('sub'), submission.platform, submission.sourceId, submission.canonicalUrl,
+    submission.title, submission.imageUrl ?? null, identity.memberId,
+  ).run();
+
+  const pending = outstandingAsks(updated, catalogue)
+    .filter((row) => row.activities.some((a) => a.id === activity.id))
+    .map((row) => row.memberId);
+
+  return json({
+    ok: true,
+    activityId: activity.id,
+    platform: platformLabel(parsed.platform),
+    title: activity.label,
+    pending,
+  });
+}
+
+/**
+ * POST /api/ripple/hangouts/:pollId/nudge — chase whoever is holding it up.
+ *
+ * Two different kinds of missing person, and they get different messages:
+ * someone who never started, and someone who answered but has not seen an
+ * option added since. Rate-limited per person so a plan cannot be used to
+ * spam somebody.
+ */
+export async function nudge(request: Request, env: Env, pollId: string): Promise<Response> {
+  const body = await readJson<{ token: string; minHoursBetween?: number }>(request);
+  if (!body?.token) return badRequest('missing token');
+
+  const identity = await memberFromToken(env, body.token);
+  if (!identity) return unauthorized();
+
+  const poll = await getPoll(env, pollId);
+  if (!poll || poll.group_id !== identity.groupId) return notFound();
+
+  const minHours = Math.max(1, body.minHoursBetween ?? 12);
+  const { ballots, catalogue } = await loadBallots(env, pollId);
+  const [names, inviteRows] = await Promise.all([
+    loadMemberNames(env, poll.group_id),
+    env.DB.prepare(
+      `SELECT member_id, channel, contact, last_nudge_at, responded_at
+         FROM invites WHERE group_id = ?`,
+    ).bind(poll.group_id).all<{
+      member_id: string; channel: string; contact: string;
+      last_nudge_at: string | null; responded_at: string | null;
+    }>(),
+  ]);
+
+  const asks = new Map(outstandingAsks(ballots, catalogue).map((r) => [r.memberId, r.activities]));
+  const started = new Set(ballots.flatMap((b) => b.seen));
+  const cutoff = Date.now() - minHours * 3_600_000;
+
+  const sent: Array<{ memberId: string; channel: string; reason: string }> = [];
+  const skipped: Array<{ memberId: string; why: string }> = [];
+  const writes: D1PreparedStatement[] = [];
+
+  for (const invite of inviteRows.results ?? []) {
+    const name = names[invite.member_id] ?? 'there';
+    const pendingFor = asks.get(invite.member_id) ?? [];
+    const hasStarted = started.has(invite.member_id);
+
+    if (hasStarted && pendingFor.length === 0) {
+      skipped.push({ memberId: invite.member_id, why: 'already answered everything' });
+      continue;
+    }
+    if (invite.last_nudge_at && Date.parse(invite.last_nudge_at) > cutoff) {
+      skipped.push({ memberId: invite.member_id, why: `nudged within ${minHours}h` });
+      continue;
+    }
+
+    const link = `${new URL(request.url).origin}/r/${pollId}`;
+    const message = hasStarted
+      ? `${name} — one more thing on the plan: `
+        + `${pendingFor.map((a) => a.label).join(', ')}. Ten seconds: ${link}`
+      : `${name} — still need your times for the plan. `
+        + `Takes 30 seconds, no app needed: ${link}`;
+
+    const channel = invite.channel === 'email' ? 'email' : 'whatsapp';
+    writes.push(env.DB.prepare(
+      'INSERT INTO outbox (id, group_id, channel, target, body) VALUES (?, ?, ?, ?, ?)',
+    ).bind(newId('out'), poll.group_id, channel, invite.contact, message));
+    writes.push(env.DB.prepare(
+      `UPDATE invites SET nudges = nudges + 1, last_nudge_at = datetime('now')
+        WHERE group_id = ? AND member_id = ?`,
+    ).bind(poll.group_id, invite.member_id));
+
+    sent.push({
+      memberId: invite.member_id,
+      channel,
+      reason: hasStarted ? 'has unseen options' : 'never started',
+    });
+  }
+
+  if (writes.length) await env.DB.batch(writes);
+  return json({ sent, skipped });
 }
