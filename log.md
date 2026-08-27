@@ -164,3 +164,6 @@ Wiki scaffolded from Karpathy's LLM Wiki pattern (https://gist.github.com/karpat
 Vault: `C:\Users\hassa\OneDrive\Documents\Civly Brain`
 Structure: raw/, pages/entities/, pages/concepts/, pages/sources/, pages/analyses/
 CLAUDE.md, AGENTS.md, wiki.md, index.md, and log.md initialized.
+
+## [2026-08-27] analysis | PASS Leader Application - Selection Criteria Statement
+Drafted a two-page STARR statement for the USyd Business School PASS Leader application. Core example: volunteer maths teaching for Grade 3/4 orphanage students with no prior schooling, mapped onto the transition struggles of first-year university students. Addresses all six published selection criteria. Bracketed placeholders remain for names, dates and counts. No resume found in the vault. Pages touched: [[PASS Leader Application - Selection Criteria Statement]].
