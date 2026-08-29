@@ -1,30 +1,38 @@
 /**
- * Banksia house dashboard.
+ * Banksia.
  *
- * Runs the same engine bundle as the Worker. In demo mode (no group id in the
- * URL) it seeds the actual house — including Isaac's Monday football clash and
- * Pete's attendance record — so the mechanics that matter can be seen working
- * before any of it is deployed.
+ * Runs the same engine bundle the Worker runs, so what the house sees here and
+ * what the deployed system decides are the same code. In demo mode (no group
+ * id in the URL) it seeds the real house — Isaac's Monday football clash, Pete
+ * with one chore ticked — so the mechanics can be seen working before anything
+ * is deployed.
+ *
+ * Three screens and no more. Everything that used to be a tab of its own —
+ * ledger, pot, offender table — either folded into one line on the Board or was
+ * cut. A house tool that requires reading does not get opened.
  */
 
 import {
-  generateGrid, formatSlot, scoreSlots, recommendAnchor, evaluateRefix,
-  collidesWithStandingConflict,
-  settleWeek, resolveDisputes, resolveIssue, offenderTable, buildAgenda,
-  describeIssueOutcome,
-  formatMoney, DEFAULT_CHORE_CONFIG,
-  openPot, applyWeekFines, potState, distributePot, recommendPot,
-  raiseAnonymous, resolveAnonymous, anonymousAgenda, ISSUE_AREAS,
+  generateGrid, formatSlot, scoreSlots, recommendAnchor, collidesWithStandingConflict,
+  DEFAULT_TASKS, boardStanding, behind,
+  validateJoin, describeAvailability, DATA_USE,
+  reminderPolicy, DEFAULT_REMINDER_CONFIG,
+  raiseAnonymous, anonymousAgenda, resolveAnonymous, softenNote, ISSUE_AREAS,
 } from '../shared/engine.js';
 
 const TZ = 'Australia/Sydney';
 const TIMES = ['18:30', '19:30', '20:30'];
-const BANDS = ['6:30', '7:30', '8:30'];
+const BANDS = { '18:30': '6:30', '19:30': '7:30', '20:30': '8:30' };
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const REQUIRED = DEFAULT_REMINDER_CONFIG.tasksRequired;
+const STAKE = DEFAULT_REMINDER_CONFIG.stakeCents / 100;
 
 const HOUSE = [
   { id: 'hassaan', name: 'Hassaan', attendanceRate: 1.0 },
-  { id: 'isaac', name: 'Isaac', attendanceRate: 0.9,
-    standingConflicts: [{ weekday: 1, startMin: 19 * 60, endMin: 21 * 60, label: 'football practice' }] },
+  {
+    id: 'isaac', name: 'Isaac', attendanceRate: 0.9,
+    standingConflicts: [{ weekday: 1, startMin: 19 * 60, endMin: 21 * 60, label: 'football' }],
+  },
   { id: 'kez', name: 'Kez', attendanceRate: 0.9 },
   { id: 'ross', name: 'Ross', attendanceRate: 0.8 },
   { id: 'eyong', name: 'Eyong', attendanceRate: 0.8 },
@@ -32,692 +40,678 @@ const HOUSE = [
   { id: 'manan', name: 'Manan', attendanceRate: 0.7 },
 ];
 
-const TASKS = [
-  ['kitchen-bench', 'Wipe kitchen bench'],
-  ['sink-drain', 'Clear sink + drain'],
-  ['bins-out', 'Bins out'],
-  ['bathroom', 'Bathroom'],
-  ['vacuum-common', 'Vacuum common areas'],
-  ['fridge-clear', 'Clear out fridge'],
-  ['mop-kitchen', 'Mop kitchen'],
-  ['recycling', 'Recycling'],
-].map(([id, label]) => ({ id, label }));
-
-const CHORE_CONFIG = { ...DEFAULT_CHORE_CONFIG, tasks: TASKS };
 const WEEK = mondayOf(new Date());
-
 const slots = generateGrid({
   startDate: WEEK, days: 14, times: TIMES, durationMins: 60, timeZone: TZ,
 });
 
-/* ── Seeded demo state ────────────────────────────────────────────────────── */
-
 const state = {
   me: 'hassaan',
-  tab: 'meeting',
+  tab: 'board',
+  board: { weekOf: WEEK, tasks: DEFAULT_TASKS, ticks: seedTicks() },
   responses: seedResponses(),
-  claims: seedClaims(),
-  issueAnswers: {},
-  refixNote: null,
-  veto: Object.fromEntries(HOUSE.map((p) => [p.id, { used: p.id === 'pete' ? 2 : 0, budget: 2 }])),
-  // The pot. Buy-in and fine are what the user tunes; distribution is how the
-  // surplus is shared when the period closes.
-  pot: { buyInCents: 4000, finePerMissedTaskCents: 500, distribution: 'split-clean' },
-  // Anonymous issues. Seeded so both states are visible: the kitchen has two
-  // quiet raisers (consensus → on the agenda) and noise has one fresh raiser
-  // (still cooling). Authors are opaque here, exactly as the house would see it.
-  anon: [
-    { id: 'anon-kitchen', area: 'kitchen', createdAt: new Date(Date.now() - 30 * 3600_000).toISOString(),
-      contributions: [
-        { author: 'x1', note: 'Pans keep getting left in the sink overnight', at: new Date(Date.now() - 30 * 3600_000).toISOString() },
-        { author: 'x2', at: new Date(Date.now() - 5 * 3600_000).toISOString() },
-      ] },
-    { id: 'anon-noise', area: 'noise', createdAt: new Date(Date.now() - 2 * 3600_000).toISOString(),
-      contributions: [{ author: 'x3', note: 'Weeknight noise past midnight has been rough', at: new Date(Date.now() - 2 * 3600_000).toISOString() }] },
-  ],
-  anonArea: 'kitchen',
+  anon: seedAnon(),
+  issues: [{
+    id: 'issue-pan',
+    description: 'Pan of noodles left on the stove since Tuesday.',
+    answers: { hassaan: 'not-me', kez: 'not-me', isaac: 'not-me' },
+  }],
+  draft: { name: '', phone: '', email: '', slots: [], varies: false, calendar: false },
+  step: 0,
 };
 
+/* ── Small helpers ────────────────────────────────────────────────────────── */
+
+const $ = (id) => document.getElementById(id);
+const el = (tag, className, text) => {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+};
+
+function toast(message) {
+  const node = $('toast');
+  node.textContent = message;
+  node.setAttribute('data-show', '');
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => node.removeAttribute('data-show'), 2400);
+}
+
 function mondayOf(date) {
-  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
   const day = d.getUTCDay();
   d.setUTCDate(d.getUTCDate() - (day === 0 ? 6 : day - 1));
   return d.toISOString().slice(0, 10);
 }
 
-function seedResponses() {
-  const map = {};
-  HOUSE.forEach((person, i) => {
-    map[person.id] = {};
-    slots.forEach((slot, j) => {
-      // Pete answers almost nothing — that is the behaviour, not a data gap.
-      if (person.id === 'pete' && (i + j) % 4 !== 0) return;
-      const seed = (i * 5 + j * 3) % 9;
-      map[person.id][slot.id] = seed < 5 ? 'yes' : seed < 7 ? 'ifneed' : 'no';
-    });
-  });
-  return map;
+function nameOf(id) {
+  return HOUSE.find((m) => m.id === id)?.name ?? id;
 }
 
-function seedClaims() {
-  const claims = [];
-  const give = (member, taskIds, challengedBy) => {
-    for (const taskId of taskIds) {
-      claims.push({
-        participantId: member, taskId, weekOf: WEEK,
-        claimedAt: `${WEEK}T10:00:00Z`,
-        challengedBy: challengedBy?.[taskId],
+/* ── Onboarding ───────────────────────────────────────────────────────────── */
+/* Four questions. The order matters: the message-volume promise is on screen
+   at the moment the phone number is asked for, not two steps later, because a
+   promise made after the fact is not a promise. */
+
+function renderOnboarding() {
+  const policy = $('policy');
+  policy.replaceChildren(...reminderPolicy().map((line) => {
+    const li = el('li');
+    li.append(el('b', null, line));
+    return li;
+  }));
+
+  const uses = $('uses');
+  uses.replaceChildren(...DATA_USE.map((use) => {
+    const li = el('li');
+    li.append(el('b', null, use.label), el('span', null, use.detail));
+    return li;
+  }));
+
+  const grid = $('ob-grid');
+  grid.replaceChildren(...[1, 2, 3, 4, 0].map((weekday) => {
+    const wrap = el('div', 'day');
+    wrap.append(el('span', null, DAYS[weekday] === 'Sun' ? 'Sunday' : fullDay(weekday)));
+    const chips = el('div', 'chips');
+    for (const time of TIMES) {
+      const chip = el('button', 'chip', BANDS[time]);
+      chip.type = 'button';
+      chip.setAttribute('aria-pressed', 'false');
+      chip.addEventListener('click', () => {
+        const key = `${weekday}@${time}`;
+        const at = state.draft.slots.indexOf(key);
+        if (at === -1) state.draft.slots.push(key); else state.draft.slots.splice(at, 1);
+        chip.setAttribute('aria-pressed', String(at === -1));
       });
+      chips.append(chip);
     }
+    wrap.append(chips);
+    return wrap;
+  }));
+
+  // Picking a calendar sync means the grid is no longer the thing answering,
+  // so it stops pretending to be required.
+  $('ob-calendar').addEventListener('change', (event) => {
+    state.draft.calendar = event.target.checked;
+    $('opt-calendar').toggleAttribute('data-on', event.target.checked);
+    grid.style.opacity = event.target.checked ? '.45' : '1';
+  });
+  $('ob-varies').addEventListener('change', (event) => {
+    state.draft.varies = event.target.checked;
+    $('opt-varies').toggleAttribute('data-on', event.target.checked);
+  });
+  $('ob-consent').addEventListener('change', (event) => {
+    $('opt-consent').toggleAttribute('data-on', event.target.checked);
+  });
+
+  for (const button of document.querySelectorAll('[data-next]')) {
+    button.addEventListener('click', () => goStep(Number(button.dataset.next) + 1));
+  }
+  for (const button of document.querySelectorAll('[data-back]')) {
+    button.addEventListener('click', () => goStep(Number(button.dataset.back) - 1));
+  }
+  $('ob-join').addEventListener('click', finishOnboarding);
+}
+
+function fullDay(weekday) {
+  return ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][weekday];
+}
+
+function goStep(next) {
+  state.step = Math.max(0, Math.min(3, next));
+  for (let i = 0; i <= 3; i++) {
+    $(`step-${i}`).toggleAttribute('data-active', i === state.step);
+    $('steps').children[i].toggleAttribute('data-on', i <= state.step);
+  }
+  window.scrollTo({ top: 0 });
+}
+
+function collectDraft() {
+  return {
+    name: $('ob-name').value,
+    phone: $('ob-phone').value || undefined,
+    email: $('ob-email').value || undefined,
+    availability: {
+      mode: state.draft.calendar ? 'calendar' : (state.draft.varies ? 'varies' : 'fixed'),
+      slots: state.draft.slots.map((key) => {
+        const [weekday, time] = key.split('@');
+        return { weekday: Number(weekday), time };
+      }),
+    },
+    acceptedDataUse: $('ob-consent').checked,
   };
-  give('hassaan', ['kitchen-bench', 'bins-out', 'bathroom', 'recycling']);
-  give('isaac', ['vacuum-common', 'mop-kitchen', 'fridge-clear', 'kitchen-bench']);
-  give('kez', ['bathroom', 'bins-out', 'recycling', 'sink-drain']);
-  give('ross', ['mop-kitchen', 'vacuum-common', 'fridge-clear']);
-  give('eyong', ['kitchen-bench', 'sink-drain', 'bins-out', 'bathroom']);
-  give('manan', ['recycling', 'fridge-clear']);
-  give('pete', ['sink-drain'], { 'sink-drain': ['hassaan'] });
-  return claims;
-}
-
-const DEMO_ISSUE = {
-  id: 'noodles',
-  raisedBy: 'hassaan',
-  description: 'Sink blocked with noodles again, third time this fortnight',
-  createdAt: new Date(Date.now() - 20 * 3600_000).toISOString(),
-  closesAt: new Date(Date.now() - 2 * 3600_000).toISOString(),
-};
-
-/* ── DOM helpers ──────────────────────────────────────────────────────────── */
-
-const $ = (s) => document.querySelector(s);
-const el = (tag, attrs = {}, children = []) => {
-  const node = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs)) {
-    if (k === 'class') node.className = v;
-    else if (k === 'text') node.textContent = v;
-    else if (k === 'html') node.innerHTML = v;
-    else if (k.startsWith('on')) node.addEventListener(k.slice(2).toLowerCase(), v);
-    else if (v !== null && v !== undefined && v !== false) node.setAttribute(k, v);
-  }
-  for (const c of [].concat(children)) {
-    if (c) node.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
-  }
-  return node;
-};
-const nameOf = (id) => HOUSE.find((p) => p.id === id)?.name ?? id;
-
-/* ── Derived state ────────────────────────────────────────────────────────── */
-
-function meetingState() {
-  const config = { timezone: TZ, quorum: 5 };
-  const timing = scoreSlots({ slots, participants: HOUSE, responses: state.responses, config });
-  const anchor = recommendAnchor({
-    slots, participants: HOUSE, responses: state.responses,
-    incumbent: { weekday: 1, time: '19:30' }, config,
-  });
-  return { timing, anchor };
-}
-
-function ledgerState() {
-  const settlements = settleWeek({
-    weekOf: WEEK, participantIds: HOUSE.map((p) => p.id),
-    claims: state.claims, config: CHORE_CONFIG,
-  });
-  // Pete disputes but does not come to the meeting; Ross disputes and does.
-  const present = HOUSE.filter((p) => p.id !== 'pete').map((p) => p.id);
-  const outcomes = resolveDisputes({
-    settlements,
-    disputes: [
-      { participantId: 'pete', weekOf: WEEK, argument: 'the board was wrong', raisedAt: 'x' },
-      { participantId: 'manan', weekOf: WEEK, argument: 'I did the bins on Sunday', raisedAt: 'x' },
-    ],
-    presentAtMeeting: present,
-  });
-
-  const issueOutcome = resolveIssue(
-    DEMO_ISSUE,
-    Object.entries(state.issueAnswers).map(([participantId, answer]) => ({
-      issueId: DEMO_ISSUE.id, participantId, answer, at: new Date().toISOString(),
-    })),
-    HOUSE.map((p) => p.id),
-    new Date().toISOString(),
-  );
-
-  const offenders = offenderTable({
-    participantIds: HOUSE.map((p) => p.id),
-    outcomes: [issueOutcome],
-    settlements: outcomes,
-    meetingsMissed: { pete: 6, manan: 2, ross: 1 },
-  });
-
-  const agenda = buildAgenda({ outcomes: [issueOutcome], settlements: outcomes, offenders, nameOf });
-  return { settlements, outcomes, issueOutcome, offenders, agenda };
-}
-
-/* ── Panels ───────────────────────────────────────────────────────────────── */
-
-function renderMeeting() {
-  const wrap = $('#panel-meeting');
-  wrap.replaceChildren();
-
-  const { timing, anchor } = meetingState();
-
-  wrap.appendChild(el('h2', { text: 'The standing time' }));
-  const moving = anchor.action === 'move';
-  wrap.appendChild(el('div', { class: `card ${moving ? 'bad' : 'good'}` }, [
-    el('h3', { text: moving ? `Move it to ${anchor.best.label}` : `Keep ${anchor.incumbent?.label ?? anchor.best?.label}` }),
-    el('p', { text: anchor.rationale }),
-  ]));
-
-  if (moving) {
-    const monday = anchor.ranked.find((c) => c.pattern.weekday === 1);
-    if (monday) {
-      wrap.appendChild(el('p', { class: 'hint' },
-        `Monday scores ${monday.score.toFixed(2)} against ${anchor.best.score.toFixed(2)}. `
-        + `A clash that repeats every week is not outvoted by one week of goodwill.`));
-    }
-  }
-
-  wrap.appendChild(el('h2', { text: 'This round' }));
-  const top = timing.ranked.slice(0, 4);
-  const table = el('table', {}, [
-    el('thead', {}, el('tr', {}, [
-      el('th', { text: 'Slot' }), el('th', { class: 'num', text: 'In' }),
-      el('th', { class: 'num', text: 'Score' }), el('th', { text: '' }),
-    ])),
-    el('tbody', {}, top.map((r) => el('tr', {}, [
-      el('td', { text: formatSlot(r.slot, TZ) }),
-      el('td', { class: 'num', text: `${r.attendees.length + r.ifNeeded.length}/${HOUSE.length}` }),
-      el('td', { class: 'num', text: r.score.toFixed(2) }),
-      el('td', {}, el('span', {
-        class: `tag ${r.viable ? 'clear' : 'upheld'}`,
-        text: r.viable ? 'viable' : 'short',
-      })),
-    ]))),
-  ]);
-  wrap.appendChild(el('div', { class: 'scroll-x' }, table));
-
-  if (timing.nonResponders.length) {
-    wrap.appendChild(el('p', { class: 'hint' },
-      `Not answered at all: ${timing.nonResponders.map(nameOf).join(', ')}. `
-      + `They score as zero, so chasing them is the fastest way to change the answer.`));
-  }
-
-  wrap.appendChild(el('h2', { text: 'Your availability' }));
-  wrap.appendChild(el('p', { class: 'hint' }, 'Tap to cycle: yes → if needed → no → clear. Dashed means it clashes with something you declared.'));
-  wrap.appendChild(renderGrid());
-
-  wrap.appendChild(el('h2', { text: 'Can’t make the fixed time?' }));
-  wrap.appendChild(el('p', { class: 'hint' },
-    'A recurring clash is free and re-picks the standing time permanently. '
-    + 'An ad-hoc one spends from a budget of two per period.'));
-
-  const me = HOUSE.find((p) => p.id === state.me);
-  const veto = state.veto[state.me];
-  wrap.appendChild(el('div', { class: 'card' }, [
-    el('p', {}, `${me.name} has used ${veto.used} of ${veto.budget} ad-hoc moves this period.`),
-    el('div', { class: 'btn-row' }, [
-      el('button', {
-        class: 'btn', type: 'button',
-        onclick: () => {
-          const decision = evaluateRefix(
-            { participantId: state.me, reason: 'something came up' },
-            { ...veto, participantId: state.me, periodStart: WEEK }, me,
-          );
-          if (decision.consumedToken) veto.used += 1;
-          state.refixNote = decision;
-          renderMeeting();
-        },
-      }, 'Something came up (ad-hoc)'),
-      el('button', {
-        class: 'btn', type: 'button',
-        onclick: () => {
-          state.refixNote = evaluateRefix(
-            { participantId: state.me, reason: 'recurring commitment', standingConflict: true },
-            { ...veto, participantId: state.me, periodStart: WEEK }, me,
-          );
-          renderMeeting();
-        },
-      }, 'It’s every week (recurring)'),
-    ]),
-  ]));
-
-  if (state.refixNote) {
-    const d = state.refixNote;
-    wrap.appendChild(el('div', {
-      class: `card ${d.outcome === 'proceed-without' ? 'bad' : 'accent'}`,
-    }, [
-      el('h3', { text: d.outcome.replace(/-/g, ' ') }),
-      el('p', { text: d.rationale }),
-    ]));
-  }
-
-  wrap.appendChild(el('h2', { text: 'Agenda' }));
-  const { agenda } = ledgerState();
-  if (agenda.length === 0) {
-    wrap.appendChild(el('p', { class: 'empty', text: 'Nothing outstanding. Short meeting.' }));
-  } else {
-    const box = el('div', { class: 'card' });
-    for (const item of agenda) {
-      box.appendChild(el('div', { class: 'agenda-item' }, [
-        el('div', { class: 'k', text: item.kind.replace(/-/g, ' ') }),
-        el('div', { class: 't', text: item.title }),
-        el('div', { class: 'd', text: item.detail }),
-      ]));
-    }
-    wrap.appendChild(box);
-  }
-}
-
-function renderGrid() {
-  const box = el('div');
-  const cycle = { undefined: 'yes', yes: 'ifneed', ifneed: 'no', no: undefined };
-  const me = HOUSE.find((p) => p.id === state.me);
-
-  const byDay = new Map();
-  for (const slot of slots.slice(0, 21)) {
-    const key = slot.id.slice(0, 10);
-    if (!byDay.has(key)) byDay.set(key, []);
-    byDay.get(key).push(slot);
-  }
-
-  for (const [day, daySlots] of byDay) {
-    const date = new Date(`${day}T12:00:00Z`);
-    const row = el('div', { class: 'grid-row' }, [
-      el('div', { class: 'd', text: new Intl.DateTimeFormat('en-AU', { weekday: 'short', day: 'numeric', timeZone: TZ }).format(date) }),
-    ]);
-
-    daySlots.forEach((slot, i) => {
-      const value = state.responses[state.me]?.[slot.id];
-      // Use the engine's own overlap check rather than re-deriving weekdays
-      // here — this is the same predicate that decides scoring, so the dashed
-      // border can never disagree with the score.
-      const clash = (me.standingConflicts ?? [])
-        .find((c) => collidesWithStandingConflict(slot, c, TZ));
-
-      row.appendChild(el('button', {
-        class: 'slot', type: 'button',
-        'data-v': value ?? '',
-        'data-conflict': clash ? '' : null,
-        title: clash ? `${formatSlot(slot, TZ)} — clashes with ${clash.label}` : formatSlot(slot, TZ),
-        onclick: (e) => {
-          const next = cycle[String(state.responses[state.me]?.[slot.id])];
-          state.responses[state.me] ??= {};
-          if (next) state.responses[state.me][slot.id] = next;
-          else delete state.responses[state.me][slot.id];
-          e.currentTarget.setAttribute('data-v', state.responses[state.me][slot.id] ?? '');
-        },
-      }, BANDS[i]));
-    });
-
-    box.appendChild(row);
-  }
-  return box;
-}
-
-function renderChores() {
-  const wrap = $('#panel-chores');
-  wrap.replaceChildren();
-
-  const { settlements } = ledgerState();
-  const mine = state.claims.filter((c) => c.participantId === state.me);
-  const mineTaskIds = new Set(mine.map((c) => c.taskId));
-
-  wrap.appendChild(el('h2', { text: `Board — week of ${WEEK}` }));
-  wrap.appendChild(el('p', { class: 'hint' },
-    `Four of eight. ${formatMoney(CHORE_CONFIG.finePerMissedTaskCents)} per task short. `
-    + `Nobody has to accuse anyone — the week just closes.`));
-
-  const grid = el('div', { class: 'chore-grid' });
-  for (const task of TASKS) {
-    const claimants = state.claims.filter((c) => c.taskId === task.id);
-    const challenged = claimants.some((c) => c.challengedBy?.length);
-    grid.appendChild(el('div', {
-      class: 'chore',
-      'data-mine': mineTaskIds.has(task.id) ? '' : null,
-      'data-challenged': challenged ? '' : null,
-    }, [
-      el('button', {
-        class: 'btn', type: 'button',
-        onclick: () => {
-          if (mineTaskIds.has(task.id)) {
-            state.claims = state.claims.filter(
-              (c) => !(c.participantId === state.me && c.taskId === task.id));
-          } else {
-            state.claims.push({
-              participantId: state.me, taskId: task.id, weekOf: WEEK,
-              claimedAt: new Date().toISOString(),
-            });
-          }
-          renderChores();
-        },
-      }, mineTaskIds.has(task.id) ? '✓ Done' : 'Tick'),
-      el('span', { class: 'name', text: task.label }),
-      el('span', { class: 'who', text: claimants.length ? claimants.map((c) => nameOf(c.participantId)).join(', ') : '—' }),
-    ]));
-  }
-  wrap.appendChild(grid);
-
-  wrap.appendChild(el('h2', { text: 'Where everyone is' }));
-  const people = el('div', { class: 'progress-people' });
-  for (const s of settlements) {
-    people.appendChild(el('div', { class: 'pp', 'data-short': s.shortfall > 0 ? '' : null }, [
-      el('span', { text: nameOf(s.participantId) }),
-      el('span', { class: 'track' }, el('i', {
-        style: `width:${Math.min(100, (s.completed / CHORE_CONFIG.tasksRequired) * 100)}%`,
-      })),
-      el('span', { class: 'n', text: `${s.completed}/${s.required}` }),
-    ]));
-  }
-  wrap.appendChild(people);
-
-  const challengedNote = settlements.find((s) => s.challenged > 0);
-  if (challengedNote) {
-    wrap.appendChild(el('p', { class: 'hint' },
-      `${nameOf(challengedNote.participantId)} has a challenged claim. It does not count until the `
-      + `meeting resolves it, and re-ticking the box will not clear the challenge.`));
-  }
-}
-
-function renderIssues() {
-  const wrap = $('#panel-issues');
-  wrap.replaceChildren();
-
-  const { issueOutcome } = ledgerState();
-
-  wrap.appendChild(el('h2', { text: 'Open issue' }));
-  wrap.appendChild(el('div', { class: 'card accent' }, [
-    el('h3', { text: DEMO_ISSUE.description }),
-    el('p', { text: `Raised by ${nameOf(DEMO_ISSUE.raisedBy)}. Poll has closed.` }),
-  ]));
-
-  wrap.appendChild(el('p', { class: 'hint' },
-    'Answering costs nothing. Not answering is the part that gets named.'));
-
-  const row = el('div', { class: 'btn-row' }, [
-    el('button', {
-      class: `btn ${state.issueAnswers[state.me] === 'was-me' ? 'primary' : ''}`,
-      type: 'button',
-      onclick: () => { state.issueAnswers[state.me] = 'was-me'; renderIssues(); },
-    }, 'Was me'),
-    el('button', {
-      class: `btn ${state.issueAnswers[state.me] === 'not-me' ? 'primary' : ''}`,
-      type: 'button',
-      onclick: () => { state.issueAnswers[state.me] = 'not-me'; renderIssues(); },
-    }, 'Not me'),
-  ]);
-  wrap.appendChild(row);
-
-  wrap.appendChild(el('h2', { text: 'Outcome' }));
-  wrap.appendChild(el('div', {
-    class: `card ${issueOutcome.escalate ? 'bad' : 'good'}`,
-  }, [
-    el('h3', { text: issueOutcome.status.replace(/-/g, ' ') }),
-    el('p', { text: describeIssueOutcome(issueOutcome, nameOf) }),
-  ]));
-
-  if (issueOutcome.silent.length) {
-    wrap.appendChild(el('p', { class: 'hint' },
-      `Silence is not an exit: ${issueOutcome.silent.map(nameOf).join(', ')} `
-      + `${issueOutcome.silent.length === 1 ? 'is' : 'are'} named, and it goes on the agenda.`));
-  }
-
-  renderAnonymous(wrap);
 }
 
 /**
- * The anonymous channel. Built to surface shared problems calmly, not to be a
- * weapon — it's about an area not a person, it aggregates into consensus, a lone
- * raise waits out a cooling window, and the house never sees who said anything.
+ * Validate with the same function the Worker uses, so the form cannot accept
+ * something the server will then reject — the classic way a join flow strands
+ * someone on a screen with no explanation.
  */
-function renderAnonymous(wrap) {
-  const houseNames = HOUSE.map((p) => p.name);
-  const now = new Date().toISOString();
+function finishOnboarding() {
+  const draft = collectDraft();
+  const result = validateJoin(draft, []);
+  const error = $('ob-err');
 
-  wrap.appendChild(el('h2', { text: 'Raise something quietly' }));
-  wrap.appendChild(el('p', { class: 'hint' },
-    'Anonymous to the house. It’s about an area, never a person — and a lone flag waits a '
-    + 'day before it surfaces, so it can’t be a heat-of-the-moment jab. If others quietly '
-    + 'agree, it becomes a house conversation instead of a snipe.'));
-
-  // Pick an area.
-  const areas = el('div', { class: 'chore-grid', style: 'grid-template-columns:1fr 1fr' });
-  for (const area of ISSUE_AREAS) {
-    areas.appendChild(el('button', {
-      class: 'btn', type: 'button',
-      style: state.anonArea === area.id
-        ? 'border-color:var(--accent);color:var(--accent-ink)' : '',
-      onclick: () => { state.anonArea = area.id; renderIssues(); },
-    }, area.label));
+  if (!result.ok) {
+    error.textContent = result.errors[0];
+    error.hidden = false;
+    return;
   }
-  wrap.appendChild(areas);
+  error.hidden = true;
 
-  const note = el('input', {
-    class: 'field', type: 'text', id: 'anon-note',
-    placeholder: 'Optional — keep it about the thing, not the person',
-    maxlength: '240',
-    style: 'margin-top:8px',
-  });
-  wrap.appendChild(note);
-
-  wrap.appendChild(el('div', { class: 'btn-row' }, [
-    el('button', {
-      class: 'btn primary', type: 'button',
-      onclick: () => {
-        // Each viewer is one opaque author; in the demo we key it to "me" so a
-        // second raise from the same person doesn't inflate the weight.
-        state.anon = raiseAnonymous(state.anon, {
-          area: state.anonArea, author: `demo-${state.me}`,
-          note: $('#anon-note').value, now: new Date().toISOString(),
-        });
-        renderIssues();
-      },
-    }, 'Raise it anonymously'),
-  ]));
-
-  // What the house would see.
-  const agenda = anonymousAgenda(state.anon, houseNames, now);
-  const building = state.anon
-    .map((i) => resolveAnonymous(i, houseNames, now))
-    .filter((o) => !o.onAgenda);
-
-  wrap.appendChild(el('h2', { text: 'What the house sees' }));
-  if (agenda.length === 0 && building.length === 0) {
-    wrap.appendChild(el('p', { class: 'empty', text: 'Nothing raised.' }));
+  // Demo mode: the new housemate joins the seeded house rather than replacing
+  // it, so the board immediately has someone on it who is short.
+  const id = result.member.name.toLowerCase().replace(/[^a-z]/g, '') || 'you';
+  if (!HOUSE.some((m) => m.id === id)) {
+    HOUSE.push({ id, name: result.member.name, attendanceRate: 1 });
   }
-  for (const outcome of agenda) {
-    wrap.appendChild(el('div', { class: 'card good' }, [
-      el('h3', { text: outcome.areaLabel }),
-      el('p', { text: outcome.summary }),
-      ...outcome.notes.map((n) => el('p', { class: 'hint', style: 'margin-top:6px', text: `“${n}”` })),
-    ]));
-  }
-  for (const outcome of building) {
-    wrap.appendChild(el('div', { class: 'card' }, [
-      el('h3', { text: outcome.areaLabel }),
-      el('p', { class: 'hint', text: outcome.summary }),
-    ]));
-  }
+  state.me = id;
+
+  $('onboard').hidden = true;
+  $('app').hidden = false;
+  renderApp();
+  toast(`Welcome, ${result.member.name} — ${describeAvailability(result.member.availability)}`);
 }
 
-function renderLedger() {
-  const wrap = $('#panel-ledger');
-  wrap.replaceChildren();
+/* ── Board ────────────────────────────────────────────────────────────────── */
 
-  const { outcomes, offenders } = ledgerState();
+function renderBoard() {
+  const panel = $('panel-board');
+  const standings = boardStanding(state.board, HOUSE, REQUIRED);
+  const mine = standings.find((s) => s.memberId === state.me);
 
-  wrap.appendChild(el('h2', { text: `Fines — week of ${WEEK}` }));
-  wrap.appendChild(el('p', { class: 'hint' },
-    'Undisputed fines uphold themselves. A dispute is heard only from someone who was at the meeting.'));
+  panel.replaceChildren();
 
-  wrap.appendChild(el('div', { class: 'scroll-x' }, el('table', {}, [
-    el('thead', {}, el('tr', {}, [
-      el('th', { text: 'Who' }), el('th', { class: 'num', text: 'Done' }),
-      el('th', { class: 'num', text: 'Owes' }), el('th', { text: 'State' }),
-      el('th', { text: 'Note' }),
-    ])),
-    el('tbody', {}, outcomes.map((o) => el('tr', {}, [
-      el('td', { text: nameOf(o.participantId) }),
-      el('td', { class: 'num', text: `${o.completed}/${o.required}` }),
-      el('td', { class: 'num', text: o.fineCents ? formatMoney(o.fineCents) : '—' }),
-      el('td', {}, el('span', {
-        class: `tag ${o.state === 'upheld' ? 'upheld' : o.state === 'disputed' ? 'disputed' : 'clear'}`,
-        text: o.state,
-      })),
-      el('td', { text: o.outcomeNote }),
-    ]))),
-  ])));
+  // The whole money rule, in two lines. It used to be a fine, a dishonour
+  // table, a pot and a distribution policy spread across four tabs; a rule
+  // nobody can restate from memory is a rule nobody follows.
+  const rule = el('div', 'rule');
+  rule.append(
+    el('b', null, `${REQUIRED} tasks a week, or it costs you $${STAKE}.`),
+    el('span', null,
+      `Everyone puts $${STAKE} in at the start of term. Do ${REQUIRED} tasks and you get it back. `
+      + 'Nothing is invoiced and nobody has to chase anyone.'),
+  );
+  panel.append(rule);
 
-  wrap.appendChild(el('h2', { text: 'Who the house keeps relitigating' }));
-  wrap.appendChild(el('p', { class: 'hint' },
-    'Orders the agenda so recurring problems get discussed while people are still in the room. Not a verdict.'));
-  wrap.appendChild(el('div', { class: 'scroll-x' }, el('table', {}, [
-    el('thead', {}, el('tr', {}, [
-      el('th', { text: 'Who' }), el('th', { class: 'num', text: 'Owned' }),
-      el('th', { class: 'num', text: 'Silent' }), el('th', { class: 'num', text: 'Fines' }),
-      el('th', { class: 'num', text: 'Missed' }), el('th', { class: 'num', text: 'Score' }),
-    ])),
-    el('tbody', {}, offenders.filter((o) => o.score > 0).map((o) => el('tr', {}, [
-      el('td', { text: nameOf(o.participantId) }),
-      el('td', { class: 'num', text: String(o.ownedIssues) }),
-      el('td', { class: 'num', text: String(o.unresolvedNearMisses) }),
-      el('td', { class: 'num', text: String(o.upheldFines) }),
-      el('td', { class: 'num', text: String(o.meetingsMissed) }),
-      el('td', { class: 'num', text: String(o.score) }),
-    ]))),
-  ])));
+  const you = el('p', 'sub',
+    mine.short === 0
+      ? `You're clear this week — ${mine.done} of ${REQUIRED} done.`
+      : `You've done ${mine.done} of ${REQUIRED}. ${mine.short} to go.`);
+  panel.append(you);
+
+  panel.append(buildGrid());
+
+  const tally = el('div', 'tally');
+  for (const standing of standings) {
+    const row = el('div', 'row');
+    if (standing.short > 0) row.setAttribute('data-short', '');
+    row.append(el('span', null, standing.name));
+    const pips = el('div', 'pips');
+    for (let i = 0; i < REQUIRED; i++) {
+      const pip = el('i');
+      if (i < standing.done) pip.setAttribute('data-on', '');
+      pips.append(pip);
+    }
+    row.append(pips, el('span', 'n', `${standing.done}/${REQUIRED}`));
+    tally.append(row);
+  }
+  panel.append(tally);
+
+  const actions = el('div', 'btn-row');
+  const upload = el('button', 'btn', '📷  Upload a photo of the board');
+  upload.addEventListener('click', () => $('board-photo').click());
+  actions.append(upload);
+  panel.append(actions);
+
+  const shortList = behind(standings);
+  const note = el('p', 'hint', shortList.length === 0
+    ? 'Everyone is on track. Banksia has nothing to send this week.'
+    : `Banksia will nudge ${shortList.map((s) => s.name).join(', ')} on Thursday, `
+      + 'and once more on Sunday if they are still short. Nothing else.');
+  panel.append(note);
+
+  panel.append(demoNote(
+    'Tap any cell in your own column to tick a job off. The photo button reads a '
+    + 'picture of the real whiteboard and adds whatever it can see — it never '
+    + 'removes a tick, because a wiped board is not evidence that nothing happened.',
+  ));
+}
+
+/**
+ * The whiteboard, as drawn: jobs down the left, names across the top.
+ *
+ * The chore column is sticky and the names scroll, because seven columns do not
+ * fit a phone and the row label is the half of a cell that carries the meaning.
+ */
+function buildGrid() {
+  const scroll = el('div', 'board-scroll');
+  const table = el('table', 'board');
+
+  const head = el('tr');
+  head.append(el('th', 'chore', 'This week'));
+  for (const member of HOUSE) {
+    const th = el('th', null, member.name.split(' ')[0]);
+    if (member.id === state.me) th.setAttribute('data-me', '');
+    head.append(th);
+  }
+  const thead = document.createElement('thead');
+  thead.append(head);
+  table.append(thead);
+
+  const body = document.createElement('tbody');
+  for (const task of state.board.tasks) {
+    const tr = el('tr');
+    const label = el('th', 'chore');
+    label.append(document.createTextNode(task.label));
+    if (task.cap) label.append(el('span', 'cap', `max ${task.cap}×`));
+    tr.append(label);
+
+    for (const member of HOUSE) {
+      const td = el('td');
+      const on = state.board.ticks.some(
+        (t) => t.taskId === task.id && t.memberId === member.id,
+      );
+      const cell = el('button', 'cell', on ? '✓' : '');
+      if (on) cell.setAttribute('data-on', '');
+      if (member.id === state.me) cell.setAttribute('data-mine', '');
+      cell.setAttribute('aria-label', `${task.label} — ${member.name}`);
+
+      // Only your own column is tappable. Ticking a job off for someone else is
+      // how a shared board turns into an argument about who ticked what.
+      if (member.id === state.me) {
+        cell.addEventListener('click', () => toggleTick(task.id));
+      } else {
+        cell.disabled = true;
+      }
+      td.append(cell);
+      tr.append(td);
+    }
+    body.append(tr);
+  }
+  table.append(body);
+  scroll.append(table);
+
+  // Seven columns do not fit a phone, and the one column that matters to the
+  // person holding it is their own — which for whoever joined last is the one
+  // furthest off-screen. Bring it into view rather than leaving them to
+  // discover the board scrolls.
+  requestAnimationFrame(() => {
+    const mine = table.querySelector('thead th[data-me]');
+    if (!mine) return;
+    const overflow = mine.offsetLeft + mine.offsetWidth - scroll.clientWidth;
+    if (overflow > 0) scroll.scrollLeft = overflow + 12;
+  });
+
+  return scroll;
+}
+
+function toggleTick(taskId) {
+  const at = state.board.ticks.findIndex(
+    (t) => t.taskId === taskId && t.memberId === state.me,
+  );
+  if (at === -1) state.board.ticks.push({ taskId, memberId: state.me });
+  else state.board.ticks.splice(at, 1);
+  renderBoard();
+}
+
+/* ── Meeting ──────────────────────────────────────────────────────────────── */
+
+function renderMeeting() {
+  const panel = $('panel-meeting');
+  panel.replaceChildren();
+
+  const scored = scoreSlots({
+    slots, participants: HOUSE, responses: state.responses, config: { timezone: TZ },
+  });
+  const anchor = recommendAnchor({
+    slots, participants: HOUSE, responses: state.responses, config: { timezone: TZ },
+  });
+
+  const card = el('div', 'card');
+  card.append(el('h3', null, 'Standing house meeting'));
+  card.append(el('p', 'big', anchor.best ? anchor.best.label : 'Not set yet'));
+  card.append(el('p', null, anchor.rationale));
+  panel.append(card);
+
+  // Who a proposed time actually excludes, named, because "quorum met" hides
+  // the fact that it is the same person every week.
+  const next = scored.ranked[0];
+  if (next) {
+    const detail = el('div', 'card');
+    detail.append(el('h3', null, `Next: ${formatSlot(next.slot, TZ)}`));
+    detail.append(el('p', null,
+      `Coming: ${next.attendees.map(nameOf).join(', ') || 'nobody yet'}`));
+    // Silence and a flat no are different facts and are shown as different
+    // facts — one is chaseable, the other is settled.
+    if (next.unknown.length > 0) {
+      detail.append(el('p', null,
+        `Waiting on: ${next.unknown.map(nameOf).join(', ')}`));
+    }
+    if (next.absent.length > 0) {
+      detail.append(el('p', null, `Can't make it: ${next.absent.map(nameOf).join(', ')}`));
+    }
+    panel.append(detail);
+  }
+
+  const clash = HOUSE.filter((m) => (m.standingConflicts ?? []).length > 0);
+  if (clash.length > 0) {
+    const card2 = el('div', 'card');
+    card2.append(el('h3', null, 'Standing commitments'));
+    for (const member of clash) {
+      for (const conflict of member.standingConflicts) {
+        card2.append(el('p', null,
+          `${member.name} — ${fullDay(conflict.weekday)} `
+          + `${Math.floor(conflict.startMin / 60)}:${String(conflict.startMin % 60).padStart(2, '0')}, `
+          + `${conflict.label}. Every slot that clashes is ruled out permanently.`));
+      }
+    }
+    panel.append(card2);
+  }
+
+  panel.append(demoNote(
+    'Declaring a recurring commitment is free and permanent — it is not a dodge, '
+    + 'so it never costs anyone anything. Skipping a meeting you said you could '
+    + 'make is what reduces your say over when the next one is.',
+  ));
+}
+
+/* ── Raise ────────────────────────────────────────────────────────────────── */
+
+function renderRaise() {
+  const panel = $('panel-raise');
+  panel.replaceChildren();
+
+  panel.append(el('h2', null, 'Raise something, anonymously'));
+  panel.append(el('p', 'sub',
+    'Pick the area, not the person. If someone else raises the same thing it '
+    + 'goes on the meeting agenda as a house issue rather than a callout.'));
+
+  const bar = el('div', 'anon');
+  const chips = el('div', 'chips');
+  let picked = null;
+  for (const area of ISSUE_AREAS) {
+    const chip = el('button', 'chip', area.label);
+    chip.type = 'button';
+    chip.setAttribute('aria-pressed', 'false');
+    chip.addEventListener('click', () => {
+      picked = picked === area.id ? null : area.id;
+      for (const other of chips.children) other.setAttribute('aria-pressed', 'false');
+      chip.setAttribute('aria-pressed', String(picked === area.id));
+    });
+    chips.append(chip);
+  }
+  bar.append(chips);
+
+  const note = el('textarea', 'field');
+  note.placeholder = 'Optional — one line about what is going on.';
+  note.maxLength = 240;
+  bar.append(note);
+
+  const send = el('button', 'btn primary wide', 'Send anonymously');
+  send.style.marginTop = '12px';
+  send.addEventListener('click', () => {
+    if (!picked) { toast('Pick an area first'); return; }
+    const softened = note.value
+      ? softenNote(note.value, HOUSE.map((m) => m.name))
+      : undefined;
+    state.anon = raiseAnonymous(state.anon, {
+      area: picked, author: state.me, note: softened, now: new Date().toISOString(),
+    });
+    note.value = '';
+    renderRaise();
+    toast('Sent. Your name is not attached.');
+  });
+  bar.append(send);
+
+  bar.append(el('div', 'anon-note',
+    'Names are stripped from the note before it is stored, not before it is shown.'));
+  panel.append(bar);
+
+  panel.append(renderWhoDidThis());
+
+  panel.append(el('h2', null, 'What the house can see'));
+  const now = new Date().toISOString();
+  const names = HOUSE.map((m) => m.name);
+  const open = anonymousAgenda(state.anon, names, now);
+
+  // Your own held flag, shown only to you. Without it a lone raise vanishes for
+  // a day and the natural response is to assume it failed and raise it again —
+  // or, worse, to say it out loud at dinner instead, which is the thing this
+  // channel exists to avoid.
+  const held = state.anon
+    .filter((issue) => issue.contributions.some((c) => c.author === state.me))
+    .map((issue) => resolveAnonymous(issue, names, now))
+    .filter((outcome) => !outcome.onAgenda);
+  for (const outcome of held) {
+    const mine = el('div', 'issue');
+    const head = el('div', 'head');
+    head.append(el('span', 'area', outcome.areaLabel));
+    head.append(el('span', 'status', 'Only you can see this'));
+    mine.append(head, el('p', null, outcome.summary));
+    panel.append(mine);
+  }
+
+  for (const outcome of open) {
+    const issue = el('div', 'issue');
+    const head = el('div', 'head');
+    head.append(el('span', 'area', outcome.areaLabel));
+    const status = el('span', 'status', 'On the agenda');
+    status.setAttribute('data-agenda', '');
+    head.append(status);
+    issue.append(head, el('p', null, outcome.summary));
+    panel.append(issue);
+  }
+
+  if (open.length === 0 && held.length === 0) {
+    panel.append(el('p', 'empty', 'Nothing raised. Quiet week.'));
+  }
+
+  panel.append(demoNote(
+    'A single raise waits 24 hours before it surfaces, so it cannot be a same-day '
+    + 'jab at whoever you just argued with. Two people raising the same area is '
+    + 'consensus and goes up immediately.',
+  ));
+}
+
+/**
+ * "Who did this?" — the not-me poll.
+ *
+ * Separate from the anonymous channel on purpose. The anonymous channel is for
+ * a pattern ("the kitchen keeps being left"); this is for one specific thing
+ * that is sitting there right now, and it is not anonymous, because the point
+ * is that somebody owns it.
+ *
+ * The mechanic that makes it work is that not answering is its own answer. A
+ * poll that only counts the people who reply lets the person responsible win by
+ * ignoring it, which is the exact behaviour it exists to price.
+ */
+function renderWhoDidThis() {
+  const wrap = document.createDocumentFragment();
+  wrap.append(el('h2', null, 'Who did this?'));
+  wrap.append(el('p', 'sub',
+    'For one specific thing, right now. Everyone gets asked once; whoever does '
+    + 'not answer is listed as not having answered.'));
+
+  for (const issue of state.issues) {
+    const card = el('div', 'card');
+    card.append(el('h3', null, issue.description));
+
+    const answered = Object.entries(issue.answers);
+    const owned = answered.find(([, value]) => value === 'was-me');
+    const silent = HOUSE.filter((m) => !(m.id in issue.answers)).map((m) => m.name);
+
+    if (owned) {
+      card.append(el('p', null, `${nameOf(owned[0])} owned it. Closed, nothing further.`));
+    } else if (silent.length === 0) {
+      card.append(el('p', null,
+        'Everyone answered "not me". It goes to the meeting as a house problem, '
+        + 'not as an accusation.'));
+    } else {
+      card.append(el('p', null, `Still to answer: ${silent.join(', ')}`));
+      if (!(state.me in issue.answers)) {
+        const row = el('div', 'btn-row');
+        const was = el('button', 'btn', 'Was me');
+        was.addEventListener('click', () => answerIssue(issue, 'was-me'));
+        const not = el('button', 'btn', 'Not me');
+        not.addEventListener('click', () => answerIssue(issue, 'not-me'));
+        row.append(was, not);
+        card.append(row);
+      } else {
+        card.append(el('p', null, issue.answers[state.me] === 'was-me'
+          ? 'You owned this one.' : 'You said it was not you.'));
+      }
+    }
+    wrap.append(card);
+  }
+
+  const ask = el('button', 'btn wide', 'Ask the house about something');
+  ask.addEventListener('click', () => {
+    const description = prompt('What has been left? Keep it factual.');
+    if (!description?.trim()) return;
+    state.issues.unshift({
+      id: `issue-${Date.now()}`, description: description.trim(), answers: {},
+    });
+    renderRaise();
+    toast('Asked. Everyone gets it once.');
+  });
+  wrap.append(ask);
+  return wrap;
+}
+
+function answerIssue(issue, value) {
+  issue.answers[state.me] = value;
+  renderRaise();
+  toast(value === 'was-me' ? 'Owned. That closes it.' : 'Noted.');
+}
+
+function demoNote(text) {
+  return el('p', 'demo', text);
+}
+
+/* ── Photo import ─────────────────────────────────────────────────────────── */
+
+/**
+ * Demo path. A real deployment posts the image to /api/g/:id/board/photo, which
+ * runs the same parse and merge server-side; here the file is accepted and the
+ * merge is explained, because there is no API key in a static page.
+ */
+function wirePhotoUpload() {
+  $('board-photo').addEventListener('change', (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    event.target.value = '';
+    toast(`Reading ${file.name}… (demo — a deployed house sends this to the Worker)`);
+  });
 }
 
 /* ── Shell ────────────────────────────────────────────────────────────────── */
 
-function renderAll() {
-  const { anchor } = meetingState();
-  $('#standing').innerHTML = anchor.action === 'move'
-    ? `standing time <b>should move</b> to ${anchor.best.label}`
-    : `standing time <b>${anchor.incumbent?.label ?? '—'}</b>`;
+function renderApp() {
+  const select = $('me');
+  select.replaceChildren(...HOUSE.map((member) => {
+    const option = el('option', null, member.name);
+    option.value = member.id;
+    if (member.id === state.me) option.selected = true;
+    return option;
+  }));
 
-  document.querySelectorAll('nav.tabs button').forEach((b) => {
-    b.setAttribute('aria-selected', String(b.dataset.tab === state.tab));
-  });
-  document.querySelectorAll('.panel').forEach((p) => {
-    p.toggleAttribute('data-active', p.id === `panel-${state.tab}`);
-  });
-
-  if (state.tab === 'meeting') renderMeeting();
-  if (state.tab === 'chores') renderChores();
-  if (state.tab === 'issues') renderIssues();
-  if (state.tab === 'ledger') renderLedger();
-  if (state.tab === 'pot') renderPot();
+  renderBoard();
+  renderMeeting();
+  renderRaise();
 }
 
-/**
- * The pot. Seeds each stake with the buy-in, deducts this week's fines from the
- * chore ledger, and previews the end-of-period split — so the mechanic that
- * makes a fine collectable-without-chasing is visible before it's deployed.
- */
-function renderPot() {
-  const wrap = $('#panel-pot');
-  wrap.replaceChildren();
+function boot() {
+  renderOnboarding();
+  wirePhotoUpload();
 
-  const cfg = state.pot;
-  const money = (cents) => `$${(cents / 100).toFixed(2)}`;
+  for (const button of document.querySelectorAll('nav.tabs button')) {
+    button.addEventListener('click', () => {
+      state.tab = button.dataset.tab;
+      for (const other of document.querySelectorAll('nav.tabs button')) {
+        other.setAttribute('aria-selected', String(other === button));
+      }
+      for (const panel of document.querySelectorAll('.panel')) {
+        panel.toggleAttribute('data-active', panel.id === `panel-${state.tab}`);
+      }
+      window.scrollTo({ top: 0 });
+    });
+  }
 
-  // Fines come straight from the chore board — same numbers as the Ledger tab.
-  const settlements = settleWeek({
-    weekOf: WEEK, participantIds: HOUSE.map((p) => p.id),
-    claims: state.claims, config: { ...CHORE_CONFIG, finePerMissedTaskCents: cfg.finePerMissedTaskCents },
+  $('me').addEventListener('change', (event) => {
+    state.me = event.target.value;
+    renderApp();
   });
-  const finesByMember = Object.fromEntries(settlements.map((s) => [s.participantId, s.fineCents]));
 
-  let stakes = openPot(HOUSE.map((p) => p.id), cfg);
-  stakes = applyWeekFines(stakes, finesByMember);
-  const state_ = potState(stakes);
-  const dist = distributePot(stakes, cfg);
-  const advice = recommendPot(cfg, CHORE_CONFIG.tasksRequired);
-
-  wrap.appendChild(el('h2', { text: 'The pot' }));
-  wrap.appendChild(el('p', { class: 'hint' },
-    'Everyone stakes a buy-in up front. Fines come out of the stake — nobody sends anyone '
-    + 'an invoice. What’s left is yours; the fines get shared out when the term closes.'));
-
-  // Controls: buy-in and fine, with the runway warning.
-  const controls = el('div', { class: 'card' }, [
-    el('div', { class: 'rows' }, [
-      potSlider('Buy-in per person', cfg.buyInCents, 1000, 30000, 1000, (v) => { cfg.buyInCents = v; renderPot(); }),
-      potSlider('Fine per task missed', cfg.finePerMissedTaskCents, 100, 10000, 100, (v) => { cfg.finePerMissedTaskCents = v; renderPot(); }),
-    ]),
-    el('div', {
-      class: `card ${advice.ok ? 'good' : 'bad'}`,
-      style: 'margin:10px 0 0',
-    }, [el('p', { text: advice.note })]),
-  ]);
-  wrap.appendChild(controls);
-
-  wrap.appendChild(el('h2', { text: `This week — pot holds ${money(state_.totalCents)}` }));
-  const people = el('div', { class: 'progress-people' });
-  for (const s of state_.stakes) {
-    const pct = Math.round((s.remainingCents / s.openingCents) * 100);
-    people.appendChild(el('div', { class: 'pp', 'data-short': s.clean ? null : '' }, [
-      el('span', { text: nameOf(s.memberId) }),
-      el('span', { class: 'track' }, el('i', { style: `width:${pct}%` })),
-      el('span', { class: 'n', text: s.overflowCents > 0 ? `-${money(s.overflowCents)}!` : money(s.remainingCents) }),
-    ]));
+  // A returning housemate skips onboarding. In the demo that is anyone who
+  // arrives with ?skip, so the board can be shown without filling the form.
+  if (new URLSearchParams(location.search).has('skip')) {
+    $('onboard').hidden = true;
+    $('app').hidden = false;
+    renderApp();
   }
-  wrap.appendChild(people);
-
-  if (state_.overflows.length) {
-    wrap.appendChild(el('p', { class: 'hint' },
-      `${state_.overflows.map((o) => nameOf(o.memberId)).join(', ')} `
-      + `${state_.overflows.length === 1 ? 'has' : 'have'} been fined past the stake — that part is a real `
-      + `debt the pot can’t cover. This is exactly the case a $100 fine on a small buy-in creates.`));
-  }
-
-  wrap.appendChild(el('h2', { text: 'If the term closed now' }));
-  wrap.appendChild(el('div', { class: 'card good' }, [el('p', { text: dist.summary })]));
-  wrap.appendChild(el('div', { class: 'scroll-x' }, el('table', {}, [
-    el('thead', {}, el('tr', {}, [
-      el('th', { text: 'Who' }), el('th', { class: 'num', text: 'Stake back' }),
-      el('th', { class: 'num', text: 'Bonus' }), el('th', { class: 'num', text: 'Gets' }),
-    ])),
-    el('tbody', {}, dist.payouts.map((p) => el('tr', {}, [
-      el('td', { text: nameOf(p.memberId) }),
-      el('td', { class: 'num', text: money(p.stakeBackCents) }),
-      el('td', { class: 'num', text: p.bonusCents ? `+${money(p.bonusCents)}` : '—' }),
-      el('td', { class: 'num', text: money(p.totalCents) }),
-    ]))),
-  ])));
-
-  wrap.appendChild(el('p', { class: 'hint' },
-    'Distribution: fines go to whoever finished the week clean — the tidy housemates are '
-    + 'literally paid out of the messy ones, and no one had to ask for a cent. Switch it to a '
-    + 'house fund (a dinner, the bond) if that feels friendlier.'));
 }
 
-function potSlider(label, valueCents, minCents, maxCents, stepCents, onInput) {
-  const out = el('span', { class: 'v', text: `$${(valueCents / 100).toFixed(0)}` });
-  const input = el('input', {
-    type: 'range', min: String(minCents), max: String(maxCents), step: String(stepCents),
-    value: String(valueCents), style: 'width:140px',
-    oninput: (e) => onInput(Number(e.target.value)),
-  });
-  return el('div', { class: 'row' }, [
-    el('span', { class: 'k', text: label }),
-    el('span', { style: 'display:flex;align-items:center;gap:10px' }, [input, out]),
-  ]);
+/* ── Seeds ────────────────────────────────────────────────────────────────── */
+
+function seedTicks() {
+  return [
+    { taskId: 'dishes', memberId: 'hassaan' },
+    { taskId: 'kitchen', memberId: 'hassaan' },
+    { taskId: 'bins', memberId: 'hassaan' },
+    { taskId: 'vacuum', memberId: 'hassaan' },
+    { taskId: 'dishes', memberId: 'isaac' },
+    { taskId: 'bathrooms', memberId: 'isaac' },
+    { taskId: 'plants', memberId: 'isaac' },
+    { taskId: 'bins', memberId: 'kez' },
+    { taskId: 'kitchen', memberId: 'kez' },
+    { taskId: 'sunday-bins', memberId: 'kez' },
+    { taskId: 'bin-bags', memberId: 'kez' },
+    { taskId: 'vacuum', memberId: 'ross' },
+    { taskId: 'bathrooms', memberId: 'eyong' },
+    { taskId: 'plants', memberId: 'manan' },
+    { taskId: 'bin-bags', memberId: 'manan' },
+    // Pete: one, which is the whole reason any of this exists.
+    { taskId: 'dishes', memberId: 'pete' },
+  ];
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const picker = $('#me');
-  for (const person of HOUSE) {
-    picker.appendChild(el('option', { value: person.id, text: person.name }));
+function seedResponses() {
+  const responses = {};
+  for (const member of HOUSE) {
+    responses[member.id] = {};
+    for (const slot of slots) {
+      if (member.id === 'pete') continue; // answers nothing; scores zero
+      // One conflict at a time: the engine takes a single commitment, and
+      // handing it the array silently compares against an undefined weekday,
+      // which reads as "no clash" and puts Isaac at his own football night.
+      const clash = (member.standingConflicts ?? []).some(
+        (conflict) => collidesWithStandingConflict(slot, conflict, TZ),
+      );
+      if (clash) { responses[member.id][slot.id] = 'no'; continue; }
+      const hour = Number(slot.id.slice(-5, -3));
+      responses[member.id][slot.id] = hour === 19 ? 'yes' : 'ifneed';
+    }
   }
-  picker.value = state.me;
-  picker.addEventListener('change', (e) => { state.me = e.target.value; state.refixNote = null; renderAll(); });
+  return responses;
+}
 
-  document.querySelectorAll('nav.tabs button').forEach((b) => {
-    b.addEventListener('click', () => { state.tab = b.dataset.tab; renderAll(); });
+function seedAnon() {
+  const dayAgo = new Date(Date.now() - 30 * 3600 * 1000).toISOString();
+  let issues = raiseAnonymous([], {
+    area: 'kitchen', author: 'kez', now: dayAgo,
+    note: 'Pans are being left overnight and it is always the same ones.',
   });
+  issues = raiseAnonymous(issues, {
+    area: 'kitchen', author: 'ross', now: new Date().toISOString(),
+  });
+  // Raised by whoever is viewing, so the "held, only you can see this" state is
+  // visible on first load rather than being a code path nobody ever sees.
+  return raiseAnonymous(issues, {
+    area: 'bins', author: 'hassaan', now: new Date().toISOString(),
+    note: 'Recycling has not gone out for two weeks.',
+  });
+}
 
-  renderAll();
-});
+boot();

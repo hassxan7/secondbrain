@@ -1716,7 +1716,7 @@ function distributePot(stakes, config) {
     totalCents: s.remainingCents,
     owesCents: s.overflowCents
   }));
-  const money = (cents) => `$${(cents / 100).toFixed(2)}`;
+  const money2 = (cents) => `$${(cents / 100).toFixed(2)}`;
   if (config.distribution === "split-clean" && clean.length > 0 && state.surplusCents > 0) {
     const share = Math.floor(state.surplusCents / clean.length);
     const remainder = state.surplusCents - share * clean.length;
@@ -1733,7 +1733,7 @@ function distributePot(stakes, config) {
       payouts: base,
       houseFundCents: 0,
       rolloverCents: 0,
-      summary: `${money(state.surplusCents)} in fines split among ${clean.length} clean ${clean.length === 1 ? "housemate" : "housemates"} \u2014 ${money(share)} each.`
+      summary: `${money2(state.surplusCents)} in fines split among ${clean.length} clean ${clean.length === 1 ? "housemate" : "housemates"} \u2014 ${money2(share)} each.`
     };
   }
   if (config.distribution === "house-fund") {
@@ -1741,7 +1741,7 @@ function distributePot(stakes, config) {
       payouts: base,
       houseFundCents: state.surplusCents,
       rolloverCents: 0,
-      summary: `${money(state.surplusCents)} of fines into the house fund.`
+      summary: `${money2(state.surplusCents)} of fines into the house fund.`
     };
   }
   if (config.distribution === "roll-over") {
@@ -1749,38 +1749,38 @@ function distributePot(stakes, config) {
       payouts: base,
       houseFundCents: 0,
       rolloverCents: state.surplusCents,
-      summary: `${money(state.surplusCents)} of fines rolled into next period.`
+      summary: `${money2(state.surplusCents)} of fines rolled into next period.`
     };
   }
   return {
     payouts: base,
     houseFundCents: state.surplusCents,
     rolloverCents: 0,
-    summary: state.surplusCents > 0 ? `Nobody finished clean \u2014 ${money(state.surplusCents)} to the house fund.` : "Everyone clean. Full stakes back, no fines."
+    summary: state.surplusCents > 0 ? `Nobody finished clean \u2014 ${money2(state.surplusCents)} to the house fund.` : "Everyone clean. Full stakes back, no fines."
   };
 }
 function recommendPot(config, tasksRequired = 4) {
   const worstWeeklyFine = config.finePerMissedTaskCents * tasksRequired;
   const weeks = worstWeeklyFine > 0 ? Math.floor(config.buyInCents / worstWeeklyFine) : Infinity;
-  const money = (cents) => `$${(cents / 100).toFixed(0)}`;
+  const money2 = (cents) => `$${(cents / 100).toFixed(0)}`;
   if (weeks >= 3) {
     return {
       weeksOfRunway: weeks,
       ok: true,
-      note: `A ${money(config.buyInCents)} stake absorbs ${weeks} bad weeks before it's gone. Healthy.`
+      note: `A ${money2(config.buyInCents)} stake absorbs ${weeks} bad weeks before it's gone. Healthy.`
     };
   }
   if (weeks >= 1) {
     return {
       weeksOfRunway: weeks,
       ok: true,
-      note: `A bad week costs up to ${money(worstWeeklyFine)}, so the ${money(config.buyInCents)} stake lasts about ${weeks} of them. Steep but workable \u2014 expect top-ups.`
+      note: `A bad week costs up to ${money2(worstWeeklyFine)}, so the ${money2(config.buyInCents)} stake lasts about ${weeks} of them. Steep but workable \u2014 expect top-ups.`
     };
   }
   return {
     weeksOfRunway: 0,
     ok: false,
-    note: `A single bad week (${money(worstWeeklyFine)}) wipes the ${money(config.buyInCents)} stake, so the pot can't enforce past week one. Either raise the buy-in or lower the fine \u2014 a $100 fine wants a stake nearer ${money(worstWeeklyFine * 3)}.`
+    note: `A single bad week (${money2(worstWeeklyFine)}) wipes the ${money2(config.buyInCents)} stake, so the pot can't enforce past week one. Either raise the buy-in or lower the fine \u2014 a $100 fine wants a stake nearer ${money2(worstWeeklyFine * 3)}.`
   };
 }
 
@@ -1877,26 +1877,481 @@ function resolveAnonymous(issue, houseNames, now, config = DEFAULT_ANON_CONFIG) 
 function anonymousAgenda(issues, houseNames, now, config = DEFAULT_ANON_CONFIG) {
   return issues.map((issue) => resolveAnonymous(issue, houseNames, now, config)).filter((o) => o.onAgenda).sort((a, b) => b.weight - a.weight);
 }
+
+// src/banksia/board.ts
+var DEFAULT_TASKS = [
+  { id: "plants", label: "Water the plants", cap: 2 },
+  { id: "dishes", label: "Unstack the dishes" },
+  { id: "bins", label: "Take the bins out" },
+  { id: "kitchen", label: "Clean the kitchen" },
+  { id: "vacuum", label: "Vacuum everything" },
+  { id: "sunday-bins", label: "Sunday bins out" },
+  { id: "bathrooms", label: "Bathrooms" },
+  { id: "bin-bags", label: "Large bin bags" }
+];
+function slugTask(label) {
+  const slug = label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40);
+  return slug || "task";
+}
+function matchTask(label, known) {
+  const needle = fold(label);
+  if (!needle)
+    return null;
+  const tiers = [
+    (t) => fold(t.label) === needle,
+    (t) => t.id === slugTask(label),
+    (t) => needle.length >= 4 && (fold(t.label).includes(needle) || needle.includes(fold(t.label)))
+  ];
+  for (const test of tiers) {
+    const hits = known.filter(test);
+    if (hits.length === 1)
+      return hits[0];
+    if (hits.length > 1)
+      return null;
+  }
+  return null;
+}
+function fold(s) {
+  return s.toLowerCase().replace(/[^a-z]/g, "");
+}
+function withinOneEdit(a, b) {
+  if (a === b)
+    return true;
+  if (Math.abs(a.length - b.length) > 1)
+    return false;
+  const [short, long] = a.length <= b.length ? [a, b] : [b, a];
+  let i = 0;
+  let j = 0;
+  let edits = 0;
+  while (i < short.length && j < long.length) {
+    if (short[i] === long[j]) {
+      i++;
+      j++;
+      continue;
+    }
+    if (++edits > 1)
+      return false;
+    if (short.length === long.length) {
+      i++;
+      j++;
+    } else {
+      j++;
+    }
+  }
+  return edits + (long.length - j) + (short.length - i) <= 1;
+}
+function matchName(raw, members) {
+  const needle = fold(raw);
+  if (!needle)
+    return null;
+  const tiers = [
+    (m) => fold(m.name) === needle,
+    (m) => fold(m.name.split(/\s+/)[0]) === needle,
+    (m) => fold(m.name).startsWith(needle) && needle.length >= 3,
+    (m) => withinOneEdit(fold(m.name.split(/\s+/)[0]), needle) && needle.length >= 3
+  ];
+  for (const test of tiers) {
+    const hits = members.filter(test);
+    if (hits.length === 1)
+      return hits[0].id;
+    if (hits.length > 1)
+      return null;
+  }
+  return null;
+}
+function parseBoardPayload(payload, members, weekOf, knownTasks = DEFAULT_TASKS) {
+  const rows = extractRows(payload);
+  if (rows.length === 0)
+    throw new Error("no rows found on that board");
+  const tasks = [];
+  const newTasks = [];
+  const ticks = [];
+  const unmatched = [];
+  const seenTick = /* @__PURE__ */ new Set();
+  for (const row of rows) {
+    const label = row.task.replace(/\s+/g, " ").trim();
+    if (!label)
+      continue;
+    const known = matchTask(label, knownTasks);
+    const task = known ?? { id: slugTask(label), label, ...row.cap ? { cap: row.cap } : {} };
+    if (!known)
+      newTasks.push(task);
+    if (!tasks.some((t) => t.id === task.id))
+      tasks.push(task);
+    for (const rawName of row.names) {
+      const name = rawName.replace(/\s+/g, " ").trim();
+      if (!name)
+        continue;
+      const memberId = matchName(name, members);
+      if (!memberId) {
+        unmatched.push({ name, task: label });
+        continue;
+      }
+      const key = `${task.id}:${memberId}`;
+      if (seenTick.has(key))
+        continue;
+      seenTick.add(key);
+      ticks.push({ taskId: task.id, memberId });
+    }
+  }
+  return { board: { weekOf, tasks, ticks }, unmatched, newTasks, ticksFound: ticks.length };
+}
+function extractRows(payload) {
+  const source = Array.isArray(payload) ? payload : payload && typeof payload === "object" && Array.isArray(payload.rows) ? payload.rows : null;
+  if (!source)
+    throw new Error("expected an array of rows");
+  const rows = [];
+  for (const entry of source) {
+    if (!entry || typeof entry !== "object")
+      continue;
+    const { task, names, cap } = entry;
+    if (typeof task !== "string")
+      continue;
+    const list = Array.isArray(names) ? names.filter((n) => typeof n === "string") : [];
+    rows.push({
+      task,
+      names: list,
+      ...typeof cap === "number" && cap > 0 ? { cap: Math.floor(cap) } : {}
+    });
+  }
+  return rows;
+}
+function mergeBoard(existing, imported) {
+  if (existing.weekOf !== imported.weekOf) {
+    throw new Error("refusing to merge boards from different weeks");
+  }
+  const has = (list, t) => list.some((x) => x.taskId === t.taskId && x.memberId === t.memberId);
+  const added = imported.ticks.filter((t) => !has(existing.ticks, t));
+  const keptDespiteAbsence = existing.ticks.filter((t) => !has(imported.ticks, t));
+  const tasks = [...existing.tasks];
+  for (const t of imported.tasks)
+    if (!tasks.some((x) => x.id === t.id))
+      tasks.push(t);
+  return {
+    board: { weekOf: existing.weekOf, tasks, ticks: [...existing.ticks, ...added] },
+    added,
+    keptDespiteAbsence
+  };
+}
+function boardStanding(board, members, tasksRequired = 4) {
+  const validTasks = new Set(board.tasks.map((t) => t.id));
+  return members.map((m) => {
+    const mine = new Set(
+      board.ticks.filter((t) => t.memberId === m.id && validTasks.has(t.taskId)).map((t) => t.taskId)
+    );
+    const done = mine.size;
+    return {
+      memberId: m.id,
+      name: m.name,
+      done,
+      required: tasksRequired,
+      short: Math.max(0, tasksRequired - done),
+      remaining: board.tasks.filter((t) => !mine.has(t.id)).map((t) => t.id)
+    };
+  });
+}
+function behind(standings) {
+  return standings.filter((s) => s.short > 0).sort((a, b) => b.short - a.short || a.name.localeCompare(b.name));
+}
+
+// src/banksia/onboarding.ts
+var DATA_USE = [
+  {
+    id: "reminders",
+    label: "Reminders about chores and the house meeting",
+    detail: "At most three messages a week, never between 9pm and 8am."
+  },
+  {
+    id: "board",
+    label: "Your name on the chore board",
+    detail: "Everyone in the house sees who ticked what. That is the point of it."
+  },
+  {
+    id: "scheduling",
+    label: "Working out a meeting time that suits the house",
+    detail: "Your weekly availability, and nothing else from your calendar."
+  },
+  {
+    id: "not",
+    label: "Not used for anything else",
+    detail: "No ads, no third parties, no selling. Ask and it is deleted."
+  }
+];
+var WEEKDAY_NAMES2 = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+function normaliseEmail(raw) {
+  if (!raw)
+    return null;
+  const trimmed = raw.trim().toLowerCase();
+  if (!trimmed)
+    return null;
+  if (/\s/.test(trimmed))
+    return null;
+  const at = trimmed.indexOf("@");
+  if (at <= 0 || at !== trimmed.lastIndexOf("@"))
+    return null;
+  const domain = trimmed.slice(at + 1);
+  if (!domain.includes(".") || domain.startsWith(".") || domain.endsWith("."))
+    return null;
+  return trimmed;
+}
+function normalisePhone(raw) {
+  if (!raw)
+    return null;
+  const cleaned = raw.replace(/[\s()\-.]/g, "");
+  if (!cleaned)
+    return null;
+  if (/^\+\d{8,15}$/.test(cleaned))
+    return cleaned;
+  if (/^0[45]\d{8}$/.test(cleaned))
+    return `+61${cleaned.slice(1)}`;
+  if (/^61[45]\d{8}$/.test(cleaned))
+    return `+${cleaned}`;
+  if (/^[45]\d{8}$/.test(cleaned))
+    return `+61${cleaned}`;
+  return null;
+}
+function normaliseName(raw) {
+  if (!raw)
+    return null;
+  const trimmed = raw.replace(/\s+/g, " ").trim();
+  if (trimmed.length < 2 || trimmed.length > 40)
+    return null;
+  return trimmed;
+}
+function validPattern(p) {
+  if (!p || typeof p !== "object")
+    return false;
+  const { weekday, time } = p;
+  return Number.isInteger(weekday) && weekday >= 0 && weekday <= 6 && typeof time === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(time);
+}
+function normaliseAvailability(raw) {
+  if (!raw || typeof raw !== "object")
+    return null;
+  const { mode, slots } = raw;
+  if (mode !== "fixed" && mode !== "varies" && mode !== "calendar")
+    return null;
+  const list = Array.isArray(slots) ? slots.filter(validPattern) : [];
+  const seen = /* @__PURE__ */ new Set();
+  const unique = [];
+  for (const s of list) {
+    const key = `${s.weekday}@${s.time}`;
+    if (seen.has(key))
+      continue;
+    seen.add(key);
+    unique.push({ weekday: s.weekday, time: s.time });
+  }
+  unique.sort((a, b) => a.weekday - b.weekday || a.time.localeCompare(b.time));
+  if (mode !== "calendar" && unique.length === 0)
+    return null;
+  return { mode, slots: unique };
+}
+function impliedAnswer(availability, slot) {
+  if (availability.mode === "calendar")
+    return null;
+  const matches = availability.slots.some(
+    (s) => s.weekday === slot.weekday && s.time === slot.time
+  );
+  if (!matches)
+    return null;
+  return availability.mode === "fixed" ? "yes" : "ifneed";
+}
+function describeAvailability(availability) {
+  if (availability.mode === "calendar") {
+    return availability.slots.length > 0 ? `Calendar synced, plus ${availability.slots.length} time(s) picked by hand` : "Calendar synced \u2014 free/busy read at poll time";
+  }
+  const byDay = /* @__PURE__ */ new Map();
+  for (const s of availability.slots) {
+    const list = byDay.get(s.weekday) ?? [];
+    list.push(s.time);
+    byDay.set(s.weekday, list);
+  }
+  const parts = [...byDay.entries()].sort((a, b) => a[0] - b[0]).map(([weekday, times]) => `${WEEKDAY_NAMES2[weekday]} ${times.join(", ")}`);
+  const suffix = availability.mode === "varies" ? " (not every week)" : "";
+  return parts.join(" \xB7 ") + suffix;
+}
+function validateJoin(draft, existing = []) {
+  const errors = [];
+  const name = normaliseName(draft.name);
+  if (!name)
+    errors.push("Give a name between 2 and 40 characters.");
+  const email = normaliseEmail(draft.email);
+  const phone = normalisePhone(draft.phone);
+  if (draft.email && !email)
+    errors.push("That email address does not look right.");
+  if (draft.phone && !phone)
+    errors.push("That looks off \u2014 use a mobile like 0412 345 678.");
+  if (!email && !phone)
+    errors.push("One way to reach you: a mobile or an email.");
+  const availability = normaliseAvailability(draft.availability);
+  if (!availability) {
+    errors.push("Pick at least one time you are usually free, or sync a calendar.");
+  }
+  if (!draft.acceptedDataUse)
+    errors.push("Tick the box to say what this is used for.");
+  if (errors.length > 0 || !name || !availability)
+    return { ok: false, errors };
+  const matched = existing.find(
+    (m) => email && normaliseEmail(m.email) === email || phone && normalisePhone(m.phone) === phone
+  );
+  return {
+    ok: true,
+    errors: [],
+    member: { name, email, phone, availability },
+    matchedExisting: matched?.id
+  };
+}
+function toParticipant(member, attendanceRate = 1) {
+  return { id: member.id, name: member.name, attendanceRate };
+}
+
+// src/banksia/reminders.ts
+var DEFAULT_REMINDER_CONFIG = {
+  maxPerWeek: 3,
+  quietEndMin: 8 * 60,
+  quietStartMin: 21 * 60,
+  tasksRequired: 4,
+  stakeCents: 1e4
+};
+function pickChannel(target) {
+  if (target.whatsapp)
+    return "whatsapp";
+  if (target.email)
+    return "email";
+  if (target.phone)
+    return "sms";
+  return null;
+}
+function withinSendingHours(minuteOfDay, config) {
+  return minuteOfDay >= config.quietEndMin && minuteOfDay < config.quietStartMin;
+}
+function money(cents) {
+  return cents % 100 === 0 ? `$${cents / 100}` : `$${(cents / 100).toFixed(2)}`;
+}
+function dueReminders(input) {
+  const config = { ...DEFAULT_REMINDER_CONFIG, ...input.config };
+  if (!withinSendingHours(input.minuteOfDay, config))
+    return [];
+  const byId = new Map(input.targets.map((t) => [t.memberId, t]));
+  const standingOf = new Map(input.standings.map((s) => [s.memberId, s]));
+  const candidates = [];
+  const push = (memberId, kind, subject, body, suffix = "") => {
+    const target = byId.get(memberId);
+    if (!target)
+      return;
+    const channel = pickChannel(target);
+    if (!channel)
+      return;
+    candidates.push({
+      id: `${kind}:${memberId}:${input.weekOf}${suffix}`,
+      memberId,
+      kind,
+      channel,
+      subject,
+      body
+    });
+  };
+  if (input.meetingTomorrow) {
+    for (const memberId of input.meetingTomorrow.attendees) {
+      const name = byId.get(memberId)?.name ?? "there";
+      push(
+        memberId,
+        "meeting-tomorrow",
+        "House meeting tomorrow",
+        `${name} \u2014 house meeting ${input.meetingTomorrow.label}. You said you were free. Anything to raise, add it before then.`
+      );
+    }
+  }
+  for (const issue of input.openIssues ?? []) {
+    for (const memberId of issue.awaiting) {
+      push(
+        memberId,
+        "issue-poll",
+        "Was this you?",
+        `${issue.description}
+
+Reply "was me" or "not me". Not answering counts as not answering \u2014 it does not count as no.`,
+        `:${issue.id}`
+      );
+    }
+  }
+  for (const memberId of input.awaitingPoll ?? []) {
+    push(
+      memberId,
+      "meeting-poll",
+      "Two taps: when are you free?",
+      "The house is picking a meeting time and you are the one it is waiting on. Silence scores as unavailable, so the time gets picked around you."
+    );
+  }
+  const lastCall = input.weekday === 0;
+  const nudgeDay = input.weekday === 4;
+  if (lastCall || nudgeDay) {
+    for (const target of input.targets) {
+      const standing = standingOf.get(target.memberId);
+      if (!standing || standing.short === 0)
+        continue;
+      if (lastCall) {
+        push(
+          target.memberId,
+          "chore-last-call",
+          "Week closes tonight",
+          `${standing.done}/${standing.required} done \u2014 ${standing.short} short. The week settles at midnight and ${money(config.stakeCents)} of your stake is on it. Anything ticked before then counts.`
+        );
+      } else {
+        push(
+          target.memberId,
+          "chore-nudge",
+          `${standing.short} to go`,
+          `${standing.done}/${standing.required} on the board, three days left. Quickest ones still open: ` + standing.remaining.slice(0, 3).join(", ") + "."
+        );
+      }
+    }
+  }
+  const spent = { ...input.sentThisWeek ?? {} };
+  const out = [];
+  for (const reminder of candidates) {
+    const used = spent[reminder.memberId] ?? 0;
+    if (used >= config.maxPerWeek)
+      continue;
+    spent[reminder.memberId] = used + 1;
+    out.push(reminder);
+  }
+  return out;
+}
+function reminderPolicy(config = DEFAULT_REMINDER_CONFIG) {
+  return [
+    `At most ${config.maxPerWeek} messages a week.`,
+    "Nothing between 9pm and 8am.",
+    "Never about something you have already done.",
+    "One chore nudge on Thursday, one on Sunday if you are still short. That is it."
+  ];
+}
 export {
   ACTIVITIES,
   ACTIVITY_BY_ID,
+  DATA_USE,
   DEFAULT_ANON_CONFIG,
   DEFAULT_CHORE_CONFIG,
   DEFAULT_CONFIG,
   DEFAULT_HANGOUT_CONFIG,
   DEFAULT_POT_CONFIG,
+  DEFAULT_REMINDER_CONFIG,
+  DEFAULT_TASKS,
   ISSUE_AREAS,
   SUBURBS,
   addSuggestion,
   anonymousAgenda,
   applyWeekFines,
+  behind,
+  boardStanding,
   buildAgenda,
   buildBrief,
   buildItinerary,
   centroid,
   collidesWithStandingConflict,
+  describeAvailability,
   describeIssueOutcome,
   distributePot,
+  dueReminders,
   estimateTravelMinutes,
   evaluateRefix,
   fetchEventMeta,
@@ -1905,18 +2360,28 @@ export {
   generateGrid,
   groupCentroid,
   haversineKm,
+  impliedAnswer,
   toActivity as linkToActivity,
   localParts,
+  matchName,
+  matchTask,
+  mergeBoard,
   mergeRippleEvents,
+  normaliseAvailability,
+  normaliseEmail,
+  normaliseName,
+  normalisePhone,
   offenderTable,
   openBallots,
   openPot,
   outstandingAsks,
+  parseBoardPayload,
   parseEventUrl,
   participants,
   patternKey,
   patternLabel,
   pendingAsksFor,
+  pickChannel,
   platformLabel,
   potState,
   raiseAnonymous,
@@ -1926,6 +2391,7 @@ export {
   recommendAnchor,
   recommendPot,
   recordAnswers,
+  reminderPolicy,
   renderChatMessage,
   resolveAnonymous,
   resolveDisputes,
@@ -1934,7 +2400,11 @@ export {
   scorePlan,
   scoreSlots,
   settleWeek,
+  slugTask,
   softenNote,
   toDirectorySubmission,
-  weightOf
+  toParticipant,
+  validateJoin,
+  weightOf,
+  withinSendingHours
 };

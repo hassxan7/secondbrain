@@ -58,3 +58,21 @@ export {
   ISSUE_AREAS, DEFAULT_ANON_CONFIG,
 } from './banksia/anonymous.ts';
 export type { AnonymousIssue, AnonymousOutcome, IssueArea } from './banksia/anonymous.ts';
+
+export {
+  DEFAULT_TASKS, slugTask, matchName, matchTask, parseBoardPayload, mergeBoard,
+  boardStanding, behind,
+} from './banksia/board.ts';
+export type { Board, BoardTask, BoardTick, BoardMember, Standing } from './banksia/board.ts';
+
+export {
+  normaliseEmail, normalisePhone, normaliseName, normaliseAvailability,
+  impliedAnswer, describeAvailability, validateJoin, toParticipant, DATA_USE,
+} from './banksia/onboarding.ts';
+export type { AvailabilityDraft, AvailabilityMode, JoinDraft } from './banksia/onboarding.ts';
+
+export {
+  dueReminders, pickChannel, withinSendingHours, reminderPolicy,
+  DEFAULT_REMINDER_CONFIG,
+} from './banksia/reminders.ts';
+export type { Reminder, ReminderTarget, ReminderKind } from './banksia/reminders.ts';

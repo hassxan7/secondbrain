@@ -7,13 +7,14 @@
  */
 
 import {
-  type Env, json, notFound, badRequest, unauthorized, newId, weekOf, enqueue,
-  loadMemberNames, memberFromToken, getPoll, slotsOf,
+  type Env, json, notFound, badRequest, unauthorized, newId, weekOf,
+  memberFromToken, getPoll, slotsOf,
 } from './db.ts';
 import {
   buildAuthUrl, exchangeCode, refreshAccessToken, fetchBusy, suggestFromBusy,
 } from './integrations/google-calendar.ts';
 import * as banksia from './banksia/routes.ts';
+import * as house from './banksia/house-routes.ts';
 import * as ripple from './ripple/routes.ts';
 
 type Handler = (
@@ -81,6 +82,29 @@ route('POST', '/api/issues/:issueId/respond', (req, env, _ctx, [issueId]) =>
 
 route('POST', '/api/issues/:issueId/close', (_req, env, _ctx, [issueId]) =>
   banksia.closeIssue(env, issueId));
+
+/* ── Banksia: joining, the board, the anonymous channel, the chase ────────── */
+
+route('GET', '/api/g/:groupId/join', (_req, env, _ctx, [groupId]) =>
+  house.joinInfo(env, groupId));
+
+route('POST', '/api/g/:groupId/join', (req, env, _ctx, [groupId]) =>
+  house.joinHouse(req, env, groupId));
+
+route('GET', '/api/g/:groupId/board', (req, env, _ctx, [groupId]) =>
+  house.getBoard(env, groupId, new URL(req.url).searchParams.get('week') ?? undefined));
+
+route('POST', '/api/g/:groupId/board/photo', (req, env, _ctx, [groupId]) =>
+  house.importBoardPhoto(req, env, groupId));
+
+route('GET', '/api/g/:groupId/anon', (_req, env, _ctx, [groupId]) =>
+  house.getAnonymous(env, groupId));
+
+route('POST', '/api/g/:groupId/anon', (req, env, _ctx, [groupId]) =>
+  house.raiseAnonymousRoute(req, env, groupId));
+
+route('POST', '/api/g/:groupId/remind', (req, env, _ctx, [groupId]) =>
+  house.remindRoute(req, env, groupId));
 
 /* ── Ripple ───────────────────────────────────────────────────────────────── */
 
@@ -395,33 +419,23 @@ async function runScheduled(event: ScheduledController, env: Env): Promise<void>
     }
   }
 
-  // Chase anyone sitting on an open poll.
-  const openPolls = await env.DB.prepare(
-    `SELECT p.id, p.group_id, p.title FROM polls p
-       JOIN groups g ON g.id = p.group_id
-      WHERE p.status = 'open' AND g.kind = 'banksia'`,
-  ).all<{ id: string; group_id: string; title: string }>();
+  const groups = await env.DB.prepare("SELECT id FROM groups WHERE kind = 'banksia'")
+    .all<{ id: string }>();
 
-  for (const poll of openPolls.results ?? []) {
-    const [names, answered] = await Promise.all([
-      loadMemberNames(env, poll.group_id),
-      env.DB.prepare('SELECT DISTINCT member_id FROM responses WHERE poll_id = ?')
-        .bind(poll.id).all<{ member_id: string }>(),
-    ]);
-    const answeredIds = new Set((answered.results ?? []).map((r) => r.member_id));
-    const missing = Object.entries(names).filter(([id]) => !answeredIds.has(id));
-
-    if (missing.length > 0) {
-      await enqueue(env, poll.group_id, 'whatsapp', 'group',
-        `⏳ Still waiting on ${missing.map(([, name]) => name).join(', ')} for "${poll.title}".\n`
-        + `A slot you haven't answered counts as a no.`);
+  // The chase. Per person and inside a weekly budget rather than a daily
+  // callout in the group chat naming everyone who has not answered — a public
+  // list of names every evening is the version of this that gets muted.
+  // runReminders decides who, whether, and through which channel; it is a
+  // no-op outside sending hours and silent on a second run.
+  for (const group of groups.results ?? []) {
+    try {
+      await house.runReminders(env, group.id);
+    } catch (error) {
+      console.error('reminder run failed for', group.id, error);
     }
   }
 
   if (!isWeekly) return;
-
-  const groups = await env.DB.prepare("SELECT id FROM groups WHERE kind = 'banksia'")
-    .all<{ id: string }>();
 
   for (const group of groups.results ?? []) {
     try {

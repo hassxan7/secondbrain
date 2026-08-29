@@ -29,6 +29,11 @@ CREATE TABLE IF NOT EXISTS members (
   -- Rolling share of recent meetings attended. Feeds scheduling weight.
   attendance_rate REAL NOT NULL DEFAULT 1.0,
   is_required     INTEGER NOT NULL DEFAULT 0,
+  -- What they said at onboarding: {"mode":"fixed|varies|calendar","slots":[...]}.
+  -- `varies` is carried through the engine as `ifneed`, never `yes`.
+  availability_json TEXT,
+  -- The consent step was shown and acknowledged. Null means they predate it.
+  joined_at       TEXT,
   created_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_members_group ON members(group_id);
@@ -301,6 +306,63 @@ CREATE TABLE IF NOT EXISTS invites (
   nudges       INTEGER NOT NULL DEFAULT 0,
   last_nudge_at TEXT,
   UNIQUE (group_id, member_id)
+);
+
+-- ── The anonymous channel ────────────────────────────────────────────────────
+-- Issues are about an *area*, never a person, and the author column is never
+-- returned by any read path. See src/banksia/anonymous.ts.
+
+CREATE TABLE IF NOT EXISTS anon_issues (
+  id          TEXT PRIMARY KEY,
+  group_id    TEXT NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
+  area        TEXT NOT NULL,
+  created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+  resolved_at TEXT
+);
+-- One open issue per area is what the engine assumes when it folds a new raise
+-- into an existing one. A plain UNIQUE would not enforce it: SQLite treats each
+-- NULL resolved_at as distinct, so the constraint would never fire on exactly
+-- the rows it exists to constrain. A partial index does.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_anon_open_area
+  ON anon_issues(group_id, area) WHERE resolved_at IS NULL;
+
+CREATE TABLE IF NOT EXISTS anon_contributions (
+  issue_id  TEXT NOT NULL REFERENCES anon_issues(id) ON DELETE CASCADE,
+  -- Opaque per person, so a second raise from the same person does not double
+  -- the weight. Never joined against members on any read path.
+  author    TEXT NOT NULL,
+  note      TEXT,
+  raised_at TEXT NOT NULL DEFAULT (datetime('now')),
+  PRIMARY KEY (issue_id, author)
+);
+
+-- ── Chasing ──────────────────────────────────────────────────────────────────
+-- One row per message actually sent. The primary key is the reminder's own
+-- dedupe id, so a cron that runs twice inserts nothing the second time; the
+-- weekly count read off this table is what enforces the three-a-week cap.
+
+CREATE TABLE IF NOT EXISTS reminders_sent (
+  id        TEXT PRIMARY KEY,
+  group_id  TEXT NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
+  member_id TEXT NOT NULL REFERENCES members(id) ON DELETE CASCADE,
+  week_of   TEXT NOT NULL,
+  kind      TEXT NOT NULL,
+  channel   TEXT NOT NULL,
+  sent_at   TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_reminders_week ON reminders_sent(group_id, member_id, week_of);
+
+-- A photographed whiteboard, and what reading it produced. Kept so an import
+-- that misread a column can be explained after the board has been wiped.
+CREATE TABLE IF NOT EXISTS board_imports (
+  id             TEXT PRIMARY KEY,
+  group_id       TEXT NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
+  week_of        TEXT NOT NULL,
+  uploaded_by    TEXT REFERENCES members(id) ON DELETE SET NULL,
+  ticks_added    INTEGER NOT NULL DEFAULT 0,
+  unmatched_json TEXT NOT NULL DEFAULT '[]',
+  new_tasks_json TEXT NOT NULL DEFAULT '[]',
+  created_at     TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
 -- ── The pot: pre-funded stakes so fines are enforceable ──────────────────────
