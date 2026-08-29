@@ -16,7 +16,9 @@
     "bot": "node bot/index.js",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm test && npm run build:web",
-    "build:web": "esbuild src/browser.ts --bundle --format=esm --target=es2022 --external:@anthropic-ai/sdk --outfile=web/shared/engine.js"
+    "build:web": "esbuild src/browser.ts --bundle --format=esm --target=es2022 --external:@anthropic-ai/sdk --outfile=web/shared/engine.js",
+    "setup": "node scripts/setup.mjs",
+    "build:banksia": "node scripts/build-banksia-artifact.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260000.0",

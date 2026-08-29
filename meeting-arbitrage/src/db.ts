@@ -16,6 +16,13 @@ export interface Env {
   BOT_TOKEN?: string;
   GOOGLE_OAUTH_ID?: string;
   GOOGLE_OAUTH_SECRET?: string;
+  /** Resend — free at a house's volume. Without it, email queues but does not send. */
+  RESEND_KEY?: string;
+  RESEND_FROM?: string;
+  /** Twilio — costs a few cents a message, so entirely optional. */
+  TWILIO_SID?: string;
+  TWILIO_TOKEN?: string;
+  TWILIO_FROM?: string;
 }
 
 export interface GroupRow {

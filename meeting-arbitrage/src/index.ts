@@ -15,6 +15,7 @@ import {
 } from './integrations/google-calendar.ts';
 import * as banksia from './banksia/routes.ts';
 import * as house from './banksia/house-routes.ts';
+import { deliver, type DrainConfig, type OutboxRow } from './integrations/notify.ts';
 import * as ripple from './ripple/routes.ts';
 
 type Handler = (
@@ -435,6 +436,8 @@ async function runScheduled(event: ScheduledController, env: Env): Promise<void>
     }
   }
 
+  await drainOutbox(env);
+
   if (!isWeekly) return;
 
   for (const group of groups.results ?? []) {
@@ -449,5 +452,60 @@ async function runScheduled(event: ScheduledController, env: Env): Promise<void>
     } catch (error) {
       console.error('weekly settle failed for', group.id, error);
     }
+  }
+}
+
+/**
+ * Send whatever the reminder run queued.
+ *
+ * Bounded per tick: a Worker invocation has a time budget, and a backlog is
+ * better drained across several ticks than not drained at all because one run
+ * timed out halfway through and left the rows ambiguous.
+ *
+ * `attempts` is incremented before the send, not after. A message whose send
+ * throws in a way that skips the update would otherwise be retried forever, and
+ * a reminder loop that resends the same nudge every hour is worse than one that
+ * gives up.
+ */
+async function drainOutbox(env: Env, limit = 25): Promise<void> {
+  const config: DrainConfig = {
+    email: env.RESEND_KEY && env.RESEND_FROM
+      ? { apiKey: env.RESEND_KEY, from: env.RESEND_FROM }
+      : undefined,
+    sms: env.TWILIO_SID && env.TWILIO_TOKEN && env.TWILIO_FROM
+      ? { accountSid: env.TWILIO_SID, authToken: env.TWILIO_TOKEN, from: env.TWILIO_FROM }
+      : undefined,
+  };
+  if (!config.email && !config.sms) return; // the WhatsApp bridge drains its own
+
+  const rows = await env.DB.prepare(
+    `SELECT id, channel, target, body, attempts FROM outbox
+      WHERE status = 'queued' AND channel IN ('email', 'sms')
+      ORDER BY created_at LIMIT ?`,
+  ).bind(limit).all<OutboxRow>();
+
+  for (const row of rows.results ?? []) {
+    await env.DB.prepare('UPDATE outbox SET attempts = attempts + 1 WHERE id = ?')
+      .bind(row.id).run();
+
+    const outcome = await deliver(row, config);
+    if (outcome.status === 'skipped') continue;
+
+    if (outcome.status === 'sent') {
+      await env.DB.prepare(
+        `UPDATE outbox SET status = 'sent', error = NULL, sent_at = datetime('now')
+          WHERE id = ?`,
+      ).bind(row.id).run();
+      continue;
+    }
+
+    // A failure stays queued so the retry budget is reachable — Resend
+    // returning a 500 once must not permanently drop a reminder. `deliver`
+    // reports the final failure itself when attempts run out, and only then
+    // does the row leave the queue.
+    const exhausted = row.attempts + 1 >= (config.maxAttempts ?? 3);
+    await env.DB.prepare(
+      `UPDATE outbox SET status = ?, error = ? WHERE id = ?`,
+    ).bind(exhausted ? 'failed' : 'queued', outcome.error ?? null, row.id).run();
   }
 }

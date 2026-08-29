@@ -13,10 +13,14 @@ database_id = "REPLACE_ME"
 directory = "web"
 binding = "ASSETS"
 
-# Nudges, poll closing, and weekly settlement. Times are UTC.
-# 08:00 UTC = 6pm Sydney (AEST) / 7pm (AEDT).
+# Two cadences. The half-hourly tick runs the reminder engine and drains the
+# outbox; it is cheap and mostly a no-op, because dueReminders returns nothing
+# outside 8am-9pm local and nothing on a day with no nudge scheduled, and every
+# reminder is keyed so a repeated tick sends nothing twice. The weekly one
+# settles the chore board. Times are UTC; the engine converts to Sydney itself,
+# because quiet hours are a promise about someone's night, not about UTC.
 [triggers]
-crons = ["0 8 * * *", "0 23 * * 0"]
+crons = ["*/30 * * * *", "0 23 * * 0"]
 
 [vars]
 DEFAULT_TIMEZONE = "Australia/Sydney"
@@ -27,3 +31,6 @@ DEFAULT_TIMEZONE = "Australia/Sydney"
 #   GOOGLE_OAUTH_ID      optional, calendar free/busy sync
 #   GOOGLE_OAUTH_SECRET  optional
 #   BOT_TOKEN            required, shared secret for the WhatsApp bot
+#   RESEND_KEY           optional, sends the email reminders (free tier)
+#   RESEND_FROM          optional, e.g. "Banksia <house@yourdomain.com>"
+#   TWILIO_SID/_TOKEN/_FROM  optional, SMS. Costs a few cents a message.
