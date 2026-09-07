@@ -11,7 +11,7 @@ SMS, and SMS is optional.
 | The database | Cloudflare D1 | 5 GB, 5M reads/day | a few thousand rows |
 | The half-hourly chase | Cloudflare Cron | included | 48 runs/day |
 | Email reminders | Resend | 3,000/month | ~40/month for seven people |
-| Reading a board photo | Anthropic API | pay per use | about a cent per photo, only when someone uploads one |
+| Reading a photo | Anthropic API | pay per use | 1–2c for a sink photo, 2–5c for a whole board |
 | WhatsApp messages | your own number | free | unlimited |
 | SMS | Twilio | none — **~5c/message** | skip it unless email is being ignored |
 

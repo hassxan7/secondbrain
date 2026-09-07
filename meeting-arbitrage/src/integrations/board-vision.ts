@@ -66,6 +66,12 @@ export async function readBoardPhoto(
       max_tokens: 2000,
       betas: ['server-side-fallback-2026-07-01'],
       fallbacks: 'default',
+      // Transcription, not reasoning — but a grid with eight rows and seven
+      // columns is where careless reading puts a tick in the wrong column, so
+      // this sits above the one-line mess reader rather than at the floor.
+      // Thinking bills as output, and at a few photos a week the difference is
+      // cents either way.
+      output_config: { effort: 'medium' },
       system: BOARD_SYSTEM,
       messages: [{
         role: 'user',
