@@ -1,29 +1,124 @@
 ---
 title: "To-Do — Hassaan"
 type: analysis
-tags: [todo, civly, hassaan, outreach, advisors, partnerships, funding]
+tags: [todo, civly, hassaan, outreach, advisors, partnerships, funding, pfc]
 created: 2026-06-18
-updated: 2026-07-14
-sources: 3
+updated: 2026-09-08
+sources: 5
 ---
 
-Hassaan's list — **business: advisors, outreach, partnerships (data moat), fundraising, registration.** Split from [[Civly To-Do — Jun 2 to Jun 16]] after the [[BIM Mentor Call — Drafting vs Coordination & Data Moat]]. Yash's half: [[To-Do — Yash]]. Direction: [[Civly Direction — Drafting-First Pivot (Jun 2026)]].
+Hassaan's list — **business: pitch, outreach, partnerships, pilots, fundraising.**
+Yash's half: [[To-Do — Yash]]. Dated board: [[Deliverables — Sep 2026]].
+Architecture: [[Civly Architecture Reference]].
+
+> [!note] Reconciled from the WhatsApp export — 8 Sep 2026
+> Chat read through **7 Sep**. Everything below the archive fold is the July state, kept
+> for provenance. Top of stack: **(1) PFC slides due Thu 11 Sep in `.pptx`;
+> (2) write the C-1 paragraph; (3) follow up Archistar VP + the Project Director;
+> (4) close the Kongwei pilot on paper.**
 
 ---
 
-> [!note] Reconciled from WhatsApp chat — 14 Jul 2026
-> Chat through **13–14 Jul**. Top of stack this week: **(1)** rewrite pitch deck + practice before Georgia (15 Jul); **(2)** polish LinkedIn profile; **(3)** reply to Sharath (ask office NDA intro); **(4)** prep Latitude 37 interview. TapReview Surry Hills door-knock happened 4 Jul. ~10 SF MEP BIM managers contacted 6 Jul.
+## 🔴 This week — 8 to 14 Sep
 
-## 🆕 From the SF / Sasha meeting (14 Jul)
-> Full formalisation of the strategic decisions: [[Data & Credibility — Core Problem & Open Decisions (SF, 14 Jul)]]. Sasha's verdict: **data + credibility is the brick wall — crack it and you have a company; everything else is above-and-beyond for PFC.**
-- [ ] **Send Sasha a 1–2 sentence blurb + the website** → she double-opt-in intros **Howdger (Plannerverse founder, ex-Dial consulting)** and a **PhD student (ADA, built environment, 3D→code)**. Quick, high-value — do first.
-- [ ] **Update PFC headshots** — current ones "look like you're 12"; use current photos of both founders (ideally together, with growth/technical/next labels).
-- [ ] **Formalise Michael as 0% equity onboarded advisor** (equity only *if* he provides data) and **ask him directly: "what would you need to see to vouch for us / be our industry champion?"**
-- [ ] **Decide Hesh structure** → **bounty of $X per data partnership he actually secures**, once there's cash. No equity, no standing retainer. (He's confident MEP consultants share schematics freely; he gave one contact.)
-- [ ] **New data avenues to work** (beyond direct firm partnerships): **BIM coordinators as aggregators** (they receive data from 10+ consultancies — Hesh's clients); **retiring architects / architecture-council ex-presidents / advisory boards** (best networks); **academics/professors** (data + credibility).
-- [ ] **Allocate warm contacts: customer-stream vs data-stream.** Andrew Tang-Smith (friend's brother, Perth Airport, Studio Tangara) = **customer**, not data. Sort Michael, Leo, the rest.
-- [ ] **Pitch fixes (your slides):** compress the compliance explanation (get to the wow faster); keep the coding-analogy hook; explain the price as **"one $199 seat replaces 4–5 drafters"**; add the undercover-research/traction proof but cut something to fit; do **not** touch the "AI replacing jobs" angle.
-- [ ] **Funding guardrail:** protect VC-ability — **no data-for-equity on the cap table** (revenue-share/credits only if ever used). See Problem E in the formalisation doc.
+- [ ] **PFC slides, `.pptx`, due Thu 11 Sep.** Canva Pro is free via UNSW. Not the 18th —
+      the 18th is the pitch. Rebuild against the mentor's flow (validation up top, real
+      timeline slide, three-way ask). Punch list: [[Slide Changes to Be Made]].
+- [ ] **Rewrite the script to v3** — the 2 Sep mentor call changed the order, not the
+      headings. Lead with *"we spoke to 78 architects"* (be specific, never "hundreds").
+      Michael Westerlund near the top. Full notes in [[Deliverables — Sep 2026]].
+- [ ] **Write the C-1 paragraph** — "technically demonstrable", one paragraph. Due 2 Aug,
+      does not exist on disk anywhere. **Without it C-2 cannot be judged on 27 Sep.**
+      Lands in `docs/31_C1_BAR.md`.
+- [ ] **Follow up the two Inner West contacts** (met 20 Aug, still open):
+      **Anycie, VP of Archistar.ai** — asked for a demo, asked for your LinkedIn;
+      **the Project Director** at a major AU firm — was interested in you shadowing
+      on-premises to see where AI helps. Both are warm and going cold.
+- [ ] **Close Kongwei on paper.** He loved the demo (27 Aug) and wants to pilot. Agreed:
+      contract sits under **Civly's name** even at 90/10 — the invoice matters more than
+      the split. Confirm whether his client has API credentials; that decides the
+      architecture. Do **not** share the repo.
+- [ ] **Text the pilot architect** from the 30 Aug call — he said yes to being the guinea
+      pig. He has not been followed up.
+- [ ] **Post the demo video** as-is (no Figma landing page yet). Then send the post to
+      Anycie and the Project Director as the follow-up artefact.
+- [ ] **Answer the pricing question properly** — $2k/seat/month. Working math is in
+      [[Deliverables — Sep 2026]]; the line that lands is *one seat replaces four to five
+      drafters*, not a comparison to $30/month SaaS.
+- [ ] **Say yes or no to Fly.io hosting** (`syd`), create the account with a payment
+      method yourself, install `flyctl`, confirm `api.civly.dev`. HOST is blocked on this.
+- [ ] **Free space on C:** — 0.76 GB. Below ~1 GB, builds fail with errors that look like
+      code failures. Target 10 GB.
+- [ ] **Delete the stale clone** `D:\revit\civly-main` — it is behind `main` and is how
+      the 27 Aug install stomp became untraceable.
+
+## 🧾 Applications — clear the backlog with the form filler
+
+> [apps/form-filler](../apps/form-filler/) exists for exactly this. Feed it a URL.
+
+- [ ] **Startmate Launch Club** — **free now** (was $1,100). "Apply to everything."
+- [ ] **UNSW 10x** — Sasha reviews it directly; you have met her.
+- [ ] **UNSW Plug and Play** — the lecturer offered to add a background note.
+- [ ] **NVIDIA Inception** — cloud credits, cheap to apply.
+- [ ] Sydney Genesis · Galactic Horizon — decide in or out, don't leave them open.
+- [~] **Blackbird pre-seed** — **hold, deliberately.** Giants alumni can request an
+      investor meeting any time and they said "whenever you're ready". Your own call
+      (7 Sep): *"we haven't thought about what we would do with money or the longer term
+      strategy... we aren't meeting the deliverables right now."* Revisit after PFC.
+
+## 📣 Brand, content, appearance
+
+- [ ] **Post cadence** — the queue you set 22 Aug: PFC finals ✅ posted · Demo announcement ·
+      MEP prompt-edit demo (with the Hesh quote screenshot) · Inner West pitch night ·
+      Reuben meeting + speed-to-win-bids · more PFC · website relaunch with interactive demo.
+- [ ] **Business cards.** Architects at the 20 Aug night asked for a card and *sighed* at
+      LinkedIn. This is a real signal, act on it. NFC metal cards are a separate nice-to-have.
+- [ ] **Website relaunch** — Figma landing page + the logo-to-cube motion piece.
+- [ ] Decide **`.com` domain**, and whether the name stays **Civly**. "Updraft" is the
+      model name, decided 2 Sep.
+- [~] **LinkedIn Premium** — charged $50 on 7 Sep; you decided to keep it for posts.
+      Note: **you cannot boost posts on a trial**, and the extra value is InMail.
+
+## 🗄️ Data partnerships & pilots
+
+> Playbook: [[Data Partnership Outreach Strategy]] · Moat: [[Data Partnership Moat]]
+
+- [ ] **Hesh's audience as a target list** (Yash's idea, 8 Aug) — his followers all work
+      at firms. Extract the firms, find the right people, set up meetings. This is the
+      most concrete data-partnership lead generator you have.
+- [ ] **Michael Westerlund** — formalise as 0% equity advisor; ask directly what he would
+      need to see to be your industry champion. Still unresponsive.
+- [ ] **Hesh structure** — bounty per data partnership actually secured. No retainer,
+      no equity. He asked for money early, which is a flag; a bounty aligns it.
+- [ ] BIM coordinators as aggregators · retiring architects · academics — three avenues
+      from the Sasha call that are still untouched.
+- [ ] **NDA / IP pack** — needed before any firm shares files.
+
+## 👥 Advisors
+
+- [ ] Maintain [[Advisor List & Question Routing]].
+- [ ] **Sasha** — send the 1–2 sentence blurb + website so she double-opt-in intros
+      **Howdger (Plannerverse founder)** and the **ADA PhD student**. Still open from 14 Jul.
+- [ ] **Onboard Andrew Tang-Smith — LATER.** Hold until traction. [[Andrew Tang-Smith]].
+
+## ✅ Landed since mid-July
+
+- [x] **PFC finals place** — announced 20 Aug
+- [x] **Kongwei pilot interest** — 27 Aug, loved the demo
+- [x] **Pilot architect discovery call** — 30 Aug, agreed to be the guinea pig
+- [x] **Inner West pitch night** — 20 Aug; Archistar VP + Project Director met
+- [x] **Revit MCP demo filmed and cut** — 30x speed, ~30s version for posting
+- [x] **62 tools** on the MCP; cladding, image processing, clash detection built
+- [x] **Mentor pitch review** — 2 Sep, full notes captured
+- [x] **"Updraft"** named as the first flagship model
+- [x] Headshots + PFC t-shirts + banner copy submitted
+- [x] Poster/banner long description written (24–26 Aug)
+
+---
+
+# Archive — July 2026 state
+
+> Kept per the never-delete rule. Superseded by the sections above.
 
 ## 🔴 This week — Jul 14–20 (PFC crunch)
 - [ ] **Polish LinkedIn profile (personal + Civly company page)** — *added 14 Jul.* Fix "Enngineers" typo; rewrite headline / about / banner so it reads founder-grade (not student/generic); pin launch film or best demo; one-liner that matches current wedge (MEP schematic → LOD ~200 / design intent → model). Needed before more InMail / SF follow-ups. See [[LinkedIn & Content Strategy]].

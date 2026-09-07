@@ -1,7 +1,7 @@
 ---
 title: "Wiki Home"
 type: home
-updated: 2026-09-07
+updated: 2026-09-08
 ---
 
 # Civly Brain Wiki
@@ -60,6 +60,9 @@ Strategy, analyses, syntheses, roadmaps, GTM plans, pitch copy, and all to-do li
 ### Apps
 Buildable tools that read this vault → `apps/` — see [[Apps Registry]]
 
+### Right now
+[[Deliverables — Sep 2026]] — the dated board. **PFC slides due Thu 11 Sep in `.pptx`.**
+
 ### Inbox
 [[Raw Inbox]] — **19 sources waiting to be ingested**
 
@@ -71,6 +74,7 @@ _(updated by the AI on every ingest)_
 
 | Date | What | Page |
 |------|------|------|
+| 2026-09-08 | **Architecture pivot recorded** (Archicad/Tapir → Revit MCP), to-do lists rebuilt from two months of WhatsApp, form filler built and run | [[Civly Revit MCP]] · [[Deliverables — Sep 2026]] · [[Civly Product Trajectory — MCP, Harness, Agentic IDE]] · [[Form Filler]] |
 | 2026-09-07 | **Vault restructured** — `apps/` created (outreach engine moved in from `civly tools/`), 19 loose sources filed into `raw/youtube/`, root cleaned | [[Apps Registry]] · [[Raw Inbox]] · [[Form Filler]] |
 | 2026-08-24 | Auto-ingest: 5 new source pages (1 MEP course lesson, 4 Revit tutorial transcripts) + cleanup of 2 already-processed CRM clippings | [[Engineering Drawing and Documentation (MEP Engineer Course)]] · [[Plumbing in Revit MEP Beginner Tutorial 1]] · [[REVIT 2023 FOR MEP - Lesson 1 Getting Started with an MEP Project]] · [[Lecture 14 HVAC Modelling in Progress 1 (Revit MEP Full Course)]] · [[Autodesk Revit - Full Beginner Course (Complete Project, Start to Finish)]] |
 | 2026-07-14 | Ingested Reuben + reconciled both expert calls against current build | [[Reuben Roy Call — Competition Bids vs BIM Drafting]] · [[Civly Target Dilemma — MEP Drafting vs Competition Bids]] · [[Reuben Roy]] |

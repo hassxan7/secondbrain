@@ -45,3 +45,10 @@ apps/**/.env.*
 apps/**/*.sqlite
 apps/**/*.sqlite3
 apps/**/data/
+
+# WhatsApp exports — raw chat logs carry secrets and personal data
+# (an Anthropic API key, TeamViewer passwords, a PC PIN, home addresses and
+# phone numbers were all found in the 8 Sep 2026 export). Ingest them, then
+# let the derived to-do/CRM pages be what gets committed. Never the export.
+raw/whatsapp/*.txt
+raw/whatsapp/*.zip

@@ -220,3 +220,79 @@ for apps.
 
 Pages touched: [[Apps Registry]], [[Form Filler]], [[Raw Inbox]], [[RME Advanced Demo Prompt (Aug 2026)]], [[Slide Changes to Be Made]], [[index]], [[wiki]], `CLAUDE.md`,
 `AGENTS.md`, `.gitignore`, `.obsidian/app.json`, `apps/ingest/*`.
+
+## [2026-09-08] ingest + context | WhatsApp Jul-Sep, Revit MCP architecture, form filler
+
+**WhatsApp export ingested** (`raw/whatsapp/_chat.txt`, 18,260 lines, Aug 2025 to 7 Sep
+2026). Read Jul/Aug/Sep 2026 in full: 3,657 messages.
+
+> [!WARNING] Secrets in the export — the file is gitignored, and a key needs revoking
+> The chat contains a **live Anthropic API key** pasted on 26 Aug 2026, three TeamViewer
+> passwords, a PC PIN, two home addresses and phone numbers. `raw/whatsapp/*.txt` and
+> `*.zip` are now in `.gitignore` so no export is ever committed. **The API key
+> (`sk-ant-api03-Tt4y...QAA`) should be revoked in the Anthropic console.** Derived
+> to-do and CRM pages are what get committed; never the export.
+
+**Architecture pivot recorded — this is the big one.** The vault described Civly as
+Claude + Tapir MCP + Archicad + a Python feasibility engine exporting IFC. **It has been
+a Revit MCP server plus a C# Revit plugin since the fork decision of 14 Jul 2026**
+(`docs/00_MISSION.md`, `docs/07` D1). Every relevance score in this wiki rested on four
+implementation surfaces that no longer exist.
+- [[Civly Architecture Reference]] rewritten around the real stack, the ring system, the
+  honest gaps and the claim guardrails. The June architecture is kept under
+  **Historical / Superseded** per the never-delete rule.
+- New **four surfaces**: MCP tool schemas · C# commandset · design brain + rule packs ·
+  **the learning harness** (which had no June equivalent and is where the moat lives).
+- **Reversed a scoring rule:** Revit UI content was "NOT relevant, we don't use Revit."
+  Civly drives Revit now, so a tutorial showing how a drafter actually works is Surface 1
+  and Surface 4 material. This re-scores several of the 19 sources in [[Raw Inbox]].
+- The Civly Context block in `CLAUDE.md` and `AGENTS.md` rewritten to match, including
+  the claim guardrails ("2026 is what is proven", "no public Revit MCP ships a
+  *dedicated, documented* MEP creation tier", say **78 architects**, never "hundreds").
+- New [[Civly Revit MCP]] entity page: 62 tools, Ring-2 evidence (38/38 ducts, 19/19
+  fittings, 19/19 terminals; 607 ids in one transaction), ~9% Ring-2 coverage, and the
+  4 Aug correction that narrowed the competitive claim.
+- New [[Civly Product Trajectory — MCP, Harness, Agentic IDE]] recording the three stages
+  and why the order cannot be skipped. Resolves the apparent conflict between "no ML in
+  the execution path" and the ML ambition: **deterministic where physics decides, learned
+  where practice decides** — evidenced by the Snowdon model containing a duct at 66x its
+  friction target, so anything trained to imitate it learns the faults.
+
+> [!WARNING] `civly context/Civly - Product and Tech.md` is now stale
+> It still says Tapir + Archicad, a codebase at `/Users/yashmittal/CivHub/BIMStudio/`,
+> IFC as the only export, and "MEP not shipped". All four are wrong. **Not edited** —
+> `civly context/` is read-only per the schema. [[Civly Revit MCP]] supersedes it.
+> Hassaan's call whether to add a banner to the read-only file.
+
+**To-do lists rebuilt** from the chat. [[To-Do — Hassaan]] and [[To-Do — Yash]] rewritten
+with current work; the June/July state kept under an Archive fold. New
+[[Deliverables — Sep 2026]] is the dated board: **PFC slides due Thu 11 Sep in `.pptx`**
+(not the 18th — the 18th is the pitch), PFC finals 18 Sep, C-2 verdict 27 Sep, month gate
+2 Oct. Records the six blockers in order, the pricing math, the 2 Sep mentor pitch notes,
+and that **the C-1 paragraph was due 2 Aug and exists nowhere on disk**, which means C-2
+cannot be judged without it.
+
+**Form filler built and run.** [[Form Filler]] moved from spec to runbook:
+- `voice.md` — how Hassaan writes, derived from the startup scripts and pitch drafts.
+  Hard rules: **no em dashes**, numbers not adjectives ("78 architects", never
+  "hundreds"), name real buildings, admit the hard part.
+- `answer-bank.md` — canonical answers at three lengths with 🟢/🟡/🔴 confidence marks.
+- Ran end to end on the **Startmate Pitch Night** Airtable form (due **22 Sep 12pm
+  AEST**, first prize is a fast-track to the $120k Accelerator final round). Draft at
+  [[Startmate Pitch Night — 2026-09-08]]; 5 of 12 fields filled; not submitted.
+- The `/humaniser` pass caught three real things: a contrast-negation construction, four
+  validation sentences in identical shape, and three stacked fragments in a row.
+- **Correction recorded in the runbook:** the fill must run through `claude-in-chrome`
+  (the real Chrome), not the in-app browser pane. Fills in the pane are invisible to
+  Hassaan, so the drafted file is the durable artefact and the browser fill is a
+  convenience on top of it.
+- Three claims are marked 🔴 and must be settled before submitting anywhere with
+  diligence: the **two LOIs**, the **five beta firms**, and the **exit figure**
+  (AUD 1.6M revenue vs $1.2M exit, unresolved since July). The exit number was removed
+  from the Startmate draft rather than guessed.
+
+Pages touched: [[Civly Architecture Reference]], [[Civly Revit MCP]],
+[[Civly Product Trajectory — MCP, Harness, Agentic IDE]], [[Deliverables — Sep 2026]],
+[[To-Do — Hassaan]], [[To-Do — Yash]], [[Form Filler]], [[Hassaan Voice Guide]],
+[[Form Filler Answer Bank]], [[Startmate Pitch Night — 2026-09-08]], [[index]], [[wiki]],
+[[Apps Registry]], `CLAUDE.md`, `AGENTS.md`, `.gitignore`.

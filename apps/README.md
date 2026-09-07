@@ -17,7 +17,7 @@ point. One folder open, one session, knowledge and code together.
 | App | What it does | Status | Own repo? |
 |---|---|---|---|
 | [outreach-engine](outreach-engine/) | LinkedIn/CRM outreach: playbooks, drafts, lead DB, send + verify | **Live** | Yes — `RatherN-t/Civly-outreach-engine` |
-| [form-filler](form-filler/) | Given a URL, fill an application form from vault knowledge | **Spec only** | No — vault repo |
+| [form-filler](form-filler/) | Given a URL, draft and fill an application form in Hassaan's voice | **Live** | No — vault repo |
 | [tapreview-site](tapreview-site/) | NFC review-card landing page (Surry Hills targets) | Deployed (Vercel) | No — vault repo |
 | [ingest](ingest/) | Local Ollama pipeline: transcripts / WhatsApp / CRM notes → wiki pages | Live | No — vault repo |
 
