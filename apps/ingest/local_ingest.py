@@ -7,7 +7,7 @@ Runs on Ollama (qwen2.5:14b). Zero cloud credits.
 Three handlers — auto-detected by folder or file content:
 
   1. WHATSAPP  → raw/whatsapp/_chat.txt        → strategy/Civly To-Do — DATE.md
-  2. TRANSCRIPT → raw/*.md (YouTube transcript) → injects [!tip] + ## Notes into file
+  2. TRANSCRIPT → raw/youtube/*.md (YouTube transcript) → injects [!tip] + ## Notes into file
                                                 → creates pages/sources/Title.md
   3. CRM        → raw/crm/*.md or *.txt         → creates CRM/First-Last.md
 
@@ -38,9 +38,12 @@ MAX_CHARS  = 80_000   # qwen2.5:14b has 32k token context; 80k chars ≈ 26k tok
 
 WATCH_DIRS = {
     "whatsapp":   VAULT / "raw" / "whatsapp",
-    "transcript": VAULT / "raw",
+    "transcript": VAULT / "raw" / "youtube",
     "crm":        VAULT / "raw" / "crm",
 }
+
+# Infrastructure files that live in raw/ but are not sources. Never ingest these.
+SKIP_NAMES = {"README.md", ".gitkeep", ".DS_Store", "Thumbs.db"}
 
 # ── Civly context — injected into every LLM call ─────────────────────────────
 #
@@ -152,9 +155,11 @@ def ask(prompt: str, model: str = MODEL) -> str:
 # ── Detect file type ──────────────────────────────────────────────────────────
 
 def detect_type(path: Path) -> str:
-    """Return 'whatsapp', 'transcript', or 'crm'."""
+    """Return 'whatsapp', 'transcript', 'crm', or 'skip'."""
     p = str(path).replace("\\", "/")
 
+    if path.name in SKIP_NAMES:
+        return "skip"
     if "raw/whatsapp" in p or path.name == "_chat.txt":
         return "whatsapp"
     if "raw/crm" in p:
@@ -571,6 +576,9 @@ def ingest(path: Path, days: int = 14) -> Path | None:
         return handle_transcript(path)
     elif kind == "crm":
         return handle_crm(path)
+    elif kind == "skip":
+        print(f"  Infrastructure file, not a source — skipping")
+        return None
     else:
         print(f"  Unknown type — skipping")
         return None

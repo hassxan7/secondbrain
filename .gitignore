@@ -6,19 +6,42 @@ Thumbs.db
 .obsidian/workspace.json
 .obsidian/workspace-mobile.json
 .obsidian/cache
-
-# Plugin node_modules and compiled binaries (too heavy, not needed by collaborators)
-.obsidian/plugins/lean-terminal/node_modules/
 .obsidian/plugins/*/node_modules/
+.obsidian/plugins/*/data.json
 
 # Claude / Claudian session files (local session state, not knowledge)
 .claude/
 .claudian/
 
-# Per-plugin local data
-.obsidian/plugins/*/data.json
-
 # Large binary assets
 raw/assets/*.mp4
 raw/assets/*.mov
 raw/assets/*.zip
+
+# ---------------------------------------------------------------------------
+# apps/ — see apps/README.md
+# ---------------------------------------------------------------------------
+
+# outreach-engine is its own git repo with its own GitHub remote
+# (RatherN-t/Civly-outreach-engine). The vault must not swallow it.
+/apps/outreach-engine/
+
+# Build output, dependencies, and virtualenvs anywhere under apps/
+apps/**/node_modules/
+apps/**/.venv/
+apps/**/venv/
+apps/**/__pycache__/
+apps/**/dist/
+apps/**/build/
+apps/**/.next/
+apps/**/.vercel/
+apps/**/*.egg-info/
+apps/**/*.py[cod]
+
+# Secrets and local data — never commit
+apps/**/.env
+apps/**/.env.*
+!apps/**/.env.example
+apps/**/*.sqlite
+apps/**/*.sqlite3
+apps/**/data/

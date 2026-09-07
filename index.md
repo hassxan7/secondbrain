@@ -1,6 +1,6 @@
 ---
 title: "Wiki Index"
-updated: 2026-08-24
+updated: 2026-09-07
 ---
 
 # Wiki Index
@@ -106,6 +106,10 @@ Curated pages distilling MEP knowledge for Civly product development. Only HIGH-
 | [[To-Do — Yash]] | Yash's list: AI BIM drafter, MEP generation, ML/data pipeline, research questions | 2026-06-18 |
 | [[Civly To-Do — Jun 2 to Jun 16]] | Historical master to-do (now split by owner) | 2026-06-18 |
 | [[NFC Review Cards — Surry Hills Target List]] | *(Non-Civly side hustle)* Curated door-knock list + walk route + pitch cheat-sheet for tap-to-review card sales | 2026-07-04 |
+| [[Data & Credibility — Core Problem & Open Decisions (SF, 14 Jul)]] | The core credibility problem + open decisions coming out of SF | 2026-07-14 |
+| [[Sales Ladders by Person Type]] | Ladder of asks per person type: advisor, data partner, customer | 2026-07-03 |
+| [[Slide Changes to Be Made]] | Running punch-list of pitch-deck changes | 2026-07-15 |
+| [[RME Advanced Demo Prompt (Aug 2026)]] | Six-act sequential build demo script; what may and may not be claimed on stage | 2026-08-13 |
 
 ---
 
@@ -120,14 +124,39 @@ See [[CRM/index]] for the full contact list.
 | [[Dhanjeet Sah]] | expert (advisor) | HIGH |
 | [[Michael Westerlund]] | design-partner | HIGH |
 | [[Andrew Tang-Smith]] | customer | HIGH |
+| [[Sasha]] | accelerator | HIGH |
 | [[Leo Chan]] | connector | MEDIUM |
 | [[Farzana Khan]] | other | LOW |
 
 ---
 
+## Apps (`apps/`)
+
+Buildable tools. Registry with rules: [[Apps Registry]].
+
+| App | What it does | Status |
+|------|---------|------|
+| `outreach-engine` | LinkedIn/CRM outreach: playbooks, drafts, lead DB, send + verify | Live (own git repo) |
+| [[Form Filler]] | Given a URL, fill an application form from vault knowledge | Spec only |
+| `tapreview-site` | NFC review-card landing page | Deployed (Vercel) |
+| `ingest` | Local Ollama pipeline: transcripts / WhatsApp / CRM notes → wiki pages | Live |
+
+---
+
+## Inbox (`raw/`)
+
+[[Raw Inbox]] — **19 unprocessed sources** as of 2026-09-07 (13 Revit MEP Full Course
+lectures 1–12 + 15, 5 standalone courses, 1 with broken frontmatter). Lecture 13 is
+missing entirely. Mostly Revit-UI content: ingest for the engineering, not the click-paths.
+
+---
+
 ## Stats
 
-- Total pages: 41 (11 sources + 5 entities + 4 concepts + 3 MEP + 1 Structural + 1 Compliance + 3 Competitors + 13 strategy)
-- CRM contacts: 7
+- Total knowledge pages: 45 (11 sources + 5 entities + 4 concepts + 3 MEP + 1 Structural + 1 Compliance + 3 Competitors + 17 strategy)
+- CRM contacts: 8
 - Sources ingested: 11
+- **Unprocessed sources in `raw/`: 19** — see [[Raw Inbox]]
+- Apps: 4 (3 live, 1 spec)
+- Last restructure: 2026-09-07
 - Last lint: _(never)_

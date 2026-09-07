@@ -10,8 +10,13 @@ You are a disciplined wiki maintainer. This document defines the structure, conv
 Civly Brain/
 ├── CLAUDE.md          ← schema for Claude Code
 ├── AGENTS.md          ← this file (schema for all other agents)
+│
+│   ── KNOWLEDGE ──────────────────────────────────────────────
 ├── civly context/     ← Civly company context files (read-only, never modify the .md content)
-├── raw/               ← UNPROCESSED incoming sources ONLY (YouTube transcripts, articles, clips)
+├── raw/               ← INBOX: unprocessed sources ONLY. Empty = backlog clear.
+│   ├── youtube/       ← YouTube transcript clippings awaiting ingest
+│   ├── crm/           ← contact notes awaiting a CRM page
+│   ├── whatsapp/      ← WhatsApp exports awaiting a to-do list
 │   └── assets/        ← images downloaded from clipped articles
 ├── processed/         ← sources move here after ingest/summarization (top-level, NOT under raw/)
 ├── pages/             ← KNOWLEDGE pages only
@@ -23,13 +28,26 @@ Civly Brain/
 │   ├── Compliance/    ← curated building-code / NCC knowledge
 │   └── Competitors/   ← competitor profiles
 ├── strategy/          ← ALL strategy, analyses, syntheses, AND to-do lists (flat folder)
+│   └── applications/  ← one file per submitted application (written by apps/form-filler)
 ├── CRM/               ← one page per person, indexed at CRM/index.md
+├── Excalidraw/        ← diagrams
+│
+│   ── APPS ───────────────────────────────────────────────────
+├── apps/              ← ALL buildable tools. Code lives here and nowhere else.
+│   ├── README.md      ← app registry — every app has a row
+│   ├── outreach-engine/ ← LinkedIn/CRM outreach (own git repo + GitHub remote)
+│   ├── form-filler/   ← fill an application form from a URL (spec stage)
+│   ├── tapreview-site/← NFC review-card landing page
+│   └── ingest/        ← local Ollama pipeline (transcripts / WhatsApp / CRM notes)
+│
 ├── wiki.md            ← human-facing home page (you update Recent Additions)
 ├── index.md           ← machine-facing page catalog (you maintain this)
 └── log.md             ← append-only chronological record (you maintain this)
 ```
 
-> **Streamlined routing:** incoming source → `raw/`; after ingest **move the source to `processed/`** (top-level). Source summaries → `pages/sources/`; knowledge → the matching `pages/` subfolder; **all strategy, analyses, and to-do lists → `strategy/`** (flat, never in `pages/`).
+> **Streamlined routing:** incoming source → the right `raw/` subfolder (`youtube/`, `crm/`, `whatsapp/`); after ingest **move the source to `processed/`** (top-level). Source summaries → `pages/sources/`; knowledge → the matching `pages/` subfolder; **all strategy, analyses, and to-do lists → `strategy/`** (flat, never in `pages/`); **anything executable → `apps/<name>/`** (never at the root).
+
+> **Rules for `apps/`:** one folder per app, registered in `apps/README.md`. Apps write knowledge outward to `strategy/`/`CRM/`/`pages/`, never into their own folder. `node_modules/`, `.venv/`, `dist/`, `.vercel/`, `__pycache__`, `.env`, `*.sqlite` and `apps/**/data/` are gitignored vault-wide — this vault syncs over OneDrive, so weight is a real cost. `apps/outreach-engine/` is its own git repo (`RatherN-t/Civly-outreach-engine`), gitignored by the vault; commit it with `git -C apps/outreach-engine ...`. App internals are hidden from Obsidian via `userIgnoreFilters` in `.obsidian/app.json`.
 
 ---
 

@@ -1,3 +1,16 @@
+---
+title: "Slide Changes to Be Made"
+type: analysis
+tags: [pitch, deck, todo, pfc]
+created: 2026-07-15
+updated: 2026-09-07
+sources: 0
+---
+
+## Question / Prompt
+Running punch-list of changes to make to the Civly pitch deck.
+
+## Findings
 1. MRR thing 
 2. Giants Traction Thing
 3. Improve the analogy 
@@ -17,3 +30,5 @@ Studio Pilot firms warm introudctions,
 15. Improve the Problem Slide
 16. Mention Somewhere fastest way to Brief to Contractor Ready BIM 
 17. Mention Somewhere Competition Bidding 
+## Related pages
+[[PFC Pitch — Deck, Scripts & Prompts]] · [[Pitch Copy Library]] · [[To-Do — Hassaan]]

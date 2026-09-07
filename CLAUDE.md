@@ -10,8 +10,13 @@ You are a disciplined wiki maintainer. This document defines the structure, conv
 Civly Brain/
 ├── CLAUDE.md          ← this file (schema for Claude Code)
 ├── AGENTS.md          ← same schema for other agents (Codex, OpenCode, etc.)
+│
+│   ── KNOWLEDGE ──────────────────────────────────────────────
 ├── civly context/     ← Civly company context files (read-only, never modify the .md content)
-├── raw/               ← UNPROCESSED incoming sources ONLY (YouTube transcripts, articles, clips)
+├── raw/               ← INBOX: unprocessed sources ONLY. Empty = backlog clear.
+│   ├── youtube/       ← YouTube transcript clippings awaiting ingest
+│   ├── crm/           ← contact notes awaiting a CRM page
+│   ├── whatsapp/      ← WhatsApp exports awaiting a to-do list
 │   └── assets/        ← images downloaded from clipped articles
 ├── processed/         ← sources move here after ingest/summarization (top-level, NOT under raw/)
 ├── pages/             ← KNOWLEDGE pages only
@@ -23,16 +28,36 @@ Civly Brain/
 │   ├── Compliance/    ← curated building-code / NCC knowledge
 │   └── Competitors/   ← competitor profiles
 ├── strategy/          ← ALL strategy, analyses, syntheses, AND to-do lists (flat folder)
+│   └── applications/  ← one file per submitted application (written by apps/form-filler)
 ├── CRM/               ← one page per person, indexed at CRM/index.md
+├── Excalidraw/        ← diagrams
+│
+│   ── APPS ───────────────────────────────────────────────────
+├── apps/              ← ALL buildable tools. Code lives here and nowhere else.
+│   ├── README.md      ← app registry — every app has a row
+│   ├── outreach-engine/ ← LinkedIn/CRM outreach (own git repo + GitHub remote)
+│   ├── form-filler/   ← fill an application form from a URL (spec stage)
+│   ├── tapreview-site/← NFC review-card landing page
+│   └── ingest/        ← local Ollama pipeline (transcripts / WhatsApp / CRM notes)
+│
 ├── wiki.md            ← human-facing home page (you update Recent Additions)
 ├── index.md           ← machine-facing page catalog (you maintain this)
 └── log.md             ← append-only chronological record (you maintain this)
 ```
 
 > [!important] Streamlined routing (where new files go)
-> - **Incoming source** → lands in `raw/`. After you ingest/summarize it, **move the source file to `processed/`** (top-level). `raw/` only ever holds things not yet processed.
+> - **Incoming source** → lands in the right `raw/` subfolder (`youtube/`, `crm/`, `whatsapp/`). After you ingest/summarize it, **move the source file to `processed/`** (top-level). `raw/` only ever holds things not yet processed.
 > - **Source summary page** → `pages/sources/`. **Entity/concept/MEP/Structural/Compliance/Competitor knowledge** → the matching `pages/` subfolder.
 > - **Anything strategic** — analyses, syntheses, comparisons, roadmaps, GTM/outreach plans, pitch copy, **and every to-do list** → `strategy/` (flat). Strategy and to-dos do NOT go in `pages/`.
+> - **Anything executable** — scripts, servers, sites, MCP tools → `apps/<name>/`. Never at the vault root, never inside `pages/` or `strategy/`.
+
+> [!important] Rules for `apps/`
+> 1. **One folder per app**, directly under `apps/`. Add a row to `apps/README.md` when you create one.
+> 2. **Apps write knowledge outward.** An app that produces an analysis, a contact, or a decision writes it to `strategy/`, `CRM/`, or `pages/` — never into its own folder.
+> 3. **Never commit or sync weight.** `node_modules/`, `.venv/`, `dist/`, `.vercel/`, `__pycache__` are gitignored vault-wide. Rebuild them; don't store them. This vault syncs over OneDrive — a 55 MB virtualenv is a real cost.
+> 4. **Secrets never enter the vault repo.** `.env`, `*.sqlite`, and `apps/**/data/` are gitignored. Commit `.env.example` instead.
+> 5. **`apps/outreach-engine/` has its own git repo** (`RatherN-t/Civly-outreach-engine`) and is gitignored by the vault. Commit and push it from inside its own folder: `git -C apps/outreach-engine ...`.
+> 6. **Obsidian ignores app internals** via `userIgnoreFilters` in `.obsidian/app.json`. Add a line there when an app has code the graph shouldn't index.
 
 ---
 

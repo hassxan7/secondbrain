@@ -164,3 +164,59 @@ Wiki scaffolded from Karpathy's LLM Wiki pattern (https://gist.github.com/karpat
 Vault: `C:\Users\hassa\OneDrive\Documents\Civly Brain`
 Structure: raw/, pages/entities/, pages/concepts/, pages/sources/, pages/analyses/
 CLAUDE.md, AGENTS.md, wiki.md, index.md, and log.md initialized.
+
+## [2026-09-07] restructure | Vault reorganised around `apps/` + a real inbox
+
+**Why:** knowledge, unprocessed sources, and app code were all sitting together at
+the root. The outreach engine lived entirely outside the vault. Nothing had a
+single obvious home.
+
+**Apps layer created.** New top-level `apps/`, registry at `apps/README.md`:
+- `apps/outreach-engine/` — **moved in from `C:/Users/hassa/civly tools/`**. Its 24
+  uncommitted files (12 modified playbooks/MCP/prompts, 13 new SF-campaign and
+  LinkedIn scripts) were committed in place first (`d88289e`, local only, **not
+  pushed**). Its 55 MB untracked `mcp-server/.venv/` was deleted — rebuildable with
+  `uv sync`, and its baked-in absolute paths would have broken on the move anyway.
+  58 MB → 3 MB. Keeps its own git repo and GitHub remote
+  (`RatherN-t/Civly-outreach-engine`); the vault gitignores `/apps/outreach-engine/`
+  so it isn't swallowed as a nested repo.
+- `apps/ingest/` ← was `scripts/`
+- `apps/tapreview-site/` ← was `tapreview-site/`
+- `apps/form-filler/` — **new, spec only.** URL → application form → answers drafted
+  from vault knowledge → `strategy/applications/`. Never auto-submits.
+
+**Inbox made real.** `raw/` was empty except two `.gitkeep` files while 19
+unprocessed sources sat at the root in `MEP/`, `MMEP/`, and `Tutorials/`. All 19
+moved to `raw/youtube/`. Root folders `MEP/`, `MMEP/`, `Tutorials/` removed — root
+`MEP/` also collided by name with the curated `pages/MEP/`.
+- `MMEP/prompt.md` was not a source — it is the six-act demo script. → `strategy/RME
+  Advanced Demo Prompt (Aug 2026).md`.
+- `raw/README.md` documents the backlog, including that **`REVIT MEP Tutorial.md` has
+  wrong frontmatter** (claims to be a Claude Code video; is actually a 10-episode
+  Revit MEP electrical course). Left unmodified per the never-touch-raw rule — fix at
+  ingest time.
+- Lecture 13 of the Revit MEP Full Course is **missing entirely** (14 is processed,
+  1–12 and 15 are queued).
+
+**Ingest pipeline repaired.** `apps/ingest/local_ingest.py` watched `raw/` with
+`recursive=False`, so after the move it would have silently stopped seeing
+transcripts. Watch dir → `raw/youtube/`; added `SKIP_NAMES` so `README.md` and
+`.gitkeep` are never ingested as sources. Routing verified against real paths (5/5),
+both scripts compile, `SETUP.md` paths corrected.
+
+**Index/wiki corrections found while cleaning:**
+- `index.md` was missing 3 existing strategy pages ([[Data & Credibility — Core Problem & Open Decisions (SF, 14 Jul)]], [[Sales Ladders by Person Type]],
+  [[Slide Changes to Be Made]]) and 1 CRM contact ([[Sasha]]).
+- `wiki.md` claimed Entities/Concepts/Sources were "none yet" — all three had pages.
+- `strategy/Slide Changes to Be made.txt` was a bare `.txt` → converted to
+  `Slide Changes to Be Made.md` with frontmatter, content preserved verbatim.
+
+**Guardrails added:** `.gitignore` now covers `node_modules/`, `.venv/`, `dist/`,
+`.vercel/`, `__pycache__`, `.env`, `*.sqlite`, and `apps/**/data/` vault-wide — this
+vault syncs over OneDrive, so weight is a real cost. `.obsidian/app.json` gained
+`userIgnoreFilters` so app internals stay out of Obsidian search and the graph.
+`CLAUDE.md` and `AGENTS.md` updated with the new tree, `apps/` routing, and six rules
+for apps.
+
+Pages touched: [[Apps Registry]], [[Form Filler]], [[Raw Inbox]], [[RME Advanced Demo Prompt (Aug 2026)]], [[Slide Changes to Be Made]], [[index]], [[wiki]], `CLAUDE.md`,
+`AGENTS.md`, `.gitignore`, `.obsidian/app.json`, `apps/ingest/*`.
