@@ -1,0 +1,36 @@
+name = "meeting-arbitrage"
+main = "src/index.ts"
+compatibility_date = "2026-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "arbitrage"
+# Replace with the id printed by: wrangler d1 create arbitrage
+database_id = "REPLACE_ME"
+
+[assets]
+directory = "web"
+binding = "ASSETS"
+
+# Two cadences. The half-hourly tick runs the reminder engine and drains the
+# outbox; it is cheap and mostly a no-op, because dueReminders returns nothing
+# outside 8am-9pm local and nothing on a day with no nudge scheduled, and every
+# reminder is keyed so a repeated tick sends nothing twice. The weekly one
+# settles the chore board. Times are UTC; the engine converts to Sydney itself,
+# because quiet hours are a promise about someone's night, not about UTC.
+[triggers]
+crons = ["*/30 * * * *", "0 23 * * 0"]
+
+[vars]
+DEFAULT_TIMEZONE = "Australia/Sydney"
+
+# Secrets — set with `wrangler secret put <NAME>`, never in this file:
+#   GOOGLE_PLACES_KEY    optional, live venue search
+#   ANTHROPIC_API_KEY    optional, event-brief prose
+#   GOOGLE_OAUTH_ID      optional, calendar free/busy sync
+#   GOOGLE_OAUTH_SECRET  optional
+#   BOT_TOKEN            required, shared secret for the WhatsApp bot
+#   RESEND_KEY           optional, sends the email reminders (free tier)
+#   RESEND_FROM          optional, e.g. "Banksia <house@yourdomain.com>"
+#   TWILIO_SID/_TOKEN/_FROM  optional, SMS. Costs a few cents a message.

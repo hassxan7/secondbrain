@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#FAF7F0">
+<title>Banksia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./app.css">
+
+<!-- Add to Home Screen. There is no App Store path for this and there does not
+     need to be: standalone display drops the browser chrome, so once it is on
+     the home screen it is indistinguishable from an installed app for what this
+     does. apple-touch-icon is the one iOS still reads instead of the manifest. -->
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Banksia">
+<meta name="description" content="The house chore board, meeting time and anonymous channel.">
+</head>
+<body>
+
+<!-- ── Onboarding. Four questions, one per screen. ───────────────────────── -->
+<main class="onboard" id="onboard">
+  <span class="logo">Banksia</span>
+  <div class="steps" id="steps"><i data-on></i><i></i><i></i><i></i></div>
+
+  <section class="step" id="step-0" data-active>
+    <h1>Welcome to the house</h1>
+    <p class="lede">
+      Banksia keeps the chore board and the house meeting honest, so nobody has
+      to be the person who brings it up at dinner. Takes about a minute.
+    </p>
+    <label class="lab" for="ob-name">What should the board call you?</label>
+    <input class="field" id="ob-name" placeholder="Your name" autocomplete="given-name">
+    <div class="btn-row"><button class="btn primary wide" data-next="0">Next</button></div>
+  </section>
+
+  <section class="step" id="step-1">
+    <h1>How do we reach you?</h1>
+    <p class="lede">One is enough. This is only used for the reminders below.</p>
+    <label class="lab" for="ob-phone">Mobile</label>
+    <input class="field" id="ob-phone" type="tel" placeholder="0412 345 678" autocomplete="tel">
+    <label class="lab" for="ob-email" style="margin-top:14px">Or email</label>
+    <input class="field" id="ob-email" type="email" placeholder="you@example.com" autocomplete="email">
+    <ul class="uses" id="policy" style="margin-top:20px"></ul>
+    <div class="btn-row">
+      <button class="btn ghost" data-back="1">Back</button>
+      <button class="btn primary" data-next="1" style="flex:1">Next</button>
+    </div>
+  </section>
+
+  <section class="step" id="step-2">
+    <h1>When are you free each week?</h1>
+    <p class="lede">
+      For picking the house meeting. Tap the times that usually work.
+    </p>
+    <div id="ob-grid"></div>
+
+    <label class="opt" id="opt-varies">
+      <input type="checkbox" id="ob-varies">
+      <span>
+        <b>I may not be free every week</b>
+        <span>Your picks count as a maybe, not a promise. You'll be asked each week.</span>
+      </span>
+    </label>
+    <label class="opt" id="opt-calendar">
+      <input type="checkbox" id="ob-calendar">
+      <span>
+        <b>Sync my calendar instead</b>
+        <span>Reads free/busy only — never event names — at the moment a poll opens.</span>
+      </span>
+    </label>
+
+    <div class="btn-row">
+      <button class="btn ghost" data-back="2">Back</button>
+      <button class="btn primary" data-next="2" style="flex:1">Next</button>
+    </div>
+  </section>
+
+  <section class="step" id="step-3">
+    <h1>What this is used for</h1>
+    <p class="lede">In full. Nothing else happens with any of it.</p>
+    <ul class="uses" id="uses"></ul>
+    <label class="opt" id="opt-consent">
+      <input type="checkbox" id="ob-consent">
+      <span><b>Got it — add me to the house</b></span>
+    </label>
+    <p class="err" id="ob-err" hidden></p>
+    <div class="btn-row">
+      <button class="btn ghost" data-back="3">Back</button>
+      <button class="btn primary" id="ob-join" style="flex:1">Join Banksia</button>
+    </div>
+  </section>
+</main>
+
+<!-- ── The house. Three screens. ─────────────────────────────────────────── -->
+<div id="app" hidden>
+  <header class="bar">
+    <div class="bar-inner">
+      <span class="logo">Banksia</span>
+      <span class="who-am-i">
+        <select id="me" aria-label="Who you are"></select>
+      </span>
+    </div>
+    <nav class="tabs">
+      <button data-tab="board" aria-selected="true">Board</button>
+      <button data-tab="meeting" aria-selected="false">Meeting</button>
+      <button data-tab="raise" aria-selected="false">Raise</button>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <section class="panel" id="panel-board" data-active></section>
+    <section class="panel" id="panel-meeting"></section>
+    <section class="panel" id="panel-raise"></section>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<input type="file" id="board-photo" accept="image/*" capture="environment" hidden>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>

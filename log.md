@@ -164,3 +164,17 @@ Wiki scaffolded from Karpathy's LLM Wiki pattern (https://gist.github.com/karpat
 Vault: `C:\Users\hassa\OneDrive\Documents\Civly Brain`
 Structure: raw/, pages/entities/, pages/concepts/, pages/sources/, pages/analyses/
 CLAUDE.md, AGENTS.md, wiki.md, index.md, and log.md initialized.
+
+## [2026-08-25] build | Meeting arbitrage engine — Banksia & Ripple
+Built a shared availability-arbitrage engine serving two use cases: the Banksia house standing meeting with chore/fine accountability, and Ripple Social hangout-planning links. Cloudflare Workers + D1, WhatsApp group bot (whatsapp-web.js), Google Calendar free/busy, Google Places. 96 tests, tsc clean, engine is fully deterministic — no model decides a time or a fine.
+Key design: scheduling weight decreases with absenteeism; a declared recurring clash is free and permanent while ad-hoc excuses spend a budget; the fixed time has hysteresis; disputes are heard only from people at the meeting; silence on an issue poll gets named.
+Code: `meeting-arbitrage/` on branch `claude/banksia-meeting-arbitrage-odscrq`. Prototype published as an artifact.
+Pages touched: [[Meeting Arbitrage — Banksia & Ripple]], index.md.
+Open: need Ripple's real brand hexes from Isaac.
+
+## [2026-08-25] build | Ripple plan builder — suggestions, links, organiser flow, widget
+Reworked the Ripple prototype to the shipped app's design language (tokens sampled pixel-by-pixel from screenshots: ground #F2F1F6, accent #709ACC, serif wordmark). Added the mid-plan suggestion model with coverage gating — an answer is one cell per option, so a late suggestion re-asks only the people who missed it, and cannot be chosen until everyone has seen it. Added pasted-event ingestion (Luma/Partiful/Eventbrite/Humanitix/Meetup, SSRF-safe by construction), an organiser flow with SMS/email invites, per-person rate-limited nudges, and a WidgetKit widget.
+155 tests, tsc clean, all endpoints verified against a local Worker + D1.
+Pages touched: [[Meeting Arbitrage — Banksia & Ripple]].
+Artifacts: prototype + a review write-up for Isaac.
+Open: real wordmark face from Isaac; whether coverage should auto-relax near the plan date.
