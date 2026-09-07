@@ -34,6 +34,11 @@ CREATE TABLE IF NOT EXISTS members (
   availability_json TEXT,
   -- The consent step was shown and acknowledged. Null means they predate it.
   joined_at       TEXT,
+  -- Set by the bot's roster sync: this number is in the group chat right now,
+  -- so a reminder can go over WhatsApp (free) rather than SMS (about 5c).
+  -- Never inferred from having a phone number on file, because a message to a
+  -- chat someone left fails silently.
+  whatsapp        INTEGER NOT NULL DEFAULT 0,
   created_at      TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_members_group ON members(group_id);
@@ -166,6 +171,8 @@ CREATE TABLE IF NOT EXISTS issues (
   created_at  TEXT NOT NULL DEFAULT (datetime('now')),
   closes_at   TEXT NOT NULL,
   status      TEXT NOT NULL DEFAULT 'open',
+  -- 'app', 'chat' or 'photo'. Only affects what the bot says, never the count.
+  source      TEXT NOT NULL DEFAULT 'app',
   outcome_json TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_issues_group_status ON issues(group_id, status);

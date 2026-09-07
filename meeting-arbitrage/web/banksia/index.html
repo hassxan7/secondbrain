@@ -9,6 +9,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./app.css">
+
+<!-- Add to Home Screen. There is no App Store path for this and there does not
+     need to be: standalone display drops the browser chrome, so once it is on
+     the home screen it is indistinguishable from an installed app for what this
+     does. apple-touch-icon is the one iOS still reads instead of the manifest. -->
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Banksia">
+<meta name="description" content="The house chore board, meeting time and anonymous channel.">
 </head>
 <body>
 

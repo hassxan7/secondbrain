@@ -362,8 +362,10 @@ export async function runReminders(
 
   const [memberRows, sentRows, pollRow] = await Promise.all([
     env.DB.prepare(
-      'SELECT id, name, phone, email FROM members WHERE group_id = ?',
-    ).bind(groupId).all<{ id: string; name: string; phone: string | null; email: string | null }>(),
+      'SELECT id, name, phone, email, whatsapp FROM members WHERE group_id = ?',
+    ).bind(groupId).all<{
+      id: string; name: string; phone: string | null; email: string | null; whatsapp: number;
+    }>(),
     env.DB.prepare(
       'SELECT member_id, COUNT(*) AS n FROM reminders_sent WHERE group_id = ? AND week_of = ? GROUP BY member_id',
     ).bind(groupId, week).all<{ member_id: string; n: number }>(),
@@ -373,8 +375,12 @@ export async function runReminders(
     ).bind(groupId).first<{ id: string }>(),
   ]);
 
+  // whatsapp comes first in pickChannel and costs nothing, so a house running
+  // the bridge never pays for SMS. The flag is only ever set by the roster
+  // sync, which means it is true exactly when the number is in the group.
   const targets: ReminderTarget[] = (memberRows.results ?? []).map((m) => ({
     memberId: m.id, name: m.name, phone: m.phone, email: m.email,
+    whatsapp: m.whatsapp === 1,
   }));
 
   let awaitingPoll: string[] = [];
@@ -437,6 +443,7 @@ export async function runReminders(
 
     const target = byId.get(reminder.memberId)!;
     const to = reminder.channel === 'email' ? target.email! : target.phone!;
+    if (!to) { skipped++; continue; }
     await env.DB.prepare(
       'INSERT INTO outbox (id, group_id, channel, target, body) VALUES (?, ?, ?, ?, ?)',
     ).bind(

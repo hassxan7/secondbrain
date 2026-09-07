@@ -15,6 +15,7 @@ import {
 } from './integrations/google-calendar.ts';
 import * as banksia from './banksia/routes.ts';
 import * as house from './banksia/house-routes.ts';
+import * as botRoutes from './banksia/bot-routes.ts';
 import { deliver, type DrainConfig, type OutboxRow } from './integrations/notify.ts';
 import * as ripple from './ripple/routes.ts';
 
@@ -288,6 +289,21 @@ route('POST', '/api/bot/outbox/:id/ack', async (request, env, _ctx, [id]) => {
  * most recent open issue, so people can respond in the chat they are already
  * in rather than opening a link.
  */
+route('POST', '/api/g/:groupId/bot/roster', async (request, env, _ctx, [groupId]) => {
+  if (!botAuthorised(request, env)) return unauthorized('bad bot token');
+  return botRoutes.syncRoster(request, env, groupId);
+});
+
+route('POST', '/api/bot/photo', async (request, env) => {
+  if (!botAuthorised(request, env)) return unauthorized('bad bot token');
+  return botRoutes.photoToPoll(request, env);
+});
+
+route('POST', '/api/bot/vote', async (request, env) => {
+  if (!botAuthorised(request, env)) return unauthorized('bad bot token');
+  return botRoutes.recordPollVote(request, env);
+});
+
 route('POST', '/api/bot/inbox', async (request, env) => {
   if (!botAuthorised(request, env)) return unauthorized('bad bot token');
 

@@ -23,7 +23,16 @@
 import pkg from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
 
-const { Client, LocalAuth } = pkg;
+// Poll arrived in whatsapp-web.js 1.23. Destructured defensively so an older
+// install degrades to the text fallback instead of crashing on startup.
+const { Client, LocalAuth, Poll } = pkg;
+const CAN_POLL = typeof Poll === 'function';
+
+/**
+ * The word that wakes the bot. One word, matched anywhere, case-insensitive.
+ * Kept in sync with TRIGGER in src/banksia/bot-routes.ts.
+ */
+const TRIGGER = /\bbanks(y|ie)\b/i;
 
 const CONFIG = {
   apiBase: process.env.ARBITRAGE_API ?? 'http://localhost:8787',
@@ -66,13 +75,38 @@ client.on('qr', (qr) => {
   qrcode.generate(qr, { small: true });
 });
 
-client.on('ready', () => {
+client.on('ready', async () => {
   console.log(`Bot ready. Draining outbox every ${CONFIG.pollSeconds}s.`);
+  console.log(CAN_POLL
+    ? 'Native polls available.'
+    : 'No Poll export — falling back to numbered text replies.');
   if (!CONFIG.chatId) {
     console.warn('WHATSAPP_CHAT_ID is not set — send "!whereami" in the group to get it.');
   }
+  await syncRoster().catch((e) => console.error('roster sync failed:', e.message));
   drainForever();
 });
+
+/**
+ * Tell the Worker who is actually in the group.
+ *
+ * Run on every start and hourly. Reminders to people in here go over WhatsApp
+ * for nothing; everyone else falls through to email, then to paid SMS. Someone
+ * leaving the group has to flip the flag back off, or we would keep queueing
+ * messages into a chat they are not in, which fails silently.
+ */
+async function syncRoster() {
+  if (!CONFIG.chatId) return;
+  const chat = await client.getChatById(CONFIG.chatId);
+  const phones = (chat.participants ?? []).map((p) => `+${p.id.user}`);
+  const result = await api(`/api/g/${CONFIG.groupId}/bot/roster`, {
+    method: 'POST',
+    body: JSON.stringify({ phones }),
+  });
+  console.log(`roster: ${result.reachable} reachable on WhatsApp`
+    + (result.unknown?.length ? `, ${result.unknown.length} in the chat but not on the board` : ''));
+}
+setInterval(() => syncRoster().catch(() => {}), 3600 * 1000);
 
 client.on('auth_failure', (message) => console.error('auth failed:', message));
 client.on('disconnected', (reason) => {
@@ -121,6 +155,70 @@ async function drainForever() {
   }
 }
 
+/* ── Polls ────────────────────────────────────────────────────────────────── */
+
+/** poll message id -> issue id. In memory: a restart just stops attributing
+ *  votes on old polls, and people can still reply "not me" in text. */
+const openPolls = new Map();
+
+/**
+ * Post the poll into the chat.
+ *
+ * Native poll when the installed version has one, because tapping a button is
+ * the entire reason this lives in WhatsApp rather than behind a link. The text
+ * fallback still works: the inbox route already understands "was me" / "not me"
+ * in plain English.
+ */
+async function postPoll(chatId, poll) {
+  if (CAN_POLL) {
+    const sent = await client.sendMessage(
+      chatId,
+      new Poll(poll.question, poll.options, { allowMultipleAnswers: false }),
+    );
+    openPolls.set(sent.id._serialized, poll.issueId);
+    return sent;
+  }
+  return client.sendMessage(
+    chatId,
+    `${poll.question}\n\nReply *was me* or *not me*.`
+    + `\n_Not answering is counted as not answering._`,
+  );
+}
+
+// Native poll votes. The event name changed across versions, so both are bound
+// and the handler is idempotent on the server (one row per issue per member).
+for (const event of ['vote_update', 'poll_vote']) {
+  client.on(event, async (vote) => {
+    try {
+      const pollId = vote.parentMessage?.id?._serialized ?? vote.pollCreationMessageKey?.id;
+      const issueId = openPolls.get(pollId);
+      if (!issueId) return;
+
+      const option = (vote.selectedOptions ?? [])[0]?.name;
+      if (!option) return;
+
+      const number = String(vote.voter ?? vote.sender ?? '').split('@')[0];
+      const result = await api('/api/bot/vote', {
+        method: 'POST',
+        body: JSON.stringify({
+          groupId: CONFIG.groupId, issueId, option, phone: `+${number}`,
+        }),
+      });
+
+      if (result.needsLink) {
+        await client.sendMessage(CONFIG.chatId,
+          'Someone voted from a number that is not on the board yet, so it has '
+          + `not been counted. Open ${CONFIG.apiBase}/h/${CONFIG.groupId} once and it links up.`);
+      } else if (result.closed) {
+        openPolls.delete(pollId);
+        await client.sendMessage(CONFIG.chatId, 'Owned. Closed, nothing further. 🙏');
+      }
+    } catch (error) {
+      console.error('vote failed:', error.message);
+    }
+  });
+}
+
 /* ── Inbound ──────────────────────────────────────────────────────────────── */
 
 const HELP = [
@@ -133,7 +231,10 @@ const HELP = [
   '`!issue <what happened>` — open a was-me/not-me poll',
   '`!whereami` — print this chat’s id (setup only)',
   '',
-  'You can also just reply *was me* or *not me* to an open issue.',
+  '*Or just say banksy.* Photo of something that needs doing + the word',
+  '“banksy” and I’ll put a was-me/not-me poll in here.',
+  '',
+  'You can also reply *was me* or *not me* to an open poll.',
 ].join('\n');
 
 client.on('message', async (message) => {
@@ -142,6 +243,13 @@ client.on('message', async (message) => {
     if (!chat.isGroup) return;
 
     const text = (message.body ?? '').trim();
+
+    // A photo plus the trigger word. Checked before every command, because
+    // this is the path people will actually use.
+    if (message.hasMedia && TRIGGER.test(text)) {
+      await handlePhoto(message, text);
+      return;
+    }
 
     if (text === '!whereami') {
       await message.reply(`This chat id is:\n\`${chat.id._serialized}\``);
@@ -203,5 +311,45 @@ client.on('message', async (message) => {
     console.error('inbound failed:', error.message);
   }
 });
+
+/**
+ * A photo somebody tagged the bot in.
+ *
+ * Everything that decides whether this becomes a poll happens server-side, in
+ * one place: a person in frame, nothing that needs doing, a duplicate of a poll
+ * already open. All of those come back as `ignored` and the bot says nothing,
+ * because a bot that comments on every photo is a bot that gets muted.
+ */
+async function handlePhoto(message, caption) {
+  const media = await message.downloadMedia();
+  if (!media?.data) return;
+
+  // ~4MB of base64 is a phone photo at full resolution. Larger is a video or a
+  // document, neither of which is a chore board or a sink.
+  if (media.data.length > 4_500_000) {
+    await message.reply('That file is too big for me to look at. A normal photo works.');
+    return;
+  }
+
+  await message.react('👀');
+
+  const result = await api('/api/bot/photo', {
+    method: 'POST',
+    body: JSON.stringify({
+      groupId: CONFIG.groupId,
+      imageBase64: media.data,
+      mediaType: media.mimetype?.startsWith('image/') ? media.mimetype : 'image/jpeg',
+      caption,
+    }),
+  });
+
+  if (result.ignored === 'already-open') {
+    await message.reply('There is already a poll open for that one 👍');
+    return;
+  }
+  if (!result.poll) return; // silent by design
+
+  await postPoll(CONFIG.chatId, result.poll);
+}
 
 client.initialize();
