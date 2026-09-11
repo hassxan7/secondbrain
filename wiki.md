@@ -60,6 +60,7 @@ _(updated by the AI on every ingest)_
 
 | Date | What | Page |
 |------|------|------|
+| 2026-09-11 | PFC appendix: mined the WhatsApp chat for post-pitch questions, wrote 7 answers with visuals, built them into the Canva deck | [[PFC Appendix — Common Questions After the Pitch]] |
 | 2026-08-24 | Auto-ingest: 5 new source pages (1 MEP course lesson, 4 Revit tutorial transcripts) + cleanup of 2 already-processed CRM clippings | [[Engineering Drawing and Documentation (MEP Engineer Course)]] · [[Plumbing in Revit MEP Beginner Tutorial 1]] · [[REVIT 2023 FOR MEP - Lesson 1 Getting Started with an MEP Project]] · [[Lecture 14 HVAC Modelling in Progress 1 (Revit MEP Full Course)]] · [[Autodesk Revit - Full Beginner Course (Complete Project, Start to Finish)]] |
 | 2026-07-14 | Ingested Reuben + reconciled both expert calls against current build | [[Reuben Roy Call — Competition Bids vs BIM Drafting]] · [[Civly Target Dilemma — MEP Drafting vs Competition Bids]] · [[Reuben Roy]] |
 | 2026-06-25 | Ingested Z Fellows application → reusable pitch copy + founder profiles | [[Pitch Copy Library]] · [[Hassaan Shamshiri]] · [[Yash]] |

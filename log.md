@@ -5,6 +5,9 @@ Parse recent entries with: `grep "^## \[" log.md | tail -10`
 
 ---
 
+## [2026-09-11] query | PFC appendix: common questions after the pitch
+Mined the founders' WhatsApp export (Aug 2025 to Sep 2026) for post-pitch questions and objections (Airwallex/Latitude investor, Slobodan, Michael, Hesh, Sasha, Reuben, LinkedIn thread, 5 Aug and 18 Aug mentor calls). Produced 7 answers with visuals (landscape table, pricing derivation, liability chain, Autodesk two-column, data flywheel, GTM ladder, compliance scope) and built them into the `CIVLY PFC` Canva deck: slide 15 became the "Common questions" divider, slides 16 to 22 are the answers. Also listed deck inconsistencies to fix (MRR maths, LOI count, 10x vs 5x, team labels, typos). Filed as analysis: yes. Pages touched: [[PFC Appendix — Common Questions After the Pitch]], [[index]], [[wiki]].
+
 ## [2026-08-24] ingest | Scheduled auto-ingest — 7 raw sources
 Automated scheduled ingest (`vault-ingest-organise`) processed everything sitting directly in `raw/`:
 - **[[Engineering Drawing and Documentation (MEP Engineer Course)]]** (Elevify course lesson) — Civly relevance MEDIUM. Teaches drawing-set organization, symbol/legend conventions, equipment tag→schedule cross-referencing, and the revision/as-built lifecycle. No formulas or code values, but the tag→schedule→property model is analogous to what Civly's schematic parser and `ifc_writer` reconstruct. Cross-linked into [[MEP Drafting — Schematic to LOD 200]].
