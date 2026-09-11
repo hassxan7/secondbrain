@@ -14,7 +14,7 @@ Files
 - `template.html` + `build.py` — the editable source. Edit the template, then `python3 build.py`
   to regenerate `index.html`.
 - `img/` — square headshots, one per person, file name = person id (`leo.jpg`, `boris.jpg`, ...).
-  A person with no image gets an initials placeholder. **`boris.jpg` is still missing.**
+  A person with no image gets an initials placeholder.
 - `render.mjs` — re-renders the MP4: `node render.mjs 60 out.mp4`. Needs `playwright` and an
   `ffmpeg` with libx264 (set `FFMPEG=/path/to/ffmpeg` if it is not on PATH).
 
