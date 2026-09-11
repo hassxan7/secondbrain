@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>78 Conversations</title>
+<style>
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;src:url(data:font/woff2;base64,__FONT__) format('woff2');}
+:root{
+  --bg:#0f0f12;          /* match this to the Canva slide background */
+  --dot:#4b4b57;
+  --accent:#ff6b00;      /* same orange as the quote marks on the feedback wall */
+  --warm:#e9a35a;        /* the "78 conversations" gold from the old slide */
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --line:#1f2937;
+  --ring:#374151;
+}
+html,body{margin:0;padding:0;background:var(--bg);}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden;}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:var(--bg);}
+/* --- dots ------------------------------------------------------------ */
+#dots{position:absolute;inset:0;z-index:5;pointer-events:none;}
+.dot{position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:var(--dot);
+     transform-origin:50% 50%;will-change:transform,opacity;}
+.dot.pick{z-index:5;}
+.dot.pick .face{position:absolute;inset:0;border-radius:50%;overflow:hidden;opacity:0;}
+.dot.pick .ring{position:absolute;inset:-2px;border-radius:50%;border:2px solid var(--accent);opacity:0;}
+/* --- headline -------------------------------------------------------- */
+#count{position:absolute;left:0;right:0;top:730px;text-align:center;color:var(--warm);z-index:6;
+       font-weight:800;font-size:76px;letter-spacing:-1.5px;line-height:1;white-space:nowrap;}
+#count b{font-variant-numeric:tabular-nums;display:inline-block;min-width:1.35em;text-align:right;}
+#kicker{position:absolute;left:0;right:0;top:58px;text-align:center;color:#fff;font-weight:800;font-size:30px;letter-spacing:1px;
+        text-transform:uppercase;white-space:nowrap;opacity:0;z-index:6;}
+#kicker span{color:var(--warm);}
+#kicker em{font-style:normal;color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0;font-size:24px;
+           margin-left:22px;padding-left:22px;border-left:1px solid var(--ring);}
+/* --- scroll wall ----------------------------------------------------- */
+#viewport{position:absolute;left:0;top:__VP_TOP__px;width:1920px;height:__VP_H__px;overflow:hidden;z-index:2;}
+#list{position:absolute;left:0;top:0;width:1920px;will-change:transform;}
+#fadeTop,#fadeBot{position:absolute;left:0;right:0;height:120px;z-index:3;pointer-events:none;}
+#fadeTop{top:__VP_TOP__px;background:linear-gradient(to bottom,var(--bg) 25%,rgba(15,15,18,0));}
+#fadeBot{bottom:0;height:150px;background:linear-gradient(to top,var(--bg) 20%,rgba(15,15,18,0));}
+.row{position:relative;height:__ROW_H__px;width:__ROW_W__px;margin:0 auto;display:flex;align-items:center;gap:56px;}
+.row.rev{flex-direction:row-reverse;}
+.row .line{position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--line);transform-origin:0 50%;}
+.row.rev .line{transform-origin:100% 50%;}
+.who{width:280px;flex:0 0 280px;display:flex;flex-direction:column;align-items:center;text-align:center;}
+.avatar{width:__AV__px;height:__AV__px;border-radius:50%;overflow:hidden;position:relative;
+        box-shadow:0 10px 22px -4px rgba(0,0,0,.6), 0 0 0 1px var(--ring);}
+.face,.avatar{background:#23232b;}
+.face img,.avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+.face .init,.avatar .init{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+        color:#fff;font-weight:800;font-size:46px;letter-spacing:1px;background:#2b2b35;}
+.who .name{margin-top:18px;color:#fff;font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.3px;line-height:28px;}
+.who .role{margin-top:6px;color:var(--muted);font-size:15px;line-height:20px;max-width:280px;white-space:nowrap;}
+.quote{flex:1 1 auto;}
+.quote .mark{color:var(--accent);font-family:Georgia,'Times New Roman',serif;font-size:72px;line-height:44px;height:40px;display:block;}
+.quote p{margin:8px 0 0;color:var(--text);font-size:__Q_FS__px;line-height:__Q_LH__px;font-weight:400;letter-spacing:-.2px;}
+.row.rev .quote{text-align:right;}
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="count"><b>0</b> conversations</div>
+  <div id="kicker"><span>78</span> conversations <em>what some of them said</em></div>
+  <div id="viewport"><div id="list"></div></div>
+  <div id="fadeTop"></div><div id="fadeBot"></div>
+  <div id="dots"></div>
+</div>
+<script>__GSAP__</script>
+<script>
+// ---------------------------------------------------------------- data
+// `cell` = [row, col] of the dot in the 6×13 grid that becomes this person.
+const PEOPLE = [
+  {id:'leo',    name:'Leo Chan',        role:'Structural Engineer · Founder, Granite AI',   cell:[0,3],
+   quote:'Hong Kong has just mandated BIM, but most firms here still are not set up for it. Compliance is the bottleneck.'},
+  {id:'boris',  name:'Boris Nikolov',   role:'Residential Architect · NKLV Architects',      cell:[1,10],
+   quote:'I’ve been waiting for a software like this for 5 years.'},
+  {id:'momen',  name:'Momen Kazi',      role:'Structural Engineer · Gilcon Structural',     cell:[2,6],
+   quote:'Most of my week goes into checking work against Australian Standards, not designing. Automate that check and I get days back on every job.'},
+  {id:'nathan', name:'Nathan Zygouras', role:'Structural Engineer · Robert Bird Group',     cell:[3,1],
+   quote:'Coordination between disciplines is where projects lose their time. Catching a conflict before it reaches the model is worth real money.'},
+  {id:'reuben', name:'Reuben Roy',      role:'Architectural Graduate · BVN Group',          cell:[4,11],
+   quote:'I have seen the same problems Michael describes, especially through our architecture partner BVN.'},
+  {id:'obadiah',name:'Obadiah Pewee',   role:'Ex Structural Engineer · AI & Deeptech',      cell:[5,5],
+   quote:'The hard part is not generating geometry. It is making regulation computable. Get that right and this is a constraint engine, not another Revit plugin.'},
+];
+const IMG = {__IMGS__};     // id -> base64 jpeg; missing id -> initials placeholder
+const SCROLL_PX_PER_S = __SCROLL__;   // wall scroll speed once it is running
+const TOTAL_SECONDS   = __TOTAL__;    // clip length
+
+// ---------------------------------------------------------------- geometry
+const COLS=13, ROWS=6, TOTAL=78, DOT=20, PITCH=72;
+const GW=(COLS-1)*PITCH+DOT, GH=(ROWS-1)*PITCH+DOT;
+const GX=(1920-GW)/2, GY=430-GH/2;
+const VP_TOP=__VP_TOP__, ROW_H=__ROW_H__, ROW_W=__ROW_W__, AV=__AV__;
+const ROW_X=(1920-ROW_W)/2;
+const pickKey=new Map(PEOPLE.map((p,i)=>[p.cell[0]*COLS+p.cell[1],i]));
+
+const faceHTML = p => IMG[p.id]
+  ? `<img src="data:image/jpeg;base64,${IMG[p.id]}" alt="${p.name}">`
+  : `<div class="init">${p.name.split(' ').map(w=>w[0]).join('')}</div>`;
+
+// ---------------------------------------------------------------- build wall (list duplicated for a seamless loop)
+const list=document.getElementById('list');
+const makeRow=(p,i)=>{
+  const row=document.createElement('div'); row.className='row'+(i%2?' rev':'');
+  row.innerHTML=`<div class="line"></div>
+    <div class="who"><div class="avatar" data-id="${p.id}">${faceHTML(p)}</div>
+      <div class="name">${p.name}</div><div class="role">${p.role.split(' · ').join('<br>')}</div></div>
+    <div class="quote"><span class="mark">“</span><p>“${p.quote}”</p></div>`;
+  return row;
+};
+PEOPLE.forEach((p,i)=>list.appendChild(makeRow(p,i)));
+PEOPLE.forEach((p,i)=>list.appendChild(makeRow(p,i)));
+const WALL_H=PEOPLE.length*ROW_H;
+const firstAvatars=[...list.querySelectorAll('.avatar')].slice(0,PEOPLE.length);
+const firstRows=[...list.querySelectorAll('.row')].slice(0,PEOPLE.length);
+// avatar landing spot (stage coords, scroll offset 0)
+const landing = i => {
+  const rev=i%2===1;
+  const x = rev ? ROW_X+ROW_W-280+(280-AV)/2 : ROW_X+(280-AV)/2;
+  const whoH = AV+18+28+6+20;                        // avatar + name + role stack
+  const y = VP_TOP + i*ROW_H + (ROW_H-whoH)/2;
+  return {x,y};
+};
+
+// ---------------------------------------------------------------- build dots
+const dotsEl=document.getElementById('dots'), dots=[], picks=[];
+for(let i=0;i<TOTAL;i++){
+  const r=Math.floor(i/COLS), c=i%COLS;
+  const d=document.createElement('div'); d.className='dot';
+  gsap.set(d,{x:GX+c*PITCH,y:GY+r*PITCH,scale:0,opacity:0});
+  if(pickKey.has(i)){
+    const p=PEOPLE[pickKey.get(i)];
+    d.classList.add('pick');
+    d.innerHTML=`<div class="face">${faceHTML(p)}</div><div class="ring"></div>`;
+    picks[pickKey.get(i)]=d;
+  }
+  dotsEl.appendChild(d); dots.push(d);
+}
+
+// ---------------------------------------------------------------- timeline
+const others=dots.filter(d=>!d.classList.contains('pick'));
+const counter={n:0}, countB=document.querySelector('#count b'), countEl=document.getElementById('count');
+gsap.set(firstAvatars,{opacity:0});
+gsap.set(list.querySelectorAll('.row .line'),{scaleX:0});
+gsap.set(list.querySelectorAll('.who .name, .who .role, .quote'),{opacity:0});
+const tl=gsap.timeline({paused:true,defaults:{ease:'power3.out'}});
+
+// 0.0  dots pop in from the centre outwards, counter ticks with them
+tl.to(dots,{scale:1,opacity:1,duration:0.55,ease:'back.out(2.2)',stagger:{each:0.012,grid:[ROWS,COLS],from:'center'}},0)
+  .fromTo(countEl,{opacity:0,y:18},{opacity:1,y:0,duration:0.6},0.15)
+  .to(counter,{n:TOTAL,duration:1.25,ease:'power2.out',onUpdate:()=>{countB.textContent=Math.round(counter.n);}},0.2);
+
+// 2.45 the ones we are about to hear from light up, one after another
+const T_PICK=2.45;
+picks.forEach((d,i)=>{
+  const t=T_PICK+i*0.1;
+  tl.to(d,{backgroundColor:'#ff6b00',scale:1.45,duration:0.32,ease:'back.out(3)'},t)
+    .fromTo(d.querySelector('.ring'),{opacity:1,scale:1},{opacity:0,scale:2.6,duration:0.7,ease:'power2.out',immediateRender:false},t);
+});
+
+// 3.4 the crowd recedes; the chosen dots fly to their place in the wall and become faces.
+//     Rows further down the wall land below the fold - they simply fly off the bottom edge.
+const T_FLY=3.4, FLY=1.05;
+tl.to(others,{opacity:0,scale:0.25,duration:0.7,ease:'power2.in',stagger:{amount:0.35,from:'random'}},T_FLY-0.05)
+  .to(countEl,{opacity:0,y:-14,duration:0.35,ease:'power2.in'},T_FLY)
+  .fromTo('#kicker',{opacity:0,y:-10},{opacity:1,y:0,duration:0.6},T_FLY+0.55);
+picks.forEach((d,i)=>{
+  const t=T_FLY+i*0.08, L=landing(i);
+  tl.to(d,{x:L.x,y:L.y,width:AV,height:AV,scale:1,duration:FLY,ease:'power3.inOut'},t)
+    .to(d,{backgroundColor:'#23232b',duration:0.5},t+0.4)
+    .to(d.querySelector('.face'),{opacity:1,duration:0.45,ease:'power2.out'},t+0.5)
+    .to(d,{boxShadow:'0 10px 22px -4px rgba(0,0,0,.6), 0 0 0 1px #374151',duration:0.4},t+0.5)
+    // hand-off: the flying dot is swapped for the real avatar inside the scrolling list (same pixel position)
+    .set(firstAvatars[i],{opacity:1},t+FLY)
+    .set(d,{opacity:0},t+FLY);
+});
+
+// 4.3 names, bios and quotes cascade in beside the faces
+const T_ROWS=T_FLY+0.9;
+firstRows.forEach((row,i)=>{
+  const t=T_ROWS+i*0.12, rev=i%2===1;
+  tl.to(row.querySelectorAll('.who .name, .who .role'),{opacity:1,duration:0.5,stagger:0.08},t)
+    .fromTo(row.querySelector('.quote'),{opacity:0,x:rev?-34:34},{opacity:1,x:0,duration:0.7,immediateRender:false},t+0.1)
+    .to(row.querySelector('.line'),{scaleX:1,duration:0.8,ease:'power2.out'},t+0.05);
+});
+// rows in the duplicate copy are already fully visible (they only ever enter from below)
+[...list.querySelectorAll('.row')].slice(PEOPLE.length).forEach(row=>{
+  gsap.set(row.querySelectorAll('.who .name, .who .role, .quote, .avatar'),{opacity:1});
+  gsap.set(row.querySelector('.line'),{scaleX:1});
+});
+
+// 5.4 the wall starts to scroll, eases up to speed, then rolls at a constant rate and loops seamlessly
+const T_SCROLL=T_ROWS+0.9;
+tl.fromTo(list,{y:0},{y:-WALL_H,duration:WALL_H/SCROLL_PX_PER_S,ease:'none',repeat:-1,immediateRender:false},T_SCROLL);
+tl.to({},{duration:0.01},TOTAL_SECONDS-0.01);
+
+// ---------------------------------------------------------------- control API (used by render.mjs)
+window.__tl=tl;
+window.__duration=TOTAL_SECONDS;
+window.__seek=t=>{tl.pause();tl.seek(t,false);};
+if(!new URLSearchParams(location.search).has('render')){
+  document.fonts.ready.then(()=>tl.play(0));
+  window.addEventListener('click',()=>tl.play(0));   // click to replay
+}
+</script>
+</body>
+</html>
