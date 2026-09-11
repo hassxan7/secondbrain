@@ -164,3 +164,6 @@ Wiki scaffolded from Karpathy's LLM Wiki pattern (https://gist.github.com/karpat
 Vault: `C:\Users\hassa\OneDrive\Documents\Civly Brain`
 Structure: raw/, pages/entities/, pages/concepts/, pages/sources/, pages/analyses/
 CLAUDE.md, AGENTS.md, wiki.md, index.md, and log.md initialized.
+
+## [2026-09-11] asset | 78 Conversations slide transition
+Built the animated replacement for the "Validated by the Best" feedback wall: 78 dots → 5 light up → fly into a single left column and become headshots → quotes cascade in. 8 s clip, wall complete at ~5.7 s. Files: `pitch-assets/78-conversations/` (index.html, render.mjs, 60 fps MP4). Related: [[PFC Pitch — Deck, Scripts & Prompts]], [[HyperFrames]].
