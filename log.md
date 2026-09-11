@@ -5,6 +5,11 @@ Parse recent entries with: `grep "^## \[" log.md | tail -10`
 
 ---
 
+## [2026-09-11] query | Rebuild TAM/SAM/SOM without AU/NZ framing
+Old set (US$40B / A$1.8B / A$6M) rejected: it signalled an AU+NZ company, the numbers were unsourced, and the layer labelled SAM was beachhead-sized rather than serviceable-market-sized. Replaced with a global USD set — **TAM US$60B** (~2M drafters/BIM technicians worldwide x ~US$30k blended loaded cost; cross-checked against 180,200 US drafters at a US$68,090 median, BLS May 2025, over the US's ~25% share of the US$1.59T global AE consulting market), **SAM US$9B** (~600,000 MEP + structural design-phase seats x US$15,600/seat/yr), **SOM US$20M ARR by 2030** (250 firms x ~US$78k ACV = 0.2% of SAM). Added the TAM-is-labour / SAM-is-revenue coherence rule and converted deck pricing from A$1,999 to US$1,300/seat/mo. Filed as analysis: yes.
+Created: [[TAM SAM SOM — Global Rebuild (Sep 2026)]] (includes the surgical Gemini/Nano Banana image-edit prompt for the existing skyline slide).
+Updated: [[PFC Pitch — Deck, Scripts & Prompts]] (new table + Historical/Superseded block, business-model script, pricing card, Nano Banana prompt pills), [[index]], [[wiki]].
+
 ## [2026-08-24] ingest | Scheduled auto-ingest — 7 raw sources
 Automated scheduled ingest (`vault-ingest-organise`) processed everything sitting directly in `raw/`:
 - **[[Engineering Drawing and Documentation (MEP Engineer Course)]]** (Elevify course lesson) — Civly relevance MEDIUM. Teaches drawing-set organization, symbol/legend conventions, equipment tag→schedule cross-referencing, and the revision/as-built lifecycle. No formulas or code values, but the tag→schedule→property model is analogous to what Civly's schematic parser and `ifc_writer` reconstruct. Cross-linked into [[MEP Drafting — Schematic to LOD 200]].

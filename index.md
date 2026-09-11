@@ -99,6 +99,7 @@ Curated pages distilling MEP knowledge for Civly product development. Only HIGH-
 | [[Data Partnership Outreach Strategy]] | 30-day playbook + ready copy (LinkedIn/email/phone) to land MEP-consultancy data partnerships | 2026-06-18 |
 | [[LinkedIn & Content Strategy]] | Civly brand plan: first demo post, launch video, content pillars, 2-week post calendar | 2026-06-18 |
 | [[Pitch Copy Library]] | Reusable, rule-compliant application answers (Z Fellows 2026 set) + per-funder tailoring + submission log | 2026-06-25 |
+| [[TAM SAM SOM — Global Rebuild (Sep 2026)]] | Global USD market sizing (US$60B / US$9B / US$20M) replacing the AU+NZ set, with derivations + the Gemini image-edit prompt | 2026-09-11 |
 | [[PFC Pitch — Deck, Scripts & Prompts]] | PFC deck rebuild handoff: design language, Business Model/Timeline/Ask slides + scripts, on-brand Nano Banana prompts, Canva workflow | 2026-07-15 |
 | [[Drafting vs Coordination Strategy Shift]] | Why Civly sells drafting not coordination, despite Hesh/Reuben pushing coordination; GTM + messaging stance | 2026-07-17 |
 | [[Advisor List & Question Routing]] | The advisor bench + process for routing open questions to the right person (Hassaan) | 2026-06-18 |
@@ -127,7 +128,7 @@ See [[CRM/index]] for the full contact list.
 
 ## Stats
 
-- Total pages: 41 (11 sources + 5 entities + 4 concepts + 3 MEP + 1 Structural + 1 Compliance + 3 Competitors + 13 strategy)
+- Total pages: 42 (11 sources + 5 entities + 4 concepts + 3 MEP + 1 Structural + 1 Compliance + 3 Competitors + 14 strategy)
 - CRM contacts: 7
 - Sources ingested: 11
 - Last lint: _(never)_
