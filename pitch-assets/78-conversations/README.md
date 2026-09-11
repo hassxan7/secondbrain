@@ -2,7 +2,7 @@
 
 Self-contained 1920×1080 animation for the pitch deck. 78 dots (one per conversation) pop in with a
 counter, six light up, fly into their place in a feedback wall and become the headshots, the names,
-bios and quotes cascade in, and the wall then scrolls continuously (alternating left/right, looping).
+bios and quotes cascade in, and the wall then scrolls continuously at 100 px/s (alternating left/right, looping).
 
 Timing: dots 0–2.4 s · picks light up 2.5 s · fly-in 3.4–4.5 s · quotes 4.3–5.4 s · wall scrolls from
 5.2 s and loops. The clip is 42 s so it keeps rolling while you talk; trim in Canva if you want less.

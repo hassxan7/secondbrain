@@ -4,7 +4,7 @@ Run after editing template.html or dropping a new headshot into img/ (file name 
 import base64, os, sys, json
 here = os.path.dirname(os.path.abspath(__file__))
 rd = lambda *p: open(os.path.join(here, *p), 'rb').read()
-cfg = dict(VP_TOP=130, VP_H=950, ROW_H=300, ROW_W=1300, AV=128, Q_FS=32, Q_LH=44, SCROLL=50, TOTAL=42)
+cfg = dict(VP_TOP=130, VP_H=950, ROW_H=300, ROW_W=1300, AV=128, Q_FS=32, Q_LH=44, SCROLL=100, TOTAL=42)
 html = rd('template.html').decode()
 html = html.replace('__FONT__', base64.b64encode(rd('Inter-variable.woff2')).decode())
 html = html.replace('__GSAP__', rd('gsap.min.js').decode())
