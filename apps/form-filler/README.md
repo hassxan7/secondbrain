@@ -142,6 +142,18 @@ signal lives. Fields are addressable with `find` by label, then `form_input` by 
 Selects render as clickable options, not `<select>` elements. File uploads are a
 drop-zone; do not attempt them.
 
+Learned on the Startmate run (13 Sep 2026):
+- **Conditional fields appear after a choice.** Picking "Yes" to co-founders added a
+  required "co-founder(s)' names" field that wasn't on the page before. After every radio
+  or select, run `find` again for new fields.
+- **Clicking a ref doesn't always register.** The radio and checkbox clicks by `ref`
+  silently did nothing. Clicking by coordinate from a fresh screenshot worked. Always read
+  the state back (`aria-checked` on `[role=radio]`, `aria-selected` on `[role=option]`)
+  before calling a field done.
+- **Revealed fields shift the layout.** Take a new screenshot before any coordinate click.
+- **Multiple Chrome browsers** are connected to Hassaan's account (Windows and macOS). The
+  extension makes you ask which one. This PC is **Browser 1 (Windows)**.
+
 **Typeform** — one question per screen. Read, answer, advance, repeat. There is no full
 page to extract, so walk it and record as you go. Watch for the logic jumps.
 

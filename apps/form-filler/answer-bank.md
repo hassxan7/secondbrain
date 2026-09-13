@@ -117,7 +117,8 @@ it to MEP without saying schematic.*
 > followers and has started mentioning us to his community. Last week a Sydney architect
 > watched our demo and happily agreed to be our guinea pig.
 
-🔴 *Confirm Michael's exact role before upgrading "worked on" to anything stronger.*
+🟢 *Michael's role as worded ("worked on", "advised us as a design partner") was
+confirmed by Hassaan on 13 Sep 2026.*
 🟡 *Engineers at Robert Bird, BVN and Gilcon checking the workflow is a pitch claim.
 Leave it out of written forms until it's verified.*
 
@@ -138,10 +139,9 @@ Leave it out of written forms until it's verified.*
 > up to try it on his own projects.
 
 🟢 Revit numbers, PFC, Giants, Arrayah, the architect.
-🔴 **"Two signed letters of intent"** and **"five firms trying the product"** have no
-record in this vault. Hassaan's Z Fellows answer (25 Jun) said "3 LOIs, 1 paid pilot, 10
-signups", and the counts have changed since, so check the current numbers before every
-use.
+🟢 **"Two signed letters of intent"** and **"five firms trying the product"**: both
+confirmed by Hassaan on 13 Sep 2026. His Z Fellows answer (25 Jun) gave different counts
+("3 LOIs, 1 paid pilot, 10 signups") and the numbers move, so re-confirm before every use.
 
 > [!warning] Never open a written traction answer with a timeline fragment
 > "Four months in." reads as curt. Hassaan called it "kinda rude" (13 Sep). Put the

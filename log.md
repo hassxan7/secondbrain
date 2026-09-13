@@ -323,3 +323,24 @@ mic-drop closers work out loud and come across as rude on paper.
   (deck, video, pitch night) registers across every section.
 - [[Form Filler]] runbook: the traction guidance no longer says "emphasise four months".
 - The voice memory is updated with the same rule.
+
+## [2026-09-13] application | Startmate Pitch Night filled in Chrome
+
+Hassaan confirmed the two letters of intent, the five firms, and Michael's role wording.
+Confidence marks moved to 🟢 in [[Startmate Pitch Night — 2026-09-08]] and
+[[Form Filler Answer Bank]].
+
+Filled the live form through `claude-in-chrome` in Hassaan's Windows Chrome (Browser 1).
+Every field was read back from the page afterwards: cohort S26, Civly, the v2 one-liner,
+Hassaan Shamshiri, civlyvibe@gmail.com, LinkedIn, co-founders Yes, co-founder names
+"Yash Mittal", and Sydney In-Person 14 Oct. **Not submitted.** Still with Hassaan: pitch
+deck PDF, 3-minute video link, logo, and Submit before 22 Sep 12pm AEST. The tab was left
+open.
+
+Runbook lessons added to [[Form Filler]]:
+- Airtable adds conditional fields after a choice (a required co-founder names field
+  appeared after "Yes").
+- Clicks by `ref` on radios and checkboxes silently failed; clicking by coordinate
+  worked. Always read state back.
+- Revealed fields shift the layout, so re-screenshot before coordinate clicks.
+- Two Chromes are connected to Hassaan's account; this PC is Browser 1 (Windows).

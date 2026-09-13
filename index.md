@@ -160,7 +160,7 @@ Drafted by [[Form Filler]]. Never submitted without Hassaan.
 
 | Application | Deadline | Status |
 |------|---------|------|
-| [[Startmate Pitch Night — 2026-09-08]] | **22 Sep 2026, 12pm AEST** | draft, 5 fields filled |
+| [[Startmate Pitch Night — 2026-09-08]] | **22 Sep 2026, 12pm AEST** | filled in Chrome, not submitted (deck, video, logo to add) |
 
 ---
 

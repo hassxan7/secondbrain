@@ -5,7 +5,7 @@ type: analysis
 tags: [application, startmate, pitch, s26]
 url: "https://airtable.com/appWrXZc3k7DSfHM4/pag7Bo6BUva8N7vqT/form"
 deadline: 2026-09-22
-status: draft
+status: filled-not-submitted
 created: 2026-09-08
 updated: 2026-09-13
 sources: 3
@@ -48,15 +48,22 @@ founder-problem fit plus rate of progress. Do not assert it until the framework 
 
 | field | value | note |
 |---|---|---|
-| Pitch Night Cohort * | S26 | only option |
-| Startup Name * | Civly | |
-| Startup One-Liner * | see Q1 | |
-| First Name * | Hassaan | |
-| Last Name * | Shamshiri | |
-| Email * | 🔴 confirm which address | |
-| LinkedIn | linkedin.com/in/hassaanshamshiri | from [[Hassaan Shamshiri]] |
-| Pitching with co-founders? * | **Yes** | Yash |
-| Preferred Pitch Location * | 🔴 **Sydney 14 Oct** suggested | Hassaan decides |
+> [!note] Filled in Hassaan's Windows Chrome via `claude-in-chrome`, 13 Sep 2026
+> Every field marked ✅ below was set and read back from the live page. **Not submitted.**
+> The tab is left open for the uploads and the Submit click.
+
+| field | value | state |
+|---|---|---|
+| Pitch Night Cohort * | S26 | ✅ |
+| Startup Name * | Civly | ✅ |
+| Startup One-Liner * | Q1 v2 | ✅ |
+| First Name * | Hassaan | ✅ |
+| Last Name * | Shamshiri | ✅ |
+| Email * | civlyvibe@gmail.com | ✅ Civly address from [[Hassaan Shamshiri]]. Change it if another inbox should get Startmate mail |
+| LinkedIn | https://www.linkedin.com/in/hassaanshamshiri/ | ✅ |
+| Pitching with co-founders? * | Yes | ✅ |
+| Co-founder(s)' names * | Yash Mittal | ✅ conditional field, only appears after "Yes" |
+| Preferred Pitch Location * | Sydney In-Person, 14 Oct | ✅ can be changed before submitting |
 | Upload Pitch Deck (PDF) * | 🔴 **Hassaan** | the PFC deck, exported to PDF |
 | Pitch Video (3 min) * | 🔴 **Hassaan** | Loom recommended; check sharing permissions |
 | Logo | 🔴 **Hassaan** | PNG exists |
@@ -121,9 +128,8 @@ as hard to reach.
 > up to try it on his own projects.
 
 **Sources:** [[Civly Revit MCP]] · [[Form Filler Answer Bank]]
-**Confidence:** 🟢 on the Revit numbers and PFC. 🔴 on **"two signed letters of intent"**
-and **"five firms trying the product"**. Neither has any record in this vault. Verify or
-cut before submitting. Startmate will ask who.
+**Confidence:** 🟢 all. The two signed letters of intent and the five firms were confirmed
+by Hassaan on 13 Sep 2026. Be ready to name them if Startmate asks.
 **v2 changes:** "Four months in." is gone, as you asked. The timeframe now sits inside a
 sentence. "Modified 819 elements" became "removed", which is exactly what the Ring-2
 result shows. And "guinea pig" is used once, in Q3, so the two answers don't repeat each
@@ -154,15 +160,15 @@ so this answer doesn't state it.
 
 ## Needs Hassaan
 
-- [ ] **Verify the two letters of intent and the five firms**, or cut them from Q4.
-- [ ] **Confirm Michael's role wording.** "Worked on" is the safe version. If he led the
-      design on either building, it can say more.
+- [x] **Verify the two letters of intent and the five firms** (confirmed 13 Sep).
+- [x] **Confirm Michael's role wording** (confirmed 13 Sep, "worked on" stands).
 - [ ] Settle the exit value if you want it in. The revenue line stands on its own.
 - [ ] Read Startmate's Spike Framework and name the spike in the deck.
-- [ ] Choose pitch location (Sydney 14 Oct suggested).
+- [x] Pitch location: Sydney In-Person, 14 Oct (filled 13 Sep; change before submitting if needed).
 - [ ] Export the PFC deck to PDF and upload.
 - [ ] Record the 3-minute Loom, check sharing permissions, paste the link.
-- [ ] Upload the logo. Confirm the email address.
+- [ ] Upload the logo.
+- [x] Email filled as civlyvibe@gmail.com (swap it if another inbox should get Startmate mail).
 - [ ] Press Submit before **Mon 22 Sep 12pm AEST**.
 
 ## Revision history
