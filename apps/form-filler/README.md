@@ -72,7 +72,7 @@ Read the form's own framing before drafting. It usually tells you exactly what i
 |---|---|
 | Judging criteria listed | Mirror those headings in the answers, in that order |
 | "Validation" as a criterion | Lead with 78 architects and Michael, not with the product |
-| "Traction / rate of progress" | Emphasise **four months**. Speed is the story |
+| "Traction / rate of progress" | Show progress in full, warm sentences. Put the timeframe *inside* a sentence ("in the months since we started"), never as a curt fragment like "Four months in." |
 | "Founder / team" | Founder-problem fit: dad's construction company, Yash's ML at Anthrobyte |
 | A named framework (e.g. Startmate's Spike) | Look it up, pick a spike, say it explicitly |
 | Word limit under 50 | Cut to one claim plus one number. Nothing else fits |

@@ -4,18 +4,52 @@ aliases: ["Hassaan Voice Guide"]
 type: analysis
 tags: [apps, form-filler, voice, writing]
 created: 2026-09-08
-updated: 2026-09-08
-sources: 4
+updated: 2026-09-13
+sources: 5
 ---
 
 # How Hassaan writes
 
-Derived from [[Civly Startup Script]], the PFC pitch scripts, the LinkedIn launch copy
-(2 Sep), the poster description (26 Aug), and two months of WhatsApp. Every rule below is
-followed by real evidence from something he actually wrote.
+Built from [[Civly Startup Script]], the PFC pitch scripts, the LinkedIn launch copy
+(2 Sep), the poster description (26 Aug), two months of WhatsApp, and **his direct
+feedback on the first Startmate draft (13 Sep)**.
 
-**The one-line summary: grand and ambitious, but the grandness is always paid for with a
-number, a name, or a scar.** He never claims big without immediately showing the receipt.
+**One-line summary: ambitious and warm, with every claim backed by a number, a name, or
+a real story. On paper it should sound like him explaining it to someone across a table,
+not like him on stage.**
+
+---
+
+## Written, not pitched (read this first)
+
+> [!important] Hassaan's feedback on v1 of the Startmate draft, 13 Sep 2026
+> "Sounds too abrasive and pitchy." Also: "we shouldn't say 'Four months in.' full stop,
+> it's kinda rude", and "talk about the exit instead of just saying I sold my last
+> company."
+
+Applications are **read at a desk**, not heard from a stage. Tricks that work in a
+three-minute pitch come across as curt, cocky or rude in a text box. So:
+
+| on stage (deck, video, pitch night) | in a written form |
+|---|---|
+| Curt fragments: "Four months in." "So we built it." | **Full sentences.** Put the timeframe inside one: "In the months since we started, ..." |
+| Contrast pairs: "An architect draws one wall, then the next." | At most one gentle contrast per application, usually none |
+| Mic-drop closers: "Two months of drafting. Twenty minutes." | End on the fact, in a normal sentence |
+| Compressed credentials: "I sold my last company." | **Tell the story:** FarmVillage Agro Inputs, what he ran, what it grew to, why he sold it |
+| Stats as punchlines | Stats inside sentences, and only when they have a source |
+
+**Warm and humble phrases are welcome.** "Guinea pig" is his and he wants it used. "That
+stayed with me." "Some on calls and some by walking up to them at build expos." These
+make an application read as a person.
+
+**Ambition stays, the edge goes.** The goal is still to sound like someone building
+something big. It should come from what has been done, not from the rhythm of the
+sentences.
+
+**Don't overstate people.** Warmth is not a licence to inflate. Michael "worked on" Quay
+Quarter Tower unless it is confirmed he led the design. Don't write that he is "generous
+with his time", because the record says he is hard to reach. Get the direction of a story
+right too: Hassaan asked the 30 Aug architect to be the guinea pig, he didn't offer.
 
 ---
 
@@ -24,47 +58,35 @@ number, a name, or a scar.** He never claims big without immediately showing the
 ### 1. No em dashes. Ever.
 
 This is absolute and it is the most common failure. An em dash (—) in a drafted answer
-means the draft is wrong, no matter how good the sentence is.
+means the draft is wrong, however good the sentence is.
 
 Replace with:
-- **a full stop**, when the two halves can stand alone. Usually the best fix.
+- **a full stop**, when the two halves can stand alone
 - **a comma**, for a light aside
-- **a colon**, when the second half explains or lists
+- **a colon**, when the second half explains (sparingly, see the colon-list note below)
 - **brackets**, for a genuine aside
 - **"and" / "but" / "so"**, when the halves are joined by logic
 
-Before: *"Civly is the fastest way from brief to BIM — we carry the weight of compliance."*
-After: *"Civly is the fastest way from brief to BIM. We carry the weight of compliance."*
-
-Do not swap one em dash for another dash character. No en dashes (–) as connectors, no
-spaced hyphens ( - ). If a sentence needs a dash to work, the sentence needs rewriting.
+No en dashes (–) as connectors and no spaced hyphens ( - ) either. If a sentence needs a
+dash to work, the sentence needs rewriting.
 
 ### 2. Never write "hundreds". Write the number.
 
 The mentor's sharpest note (2 Sep): *"You said hundreds of architects. Be specific."*
+"We have spoken with 78 architects", not "hundreds of architects". "$1.6 million in
+revenue", not "a successful business".
 
-- ✅ "We spoke to 78 architects."
-- ❌ "We spoke to hundreds of architects."
+### 3. Name real people and real buildings, accurately.
 
-Same for everything else. "$1.6M exit", not "a successful exit". "62 tools", not "a lot
-of tools". "Two signed letters of intent", not "several".
-
-### 3. Name real people and real buildings.
-
-Names are the credibility. They do the work that adjectives cannot.
-
-> "Michael Westerlund, the architect behind Quay Quarter Tower and the new Sydney Fish
-> Market, is our design partner and mentor."
-
-Not "a leading Sydney architect". The specific building is the proof.
+Names do the work that adjectives can't: Michael Westerlund, Quay Quarter Tower, Blackbird
+Giants, FarmVillage Agro Inputs. **The accuracy rule above still applies.**
 
 ### 4. Claims stay inside the guardrails.
 
-The claim guardrails in [[Civly Architecture Reference]] bind form answers exactly as
-they bind code. An application is a written record. Do not say "works in Revit" without a
-result file, do not say "supports 2020 to 2027" (2026 is proven), do not say "designs
-HVAC" (it lays out schematic supply). Being caught out in a diligence conversation costs
-more than the extra adjective buys.
+The claim guardrails in [[Civly Architecture Reference]] bind form answers exactly as they
+bind code. A form is a written record. No "works in Revit" without a result file, no
+"supports 2020 to 2027" (2026 is proven), no "designs HVAC" (it lays out schematic supply).
+Use the exact verb the evidence supports: the 819-element Ring-2 result was a *removal*.
 
 ---
 
@@ -72,91 +94,74 @@ more than the extra adjective buys.
 
 ### Open with the human stake, not the market
 
-> "An architect almost made my dad go bankrupt. It was 2024. He runs a construction
-> company, and he took me to a client acquisition meeting for the biggest pitch of his
-> life. Three days out, our architect said the first draft wouldn't be ready. We walked
-> in empty-handed."
+> "An architect almost made my dad go bankrupt. It was 2024..."
 
-Personal, specific, dated, and it earns the right to talk about the industry. When a form
-asks "why are you building this", this is the shape of the answer.
+That is the **stage** version. For a written answer, keep the story but say it evenly:
 
-### The contrast sentence
+> "I grew up around my dad's construction company, and I watched an architect's late first
+> draft nearly cost him the biggest pitch of his career. That stayed with me."
 
-He builds a gap and lets it sit.
+### Tell the exit as a story
 
-> "A software engineer writes one line, and AI finishes the function. An architect draws
-> one wall, then the next. For two months."
+The stage line "I exited my last company at $1.6 million" becomes, on paper:
 
-> "Two months of drafting. Twenty minutes."
+> "I started my first company at 15 and later built FarmVillage Agro Inputs, an
+> agricultural trading business, where I ran the mills and the supply chain. By 19 it had
+> grown to $1.6 million in revenue, and I sold it so I could move to Sydney and work on
+> problems like this one."
 
-Short. Parallel. No explanation afterwards. Resist the urge to add "which shows that...".
+Use the **revenue** figure, which his applications state consistently. The exit *value*
+(USD 1.2M vs AUD 1.6M) is unreconciled, so leave it out until it's settled.
 
-### Analogies from software, aimed at a non-AEC reader
+### Analogies from software, for a non-AEC reader
 
 - "Civly is Claude Code for BIM."
 - "Think Cursor, but for engineering."
-- "It's an A\* problem, like Google Maps, except you're hitting every room with supply and return."
-- "Imagine writing a novel with five co-authors in five separate rooms."
+- "It's a route-finding problem, like Google Maps, except every room needs supply and return."
 
-Judges and investors are not architects. The analogy is how the pitch survives that.
-
-### State the ambition plainly, then ground it
-
-> "We're not replacing architects. We're giving them superpowers. And when we get this
-> right, we're not just building software. We're changing how buildings get designed."
-
-But the sentence before it was "Five firms beta-testing. Two signed letters of intent."
-**The vision line only works because the receipt came first.** Never let a vision
-sentence stand alone in a form answer.
+Use them in a pitch or when a form asks "explain it simply". In a written form, one
+analogy at most.
 
 ### Admit the hard part
 
 > "It almost sounds too good to be true."
-> "Our thing is also credibility. We right now don't have any sort of credibility to show
-> them."
 
-When a form asks about risks or challenges, he does not deflect. This reads as confidence,
-not weakness, and it is the single easiest way to sound like a real founder rather than a
-generated application.
+When a form asks about risks or challenges, he doesn't deflect. That reads as confidence.
 
 ### Restore, not disrupt
 
-The closing move is almost always about giving something back rather than breaking
-something:
-
-> "We like to think we are restoring architecture to what it was actually about: design."
-> "Gives the profession back the thing it was founded on."
-> "Architects taking joy in their work again."
+He closes on giving something back rather than breaking something: *"restoring
+architecture to what it was actually about: design."* That works in a vision answer. Keep
+it out of traction and team answers.
 
 ---
 
 ## Rhythm
 
-- **Vary sentence length hard.** A 30-word sentence, then a four-word one. The four-word
-  one is the point.
-- **Fragments are allowed** when they land: *"So we built it."* *"Unprompted."*
-- **Start sentences with And / But / So.** He does, constantly.
-- **One idea per paragraph.** Two or three sentences, then a break.
-- **Lowercase energy in casual contexts, full grammar in formal ones.** Forms are formal.
-  Keep the rhythm, drop the texting register.
+- **Vary sentence length**, but on paper keep every sentence a complete sentence.
+- **Stage only:** fragments, "So we built it.", one-line mic drops.
+- **Start sentences with And / But / So** now and then. Never two sentences in a row
+  starting with the same word, and not two "I" sentences back to back.
+- **Don't write every sentence to the same template.** Four sentences shaped "Name, who
+  did X, has Y" read as a generated list.
+- **Colon lists:** if there are fewer than four items, write them as a sentence.
 
 ---
 
 ## Banned register
 
-These make it read as generated. Cut on sight:
-
 | Never | Instead |
 |---|---|
-| em dashes | full stop, comma, colon |
+| em dashes, en dashes | full stop, comma |
 | "leverage", "utilise", "robust", "seamless", "cutting-edge", "revolutionise" | plain verbs |
 | "In today's fast-paced world" | delete the sentence |
-| "It's not just X, it's Y" (as a formula) | he uses it once, deliberately, at the very end. Never mid-answer. |
+| "It's not X, it's Y" | say the positive: "is compliance, not design" |
 | "we're passionate about" | say what you did |
 | "solutions", "offerings", "verticals" | the actual thing |
 | "hundreds of", "many", "several", "various" | the number |
-| tricolons everywhere ("faster, cheaper, better") | one strong claim |
-| "delve", "tapestry", "landscape", "realm" | — |
+| tricolons ("the industry, the business and the technology") | one plain claim |
+| curt timeline fragments ("Four months in.") | a clause inside a sentence |
+| "delve", "tapestry", "landscape", "realm" | cut |
 | hedges: "we believe we may be able to" | "we do" or "we don't yet" |
 
 ---
@@ -164,11 +169,12 @@ These make it read as generated. Cut on sight:
 ## The `/humaniser` pass is mandatory
 
 Every drafted answer goes through the `the-humanizer` skill before it reaches Hassaan.
-That is not optional polish. It is the step that catches the AI texture this guide
-describes but cannot fully prevent.
+Tell it the answers are **read, not pitched**, so it targets stage cadence as well as AI
+texture. Then check two things it won't:
 
-Run it per answer, not on the whole document, so each one keeps its own rhythm. Then read
-the result once more for em dashes, because humanisers sometimes introduce them.
+1. **Dashes**, because humanisers sometimes reintroduce them.
+2. **Accuracy.** A humanised sentence that has become warmer can also have become less
+   true. Check every name, verb and relationship against the vault again.
 
 ---
 
@@ -176,28 +182,31 @@ the result once more for em dashes, because humanisers sometimes introduce them.
 
 **Question:** *What problem are you solving? (100 words)*
 
-**Draft 1 — generated texture, wrong:**
+**Draft 1: generated texture (wrong)**
 > Civly is a cutting-edge AI solution that leverages advanced machine learning to
 > revolutionise the BIM drafting process. Architects today face numerous challenges —
 > from compliance complexity to coordination overhead — and we believe our robust
 > platform can help them work faster, smarter, and more efficiently.
 
-Four failures: em dash, "leverage/robust/cutting-edge/revolutionise", "numerous
-challenges" instead of a number, and a tricolon with no evidence anywhere.
-
-**Draft 2 — his voice:**
+**Draft 2: stage cadence (right for a pitch, wrong for a form)**
 > A software engineer writes one line and AI finishes the function. An architect draws one
-> wall, then the next, for two months. Sixty-eight percent of that time isn't design, it's
-> compliance. We spoke to 78 architects to check we weren't imagining it, and every one of
-> them described the same two thousand hours of chasing code. Civly takes the brief and
-> returns the drafted model, with the structure and MEP routed to the architect's original
-> design. Two months of drafting becomes twenty minutes.
+> wall, then the next, for two months. Sixty-eight percent of that time is compliance, not
+> design. ... Two months of drafting becomes twenty minutes.
 
-Numbers, a contrast, the validation count, a concrete claim, no em dashes.
+**Draft 3: written voice (right for a form)**
+> Architects spend most of a project drafting rather than designing. Turning a design into
+> a buildable model still means placing every wall, duct and pipe by hand, and checking
+> each one against the building code as you go. We have spoken with 78 architects about
+> this, and most of them described weeks of drafting and rework that leave less time for
+> the design itself. Civly takes an architect's design and drafts the model for them, with
+> the structure and mechanical services routed to match what they intended. The architect
+> can then ask for changes in plain English, and nothing goes anywhere until they have
+> reviewed it.
 
 ---
 
 ## Related
 
 [[Form Filler]] · [[Form Filler Answer Bank]] · [[Pitch Copy Library]] ·
-[[Civly Startup Script]] · [[Civly - Messaging Rules and Open Questions]]
+[[Civly Startup Script]] · [[Civly - Messaging Rules and Open Questions]] ·
+[[Startmate Pitch Night — 2026-09-08]]

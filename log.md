@@ -296,3 +296,30 @@ Pages touched: [[Civly Architecture Reference]], [[Civly Revit MCP]],
 [[To-Do — Hassaan]], [[To-Do — Yash]], [[Form Filler]], [[Hassaan Voice Guide]],
 [[Form Filler Answer Bank]], [[Startmate Pitch Night — 2026-09-08]], [[index]], [[wiki]],
 [[Apps Registry]], `CLAUDE.md`, `AGENTS.md`, `.gitignore`.
+
+## [2026-09-13] revision | Startmate draft v2 and the written-vs-pitched voice rule
+
+Hassaan's feedback on the v1 Startmate answers: **"too abrasive and pitchy."** Specifics:
+keep the phrase "guinea pig"; don't open traction with "Four months in." ("kinda rude");
+tell the exit as a story instead of "I sold my last company".
+
+Root cause: v1 used **stage copy in a written form**. Curt fragments, contrast pairs and
+mic-drop closers work out loud and come across as rude on paper.
+
+- [[Startmate Pitch Night — 2026-09-08]] rewritten to v2 (v1 kept under Historical /
+  Superseded). Passed `/humaniser` again. Beyond style it caught three accuracy problems
+  introduced in drafting: "over coffee" (the interviews were calls and build expos),
+  Michael "generous with his time" (the vault records him as hard to reach), and the
+  architect "offered" to be the guinea pig (Hassaan asked and he said yes). Michael's
+  "designed" was softened to "worked on" pending confirmation of his role.
+- Exit now told in full: FarmVillage Agro Inputs, started first company at 15, ran the
+  mills and supply chain, $1.6M revenue by 19, sold it to move to Sydney. The revenue
+  figure is used because every application states it consistently. The exit value stays
+  out until USD 1.2M vs AUD 1.6M is reconciled.
+- [[Hassaan Voice Guide]] gains a **Written, not pitched** section as its first rule, with
+  a stage-vs-written table. The worked example now shows three drafts: generated, stage,
+  written.
+- [[Form Filler Answer Bank]] split into ✍️ Written (default for forms) and 🎤 Spoken
+  (deck, video, pitch night) registers across every section.
+- [[Form Filler]] runbook: the traction guidance no longer says "emphasise four months".
+- The voice memory is updated with the same rule.

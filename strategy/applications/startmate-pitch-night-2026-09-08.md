@@ -7,13 +7,14 @@ url: "https://airtable.com/appWrXZc3k7DSfHM4/pag7Bo6BUva8N7vqT/form"
 deadline: 2026-09-22
 status: draft
 created: 2026-09-08
-updated: 2026-09-08
+updated: 2026-09-13
 sources: 3
 ---
 
 # Startmate Pitch Night — S26
 
-Drafted by [[Form Filler]] on 8 Sep 2026. **Not submitted.**
+Drafted by [[Form Filler]]. **Revision 2, 13 Sep 2026: rewritten after Hassaan found v1
+"too abrasive and pitchy".** Not submitted.
 
 ## Deadline & logistics
 
@@ -27,23 +28,19 @@ Drafted by [[Form Filler]] on 8 Sep 2026. **Not submitted.**
 | Audience | 120 to 150 people per event, public |
 
 **This is the highest-value application currently open.** First prize is a fast-track to
-the Accelerator final round, which is the thing Startmate Launch Club was a longer route
-to. It lands eight days after PFC finals, so the deck will already exist.
+the Accelerator final round. It lands a few weeks after PFC finals, so the deck will
+already exist.
 
 ## What it scores (stated on the form)
 
-The form names its own judging criteria, so the deck and video answer these in this order:
-
 1. **Idea (problem / solution) + Vision**
-2. **Validation** — how do you know this is a real problem? Customer insights, experiments, early feedback
-3. **Traction / rate of progress** — how long have you worked on it, what have you achieved
+2. **Validation** — how do you know this is a real problem?
+3. **Traction / rate of progress** — how long, what achieved
 4. **Founder / team** — founder-problem fit
 
 It also asks you to read Startmate's **Spike Framework** and *identify your spike*.
-🔴 Read the actual framework before the deck is finalised. The likely spike, on the
-evidence: **founder-problem fit plus rate of progress** — grew up inside a construction
-business, 78 primary interviews including undercover at build expos, and four months from
-zero to native geometry in Revit. Do not assert this until the framework is read.
+🔴 Read the actual framework before the deck is finalised. Likely spike on the evidence:
+founder-problem fit plus rate of progress. Do not assert it until the framework is read.
 
 ---
 
@@ -56,115 +53,133 @@ zero to native geometry in Revit. Do not assert this until the framework is read
 | Startup One-Liner * | see Q1 | |
 | First Name * | Hassaan | |
 | Last Name * | Shamshiri | |
-| Email * | civlyvibe@gmail.com | 🔴 confirm which address |
-| LinkedIn | 🔴 Hassaan's profile URL | not in the vault |
+| Email * | 🔴 confirm which address | |
+| LinkedIn | linkedin.com/in/hassaanshamshiri | from [[Hassaan Shamshiri]] |
 | Pitching with co-founders? * | **Yes** | Yash |
-| Preferred Pitch Location * | 🔴 **Sydney 14 Oct** suggested | multi-select allowed; Hassaan decides |
+| Preferred Pitch Location * | 🔴 **Sydney 14 Oct** suggested | Hassaan decides |
 | Upload Pitch Deck (PDF) * | 🔴 **Hassaan** | the PFC deck, exported to PDF |
-| Pitch Video (3 min) * | 🔴 **Hassaan** | Loom recommended. Check sharing permissions |
+| Pitch Video (3 min) * | 🔴 **Hassaan** | Loom recommended; check sharing permissions |
 | Logo | 🔴 **Hassaan** | PNG exists |
 
 ---
 
-## Q1. Startup One-Liner  *(short field · 16 words)*
+## Q1. Startup One-Liner  *(short field · 18 words)*
 
-> Civly turns an architect's sketch into a compliant, buildable 3D model in minutes
-> instead of months.
+> Civly helps architects turn a sketch into a compliant, buildable 3D model in minutes
+> rather than months.
 
-**Sources:** [[Form Filler Answer Bank]] · [[Pitch Copy Library]]
 **Confidence:** 🟢
-**Why this one:** Startmate's audience is startup people, not AEC. Yash's standing
-objection to "sketch to 3D BIM Model" is that nobody outside the industry parses "BIM".
-This says "3D model" and keeps the minutes-versus-months contrast that does the work.
+**v2 change:** "helps architects" instead of "turns an architect's sketch". It names who
+it is for and reads less like a slogan.
 
 ---
 
-## Q2. Problem & Solution  *(deck + video · ~90 words)*
+## Q2. Problem & Solution  *(deck + video · 95 words)*
 
-> A software engineer writes one line and AI finishes the function. An architect draws one
-> wall, then the next, for two months. Sixty-eight percent of that time is compliance, not
-> design. We spoke to 78 architects to check we weren't imagining it, and every one
-> described the same two thousand hours of chasing code. Civly takes the brief and returns
-> the drafted model, with the structure and mechanical services routed to the architect's
-> original design. Then you edit it in plain English. Two months of drafting becomes
-> twenty minutes.
+> Architects spend most of a project drafting rather than designing. Turning a design into
+> a buildable model still means placing every wall, duct and pipe by hand, and checking
+> each one against the building code as you go. We have spoken with 78 architects about
+> this, and most of them described weeks of drafting and rework that leave less time for
+> the design itself. Civly takes an architect's design and drafts the model for them, with
+> the structure and mechanical services routed to match what they intended. The architect
+> can then ask for changes in plain English, and nothing goes anywhere until they have
+> reviewed it.
 
-**Sources:** [[Form Filler Answer Bank]] · [[Civly Startup Script]]
-**Confidence:** 🟡 — 68% and 2,000 hours come from the deck. 🔴 **Find the source.**
-A judging panel that fast-tracks you to a $120k final round will ask.
-
-**Humaniser change:** "isn't design, it's compliance" was a contrast-negation
-construction. Rewritten to the positive form, which is also two words shorter.
+**Sources:** [[Form Filler Answer Bank]]
+**Confidence:** 🟢
+**v2 change:** dropped the stage opener ("A software engineer writes one line...") and the
+68% statistic. Both work out loud and come across as pitching on paper. The statistic is
+also still unsourced.
 
 ---
 
-## Q3. Validation  *(~75 words)*
+## Q3. Validation  *(~60 words)*
 
-> We spoke to 78 architects. Some of that was going to build expos as an outsider and
-> interviewing people on the floor. Michael Westerlund, who designed Quay Quarter Tower
-> and the new Sydney Fish Market, came on as our design partner. Hesh teaches BIM
-> coordination to 27,000 followers and started telling them about us unprompted. Last
-> week a practising Sydney architect watched the demo and asked to be the guinea pig.
+> We have spoken with 78 architects so far, some on calls and some by walking up to them
+> at build expos. Michael Westerlund, who worked on Quay Quarter Tower and the new Sydney
+> Fish Market, has advised us as a design partner. Hesh teaches BIM coordination to 27,000
+> followers and has started mentioning us to his community. Last week a Sydney architect
+> watched our demo and happily agreed to be our guinea pig.
 
-**Sources:** [[Form Filler Answer Bank]] · [[Michael Westerlund]] · [[Hesh]]
+**Sources:** [[Michael Westerlund]] · [[Hesh]] · the 30 Aug architect call
 **Confidence:** 🟢 all four
-
-**Humaniser changes:** the original had four sentences in an identical shape (name,
-credential, relationship), which reads as a generated list. Rhythm varied. The weak
-closing sentence ("agreed to be our first pilot") was replaced with what actually
-happened, in his words, which is stronger and true.
-
----
-
-## Q4. Traction  *(~55 words)*
-
-> Four months in. We're in Blackbird Giants and Arrayah, and we're finalists in the Peter
-> Farrell Cup. The product builds real, editable geometry inside Revit: 38 of 38 ducts
-> placed and connected, 819 elements modified in one undoable transaction. Two signed
-> letters of intent, five firms beta testing, and a pilot agreed last week.
-
-**Sources:** [[Form Filler Answer Bank]] · [[Civly Revit MCP]]
-**Confidence:** 🟢 on the Revit numbers and PFC. 🔴 on **"two signed LOIs"** and **"five
-firms beta testing"** — both are repeated pitch claims with no record in this vault.
-Verify or cut before submitting. Startmate will ask who.
-
-**Humaniser change:** the original opened with three stacked fragments in a row, which is
-the AI cadence tell. One fragment is good. Three is a pattern. The second and third were
-folded into a sentence.
+**v2 changes:** "guinea pig" kept, as you asked. Three accuracy fixes. v1 said the
+architect *offered*, but you asked him and he said yes. "Designed" became "worked on",
+because Michael was on those projects and "designed" claims more than the vault supports.
+And "generous with his time" was cut before it shipped, because the vault records Michael
+as hard to reach.
 
 ---
 
-## Q5. Team / Founder  *(~55 words)*
+## Q4. Traction  *(~75 words)*
 
-> I grew up inside this problem. My dad runs a construction company, and I watched a
-> drafting delay nearly cost him the biggest pitch of his life. Yash built production ML
-> for construction at Anthrobyte. I sold my last company. Between us we know the workflow
-> and we can build the thing.
+> In the months since we started, we have joined Blackbird Giants and Arrayah, and we are
+> finalists in this year's Peter Farrell Cup. The product now builds real, editable
+> geometry inside Revit. In one test it placed and connected 38 of 38 ducts, and in
+> another it removed 819 elements in a single step that can be undone. We also have two
+> signed letters of intent, five firms trying the product, and our first architect lined
+> up to try it on his own projects.
 
-**Sources:** [[Hassaan Shamshiri]] · [[Yash]]
-**Confidence:** 🟢 on Anthrobyte and the family story. 🔴 on the exit figure.
+**Sources:** [[Civly Revit MCP]] · [[Form Filler Answer Bank]]
+**Confidence:** 🟢 on the Revit numbers and PFC. 🔴 on **"two signed letters of intent"**
+and **"five firms trying the product"**. Neither has any record in this vault. Verify or
+cut before submitting. Startmate will ask who.
+**v2 changes:** "Four months in." is gone, as you asked. The timeframe now sits inside a
+sentence. "Modified 819 elements" became "removed", which is exactly what the Ring-2
+result shows. And "guinea pig" is used once, in Q3, so the two answers don't repeat each
+other.
 
-**Change made:** the exit number was removed pending reconciliation. [[To-Do — Hassaan]]
-has flagged "AUD 1.6M revenue vs $1.2M exit" as unresolved since July. **Put the number
-back the moment it is settled** — it is one of the strongest lines available, and a
-Startmate judge will care. Do not submit an unverified figure to a programme that runs
-diligence.
+---
+
+## Q5. Team / Founder  *(~90 words)*
+
+> I grew up around my dad's construction company, and I watched an architect's late first
+> draft nearly cost him the biggest pitch of his career. That stayed with me. I started my
+> first company at 15 and later built FarmVillage Agro Inputs, an agricultural trading
+> business, where I ran the mills and the supply chain. By 19 it had grown to $1.6 million
+> in revenue, and I sold it so I could move to Sydney and work on problems like this one.
+> Yash is an AI engineer who built production machine learning for construction at
+> Anthrobyte, so between us we know how the industry works and how to build for it.
+
+**Sources:** [[Hassaan Shamshiri]] · [[Yash]] · [[Pitch Copy Library]]
+**Confidence:** 🟢 on FarmVillage, the mills and supply chain, $1.6M revenue before 19,
+and selling it to move to Sydney. All of it matches your Z Fellows achievements answer.
+🟡 on Yash's Anthrobyte line.
+**v2 change:** the exit is told as a story now, as you asked, not "I sold my last
+company". The number used is the **revenue** figure, which your applications state
+consistently. The **exit value** (the $1.2M USD vs AUD 1.6M question) is still unsettled,
+so this answer doesn't state it.
 
 ---
 
 ## Needs Hassaan
 
-- [ ] **Verify the two LOIs and the five beta firms.** Both appear in Q4 and in the PFC
-      deck. Nothing in this vault records who they are.
-- [ ] **Reconcile the exit figure**, then put it back into Q5.
-- [ ] **Source the 68% / 2,000-hours statistic.**
-- [ ] **Read Startmate's Spike Framework** and name the spike explicitly in the deck.
+- [ ] **Verify the two letters of intent and the five firms**, or cut them from Q4.
+- [ ] **Confirm Michael's role wording.** "Worked on" is the safe version. If he led the
+      design on either building, it can say more.
+- [ ] Settle the exit value if you want it in. The revenue line stands on its own.
+- [ ] Read Startmate's Spike Framework and name the spike in the deck.
 - [ ] Choose pitch location (Sydney 14 Oct suggested).
 - [ ] Export the PFC deck to PDF and upload.
 - [ ] Record the 3-minute Loom, check sharing permissions, paste the link.
-- [ ] Upload the logo.
-- [ ] Confirm the email address and paste the LinkedIn URL.
+- [ ] Upload the logo. Confirm the email address.
 - [ ] Press Submit before **Mon 22 Sep 12pm AEST**.
+
+## Revision history
+
+### Historical / Superseded — v1 (8 Sep 2026)
+
+Rejected by Hassaan as too abrasive and pitchy. Kept for reference.
+
+- **Q2 v1:** "A software engineer writes one line and AI finishes the function. An architect
+  draws one wall, then the next, for two months. Sixty-eight percent of that time is
+  compliance, not design. ..."
+- **Q3 v1:** "...Last week a practising Sydney architect watched the demo and asked to be
+  the guinea pig."
+- **Q4 v1:** "Four months in. We're in Blackbird Giants and Arrayah, and we're finalists in
+  the Peter Farrell Cup. ..."
+- **Q5 v1:** "...Yash built production ML for construction at Anthrobyte. I sold my last
+  company. Between us we know the workflow and we can build the thing."
 
 ## Related
 
