@@ -46,8 +46,6 @@ founder-problem fit plus rate of progress. Do not assert it until the framework 
 
 ## The form fields
 
-| field | value | note |
-|---|---|---|
 > [!note] Filled in Hassaan's Windows Chrome via `claude-in-chrome`, 13 Sep 2026
 > Every field marked ✅ below was set and read back from the live page. **Not submitted.**
 > The tab is left open for the uploads and the Submit click.
