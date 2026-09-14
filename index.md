@@ -1,6 +1,6 @@
 ---
 title: "Wiki Index"
-updated: 2026-08-24
+updated: 2026-09-08
 ---
 
 # Wiki Index
@@ -36,6 +36,7 @@ Catalog of all pages. Updated on every ingest. Read this first when answering qu
 | [[Navisworks]] | Tool | Autodesk clash-detection/coordination tool; downstream of Civly's drafting scope | 1 |
 | [[video-use]] | Tool | AI video editing Claude skill — transcribe, cut, grade, subtitle, animate | 2 |
 | [[HyperFrames]] | Tool | HTML-to-video motion graphics renderer — write HTML, render MP4 | 2 |
+| [[Civly Revit MCP]] | Product | The product as built: 62 tools, Ring-2 evidence, the narrowed competitive claim | 3 |
 
 ---
 
@@ -106,6 +107,12 @@ Curated pages distilling MEP knowledge for Civly product development. Only HIGH-
 | [[To-Do — Yash]] | Yash's list: AI BIM drafter, MEP generation, ML/data pipeline, research questions | 2026-06-18 |
 | [[Civly To-Do — Jun 2 to Jun 16]] | Historical master to-do (now split by owner) | 2026-06-18 |
 | [[NFC Review Cards — Surry Hills Target List]] | *(Non-Civly side hustle)* Curated door-knock list + walk route + pitch cheat-sheet for tap-to-review card sales | 2026-07-04 |
+| [[Data & Credibility — Core Problem & Open Decisions (SF, 14 Jul)]] | The core credibility problem + open decisions coming out of SF | 2026-07-14 |
+| [[Sales Ladders by Person Type]] | Ladder of asks per person type: advisor, data partner, customer | 2026-07-03 |
+| [[Slide Changes to Be Made]] | Running punch-list of pitch-deck changes | 2026-07-15 |
+| [[RME Advanced Demo Prompt (Aug 2026)]] | Six-act sequential build demo script; what may and may not be claimed on stage | 2026-08-13 |
+| [[Deliverables — Sep 2026]] | **The dated board** — PFC, C-2, blockers, open applications, pricing math | 2026-09-08 |
+| [[Civly Product Trajectory — MCP, Harness, Agentic IDE]] | The three stages and why the order cannot be skipped | 2026-09-08 |
 
 ---
 
@@ -120,14 +127,50 @@ See [[CRM/index]] for the full contact list.
 | [[Dhanjeet Sah]] | expert (advisor) | HIGH |
 | [[Michael Westerlund]] | design-partner | HIGH |
 | [[Andrew Tang-Smith]] | customer | HIGH |
+| [[Sasha]] | accelerator | HIGH |
 | [[Leo Chan]] | connector | MEDIUM |
 | [[Farzana Khan]] | other | LOW |
 
 ---
 
+## Apps (`apps/`)
+
+Buildable tools. Registry with rules: [[Apps Registry]].
+
+| App | What it does | Status |
+|------|---------|------|
+| `outreach-engine` | LinkedIn/CRM outreach: playbooks, drafts, lead DB, send + verify | Live (own git repo) |
+| [[Form Filler]] | Given a URL, fill an application form in Hassaan's voice | **Live** (runbook + voice + answer bank) |
+| `tapreview-site` | NFC review-card landing page | Deployed (Vercel) |
+| `ingest` | Local Ollama pipeline: transcripts / WhatsApp / CRM notes → wiki pages | Live |
+
+---
+
+## Inbox (`raw/`)
+
+[[Raw Inbox]] — **19 unprocessed sources** as of 2026-09-07 (13 Revit MEP Full Course
+lectures 1–12 + 15, 5 standalone courses, 1 with broken frontmatter). Lecture 13 is
+missing entirely. Mostly Revit-UI content: ingest for the engineering, not the click-paths.
+
+---
+
+## Applications (`strategy/applications/`)
+
+Drafted by [[Form Filler]]. Never submitted without Hassaan.
+
+| Application | Deadline | Status |
+|------|---------|------|
+| [[Startmate Pitch Night — 2026-09-08]] | **22 Sep 2026, 12pm AEST** | filled in Chrome, not submitted (deck, video, logo to add) |
+
+---
+
 ## Stats
 
-- Total pages: 41 (11 sources + 5 entities + 4 concepts + 3 MEP + 1 Structural + 1 Compliance + 3 Competitors + 13 strategy)
-- CRM contacts: 7
+- Total knowledge pages: 49 (11 sources + 6 entities + 4 concepts + 3 MEP + 1 Structural + 1 Compliance + 3 Competitors + 19 strategy + 1 application)
+- CRM contacts: 8
 - Sources ingested: 11
+- **Unprocessed sources in `raw/`: 19** — see [[Raw Inbox]]
+- Apps: 4 (all live)
+- Last restructure: 2026-09-07
+- **Architecture pivot recorded: 2026-09-08** (Archicad/Tapir → Revit MCP)
 - Last lint: _(never)_

@@ -25,10 +25,12 @@ These are auto-created when you first run watch mode, but you can make them now:
 ```
 Civly Brain/
   raw/
+    youtube/      ← drop YouTube transcript .md files here
     whatsapp/     ← drop WhatsApp _chat.txt exports here
     crm/          ← drop contact notes (.md or .txt) here
-  raw/            ← drop YouTube transcript .md files here (existing behaviour)
 ```
+The watcher is **not recursive** — each folder above is watched directly, so
+transcripts must go in `raw/youtube/`, not loose in `raw/`.
 
 ---
 
@@ -36,12 +38,12 @@ Civly Brain/
 
 ### Option A — Ingest a single file manually
 ```powershell
-python "C:\Users\hassa\OneDrive\Documents\Civly Brain\scripts\local_ingest.py" "D:\path\to\file.md"
+python "C:\Users\hassa\OneDrive\Documents\Civly Brain\apps\ingest\local_ingest.py" "D:\path\to\file.md"
 ```
 
 ### Option B — Watch mode (recommended)
 ```powershell
-python "C:\Users\hassa\OneDrive\Documents\Civly Brain\scripts\local_ingest.py" --watch
+python "C:\Users\hassa\OneDrive\Documents\Civly Brain\apps\ingest\local_ingest.py" --watch
 ```
 Leave this running in a terminal. Drop any file into a watched folder → auto-processes.
 
@@ -52,7 +54,7 @@ Leave this running in a terminal. Drop any file into a watched folder → auto-p
 | Drop this... | Into this folder... | Gets processed as... |
 |---|---|---|
 | WhatsApp `_chat.txt` export | `raw/whatsapp/` | To-do list → `strategy/Civly To-Do — DATE.md` |
-| YouTube transcript `.md` | `raw/` | Notes injected into file + source page in `pages/sources/` |
+| YouTube transcript `.md` | `raw/youtube/` | Notes injected into file + source page in `pages/sources/` |
 | Contact notes `.md` or `.txt` | `raw/crm/` | CRM page → `CRM/First-Last.md` |
 
 ---
@@ -98,7 +100,7 @@ To have watch mode start automatically when you log into Windows:
 3. Paste:
 ```batch
 @echo off
-cd /d "C:\Users\hassa\OneDrive\Documents\Civly Brain\scripts"
+cd /d "C:\Users\hassa\OneDrive\Documents\Civly Brain\apps\ingest"
 python local_ingest.py --watch
 ```
 4. Save — it will run every time you log in.

@@ -4,5 +4,12 @@
     "landscape": false,
     "margin": "0",
     "downscalePercent": 100
-  }
+  },
+  "userIgnoreFilters": [
+    "apps/outreach-engine/mcp-server/",
+    "apps/outreach-engine/.cursor/",
+    "apps/outreach-engine/data/",
+    "apps/tapreview-site/",
+    "apps/form-filler/"
+  ]
 }

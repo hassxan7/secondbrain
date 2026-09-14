@@ -164,3 +164,183 @@ Wiki scaffolded from Karpathy's LLM Wiki pattern (https://gist.github.com/karpat
 Vault: `C:\Users\hassa\OneDrive\Documents\Civly Brain`
 Structure: raw/, pages/entities/, pages/concepts/, pages/sources/, pages/analyses/
 CLAUDE.md, AGENTS.md, wiki.md, index.md, and log.md initialized.
+
+## [2026-09-07] restructure | Vault reorganised around `apps/` + a real inbox
+
+**Why:** knowledge, unprocessed sources, and app code were all sitting together at
+the root. The outreach engine lived entirely outside the vault. Nothing had a
+single obvious home.
+
+**Apps layer created.** New top-level `apps/`, registry at `apps/README.md`:
+- `apps/outreach-engine/` — **moved in from `C:/Users/hassa/civly tools/`**. Its 24
+  uncommitted files (12 modified playbooks/MCP/prompts, 13 new SF-campaign and
+  LinkedIn scripts) were committed in place first (`d88289e`, local only, **not
+  pushed**). Its 55 MB untracked `mcp-server/.venv/` was deleted — rebuildable with
+  `uv sync`, and its baked-in absolute paths would have broken on the move anyway.
+  58 MB → 3 MB. Keeps its own git repo and GitHub remote
+  (`RatherN-t/Civly-outreach-engine`); the vault gitignores `/apps/outreach-engine/`
+  so it isn't swallowed as a nested repo.
+- `apps/ingest/` ← was `scripts/`
+- `apps/tapreview-site/` ← was `tapreview-site/`
+- `apps/form-filler/` — **new, spec only.** URL → application form → answers drafted
+  from vault knowledge → `strategy/applications/`. Never auto-submits.
+
+**Inbox made real.** `raw/` was empty except two `.gitkeep` files while 19
+unprocessed sources sat at the root in `MEP/`, `MMEP/`, and `Tutorials/`. All 19
+moved to `raw/youtube/`. Root folders `MEP/`, `MMEP/`, `Tutorials/` removed — root
+`MEP/` also collided by name with the curated `pages/MEP/`.
+- `MMEP/prompt.md` was not a source — it is the six-act demo script. → `strategy/RME
+  Advanced Demo Prompt (Aug 2026).md`.
+- `raw/README.md` documents the backlog, including that **`REVIT MEP Tutorial.md` has
+  wrong frontmatter** (claims to be a Claude Code video; is actually a 10-episode
+  Revit MEP electrical course). Left unmodified per the never-touch-raw rule — fix at
+  ingest time.
+- Lecture 13 of the Revit MEP Full Course is **missing entirely** (14 is processed,
+  1–12 and 15 are queued).
+
+**Ingest pipeline repaired.** `apps/ingest/local_ingest.py` watched `raw/` with
+`recursive=False`, so after the move it would have silently stopped seeing
+transcripts. Watch dir → `raw/youtube/`; added `SKIP_NAMES` so `README.md` and
+`.gitkeep` are never ingested as sources. Routing verified against real paths (5/5),
+both scripts compile, `SETUP.md` paths corrected.
+
+**Index/wiki corrections found while cleaning:**
+- `index.md` was missing 3 existing strategy pages ([[Data & Credibility — Core Problem & Open Decisions (SF, 14 Jul)]], [[Sales Ladders by Person Type]],
+  [[Slide Changes to Be Made]]) and 1 CRM contact ([[Sasha]]).
+- `wiki.md` claimed Entities/Concepts/Sources were "none yet" — all three had pages.
+- `strategy/Slide Changes to Be made.txt` was a bare `.txt` → converted to
+  `Slide Changes to Be Made.md` with frontmatter, content preserved verbatim.
+
+**Guardrails added:** `.gitignore` now covers `node_modules/`, `.venv/`, `dist/`,
+`.vercel/`, `__pycache__`, `.env`, `*.sqlite`, and `apps/**/data/` vault-wide — this
+vault syncs over OneDrive, so weight is a real cost. `.obsidian/app.json` gained
+`userIgnoreFilters` so app internals stay out of Obsidian search and the graph.
+`CLAUDE.md` and `AGENTS.md` updated with the new tree, `apps/` routing, and six rules
+for apps.
+
+Pages touched: [[Apps Registry]], [[Form Filler]], [[Raw Inbox]], [[RME Advanced Demo Prompt (Aug 2026)]], [[Slide Changes to Be Made]], [[index]], [[wiki]], `CLAUDE.md`,
+`AGENTS.md`, `.gitignore`, `.obsidian/app.json`, `apps/ingest/*`.
+
+## [2026-09-08] ingest + context | WhatsApp Jul-Sep, Revit MCP architecture, form filler
+
+**WhatsApp export ingested** (`raw/whatsapp/_chat.txt`, 18,260 lines, Aug 2025 to 7 Sep
+2026). Read Jul/Aug/Sep 2026 in full: 3,657 messages.
+
+> [!WARNING] Secrets in the export — the file is gitignored, and a key needs revoking
+> The chat contains a **live Anthropic API key** pasted on 26 Aug 2026, three TeamViewer
+> passwords, a PC PIN, two home addresses and phone numbers. `raw/whatsapp/*.txt` and
+> `*.zip` are now in `.gitignore` so no export is ever committed. **The API key
+> (`sk-ant-api03-Tt4y...QAA`) should be revoked in the Anthropic console.** Derived
+> to-do and CRM pages are what get committed; never the export.
+
+**Architecture pivot recorded — this is the big one.** The vault described Civly as
+Claude + Tapir MCP + Archicad + a Python feasibility engine exporting IFC. **It has been
+a Revit MCP server plus a C# Revit plugin since the fork decision of 14 Jul 2026**
+(`docs/00_MISSION.md`, `docs/07` D1). Every relevance score in this wiki rested on four
+implementation surfaces that no longer exist.
+- [[Civly Architecture Reference]] rewritten around the real stack, the ring system, the
+  honest gaps and the claim guardrails. The June architecture is kept under
+  **Historical / Superseded** per the never-delete rule.
+- New **four surfaces**: MCP tool schemas · C# commandset · design brain + rule packs ·
+  **the learning harness** (which had no June equivalent and is where the moat lives).
+- **Reversed a scoring rule:** Revit UI content was "NOT relevant, we don't use Revit."
+  Civly drives Revit now, so a tutorial showing how a drafter actually works is Surface 1
+  and Surface 4 material. This re-scores several of the 19 sources in [[Raw Inbox]].
+- The Civly Context block in `CLAUDE.md` and `AGENTS.md` rewritten to match, including
+  the claim guardrails ("2026 is what is proven", "no public Revit MCP ships a
+  *dedicated, documented* MEP creation tier", say **78 architects**, never "hundreds").
+- New [[Civly Revit MCP]] entity page: 62 tools, Ring-2 evidence (38/38 ducts, 19/19
+  fittings, 19/19 terminals; 607 ids in one transaction), ~9% Ring-2 coverage, and the
+  4 Aug correction that narrowed the competitive claim.
+- New [[Civly Product Trajectory — MCP, Harness, Agentic IDE]] recording the three stages
+  and why the order cannot be skipped. Resolves the apparent conflict between "no ML in
+  the execution path" and the ML ambition: **deterministic where physics decides, learned
+  where practice decides** — evidenced by the Snowdon model containing a duct at 66x its
+  friction target, so anything trained to imitate it learns the faults.
+
+> [!WARNING] `civly context/Civly - Product and Tech.md` is now stale
+> It still says Tapir + Archicad, a codebase at `/Users/yashmittal/CivHub/BIMStudio/`,
+> IFC as the only export, and "MEP not shipped". All four are wrong. **Not edited** —
+> `civly context/` is read-only per the schema. [[Civly Revit MCP]] supersedes it.
+> Hassaan's call whether to add a banner to the read-only file.
+
+**To-do lists rebuilt** from the chat. [[To-Do — Hassaan]] and [[To-Do — Yash]] rewritten
+with current work; the June/July state kept under an Archive fold. New
+[[Deliverables — Sep 2026]] is the dated board: **PFC slides due Thu 11 Sep in `.pptx`**
+(not the 18th — the 18th is the pitch), PFC finals 18 Sep, C-2 verdict 27 Sep, month gate
+2 Oct. Records the six blockers in order, the pricing math, the 2 Sep mentor pitch notes,
+and that **the C-1 paragraph was due 2 Aug and exists nowhere on disk**, which means C-2
+cannot be judged without it.
+
+**Form filler built and run.** [[Form Filler]] moved from spec to runbook:
+- `voice.md` — how Hassaan writes, derived from the startup scripts and pitch drafts.
+  Hard rules: **no em dashes**, numbers not adjectives ("78 architects", never
+  "hundreds"), name real buildings, admit the hard part.
+- `answer-bank.md` — canonical answers at three lengths with 🟢/🟡/🔴 confidence marks.
+- Ran end to end on the **Startmate Pitch Night** Airtable form (due **22 Sep 12pm
+  AEST**, first prize is a fast-track to the $120k Accelerator final round). Draft at
+  [[Startmate Pitch Night — 2026-09-08]]; 5 of 12 fields filled; not submitted.
+- The `/humaniser` pass caught three real things: a contrast-negation construction, four
+  validation sentences in identical shape, and three stacked fragments in a row.
+- **Correction recorded in the runbook:** the fill must run through `claude-in-chrome`
+  (the real Chrome), not the in-app browser pane. Fills in the pane are invisible to
+  Hassaan, so the drafted file is the durable artefact and the browser fill is a
+  convenience on top of it.
+- Three claims are marked 🔴 and must be settled before submitting anywhere with
+  diligence: the **two LOIs**, the **five beta firms**, and the **exit figure**
+  (AUD 1.6M revenue vs $1.2M exit, unresolved since July). The exit number was removed
+  from the Startmate draft rather than guessed.
+
+Pages touched: [[Civly Architecture Reference]], [[Civly Revit MCP]],
+[[Civly Product Trajectory — MCP, Harness, Agentic IDE]], [[Deliverables — Sep 2026]],
+[[To-Do — Hassaan]], [[To-Do — Yash]], [[Form Filler]], [[Hassaan Voice Guide]],
+[[Form Filler Answer Bank]], [[Startmate Pitch Night — 2026-09-08]], [[index]], [[wiki]],
+[[Apps Registry]], `CLAUDE.md`, `AGENTS.md`, `.gitignore`.
+
+## [2026-09-13] revision | Startmate draft v2 and the written-vs-pitched voice rule
+
+Hassaan's feedback on the v1 Startmate answers: **"too abrasive and pitchy."** Specifics:
+keep the phrase "guinea pig"; don't open traction with "Four months in." ("kinda rude");
+tell the exit as a story instead of "I sold my last company".
+
+Root cause: v1 used **stage copy in a written form**. Curt fragments, contrast pairs and
+mic-drop closers work out loud and come across as rude on paper.
+
+- [[Startmate Pitch Night — 2026-09-08]] rewritten to v2 (v1 kept under Historical /
+  Superseded). Passed `/humaniser` again. Beyond style it caught three accuracy problems
+  introduced in drafting: "over coffee" (the interviews were calls and build expos),
+  Michael "generous with his time" (the vault records him as hard to reach), and the
+  architect "offered" to be the guinea pig (Hassaan asked and he said yes). Michael's
+  "designed" was softened to "worked on" pending confirmation of his role.
+- Exit now told in full: FarmVillage Agro Inputs, started first company at 15, ran the
+  mills and supply chain, $1.6M revenue by 19, sold it to move to Sydney. The revenue
+  figure is used because every application states it consistently. The exit value stays
+  out until USD 1.2M vs AUD 1.6M is reconciled.
+- [[Hassaan Voice Guide]] gains a **Written, not pitched** section as its first rule, with
+  a stage-vs-written table. The worked example now shows three drafts: generated, stage,
+  written.
+- [[Form Filler Answer Bank]] split into ✍️ Written (default for forms) and 🎤 Spoken
+  (deck, video, pitch night) registers across every section.
+- [[Form Filler]] runbook: the traction guidance no longer says "emphasise four months".
+- The voice memory is updated with the same rule.
+
+## [2026-09-13] application | Startmate Pitch Night filled in Chrome
+
+Hassaan confirmed the two letters of intent, the five firms, and Michael's role wording.
+Confidence marks moved to 🟢 in [[Startmate Pitch Night — 2026-09-08]] and
+[[Form Filler Answer Bank]].
+
+Filled the live form through `claude-in-chrome` in Hassaan's Windows Chrome (Browser 1).
+Every field was read back from the page afterwards: cohort S26, Civly, the v2 one-liner,
+Hassaan Shamshiri, civlyvibe@gmail.com, LinkedIn, co-founders Yes, co-founder names
+"Yash Mittal", and Sydney In-Person 14 Oct. **Not submitted.** Still with Hassaan: pitch
+deck PDF, 3-minute video link, logo, and Submit before 22 Sep 12pm AEST. The tab was left
+open.
+
+Runbook lessons added to [[Form Filler]]:
+- Airtable adds conditional fields after a choice (a required co-founder names field
+  appeared after "Yes").
+- Clicks by `ref` on radios and checkboxes silently failed; clicking by coordinate
+  worked. Always read state back.
+- Revealed fields shift the layout, so re-screenshot before coordinate clicks.
+- Two Chromes are connected to Hassaan's account; this PC is Browser 1 (Windows).
