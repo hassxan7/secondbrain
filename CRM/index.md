@@ -1,6 +1,6 @@
 ---
 title: "CRM Index"
-updated: 2026-07-14
+updated: 2026-09-15
 ---
 
 # CRM Index
@@ -26,6 +26,7 @@ Everyone worth knowing for Civly. Updated on every `CRM` ingest. Advisor routing
 | Name | Category | Organisation | Why They Matter | Follow-up |
 |------|----------|-------------|----------------|-----------|
 | [[Leo Chan]] | connector | Granite AI | Origin contact; structural engineer; HK/APAC GTM pipeline into structural + compliance firms | Keep warm; revisit for HK expansion |
+| [[Aadi Jain]] | other (trial intern) | GGSIPU Delhi (student) | Trial intern; NDA signed; absorbs grunt work — tutorial grinding, tool building, output comparison, data cleaning | Send task menu; confirm LiDAR phone; review week-one output |
 
 ---
 
@@ -50,10 +51,10 @@ Everyone worth knowing for Civly. Updated on every `CRM` ingest. Advisor routing
 | channel | 0 | |
 | connector | 1 | [[Leo Chan]] |
 | press | 0 | |
-| other | 1 | [[Farzana Khan]] |
+| other | 2 | [[Farzana Khan]], [[Aadi Jain]] |
 
 ---
 
 ## Stats
-- Total contacts: 7
-- Last updated: 2026-07-14
+- Total contacts: 8
+- Last updated: 2026-09-15

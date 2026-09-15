@@ -13,6 +13,7 @@ Catalog of all pages. Updated on every ingest. Read this first when answering qu
 
 | Page | Civly Relevance | Channel / Type | Date |
 |------|----------------|---------|------|
+| [[Architect Call — Design Process, Polycam & Drafting Automation (Sep 2026)]] | HIGH | Practitioner interview — Sydney architect (residential + developer apartments) | 2026-09-15 |
 | [[Reuben Roy Call — Competition Bids vs BIM Drafting]] | HIGH | Expert interview — Reuben Roy (architecture/BVN experience) | 2026-06-25 |
 | [[BIM Mentor Call — Drafting vs Coordination & Data Moat]] | HIGH | Expert interview — Hesh (BIM Accelerator) | 2026-06-16 |
 | [[Revit MEP Tutorial for Complete Beginners]] | HIGH | SourceCAD (YouTube) | 2024-06-23 |
@@ -105,6 +106,7 @@ Curated pages distilling MEP knowledge for Civly product development. Only HIGH-
 | [[To-Do — Hassaan]] | Hassaan's list: advisors, outreach, data partnerships, funding | 2026-06-18 |
 | [[To-Do — Yash]] | Yash's list: AI BIM drafter, MEP generation, ML/data pipeline, research questions | 2026-06-18 |
 | [[Civly To-Do — Jun 2 to Jun 16]] | Historical master to-do (now split by owner) | 2026-06-18 |
+| [[Intern Onboarding & Task Menu — Aadi Jain]] | Intern setup guide + 6 fully-specified grunt-work tasks (free tools only); he picks 2 per week | 2026-09-15 |
 | [[NFC Review Cards — Surry Hills Target List]] | *(Non-Civly side hustle)* Curated door-knock list + walk route + pitch cheat-sheet for tap-to-review card sales | 2026-07-04 |
 
 ---
@@ -122,12 +124,13 @@ See [[CRM/index]] for the full contact list.
 | [[Andrew Tang-Smith]] | customer | HIGH |
 | [[Leo Chan]] | connector | MEDIUM |
 | [[Farzana Khan]] | other | LOW |
+| [[Aadi Jain]] | other (trial intern) | MEDIUM |
 
 ---
 
 ## Stats
 
-- Total pages: 41 (11 sources + 5 entities + 4 concepts + 3 MEP + 1 Structural + 1 Compliance + 3 Competitors + 13 strategy)
-- CRM contacts: 7
-- Sources ingested: 11
+- Total pages: 43 (12 sources + 5 entities + 4 concepts + 3 MEP + 1 Structural + 1 Compliance + 3 Competitors + 14 strategy)
+- CRM contacts: 8
+- Sources ingested: 12
 - Last lint: _(never)_

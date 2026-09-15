@@ -1,3 +1,14 @@
+## [2026-09-15] ingest | Architect Call — Design Process, Polycam & Drafting Automation
+Civly relevance: HIGH. Practitioner interview with a Sydney architect (residential renovations + developer apartment work). Key unlocks: (1) he asked unprompted for a deterministic clearance/space-planning checker that re-tests a layout on every change; (2) Polycam sells a Revit model from a phone scan for ~US$100, probably fulfilled by offshore human drafters — we already own the floor-plan→Revit half; (3) option generation across a floor plate is the repetitive manual unit of work, and repeating a resolved room across many layouts is 100% manual in Revit; (4) offshore drafting fails on code knowledge, time zones and not printing — the bar we must beat is low; (5) he does NOT want cladding replacement automated (corrects Boris's assumption); (6) speed threatens the hourly billing model — pricing objection heard twice now. He offered to be a pilot.
+Pages touched: [[Architect Call — Design Process, Polycam & Drafting Automation (Sep 2026)]], [[Intern Onboarding & Task Menu — Aadi Jain]], [[Aadi Jain]], [[CRM/index]], [[index]], [[wiki]].
+Filed transcript to processed/.
+
+## [2026-09-15] crm | Aadi Jain
+Category: other (trial intern). Relevance: MEDIUM. Action: created. NDA signed; trial starts with 2 tasks from the menu.
+
+## [2026-09-15] strategy | Intern Onboarding & Task Menu — Aadi Jain
+Created the intern pack: setup/context section (how Civly works, the three layers, what's shipped vs blocked, free installs, working rules, glossary) plus 6 fully-specified grunt-work tasks — free scan→floor plan→Revit pipeline, Revit MEP tutorial grind producing our first golden pair + timed workflow spec, IFC round-trip fidelity scorecard, MEP output comparison harness, space-planning clearance checker, and a BIM library organiser. Zero-spend constraint on every task. He picks 2 per week. Tasks 1 and 5 derive directly from the architect call; tasks 2, 3, 4 clear long-stalled items on [[To-Do — Yash]].
+
 # Wiki Log
 
 Append-only chronological record of all operations.

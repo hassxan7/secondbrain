@@ -1,7 +1,7 @@
 ---
 title: "Wiki Home"
 type: home
-updated: 2026-08-24
+updated: 2026-09-15
 ---
 
 # Civly Brain Wiki
@@ -60,6 +60,7 @@ _(updated by the AI on every ingest)_
 
 | Date | What | Page |
 |------|------|------|
+| 2026-09-15 | Ingested the Sydney architect call (space-planning checker, Polycam scan→model, option generation); built the trial-intern task menu | [[Architect Call — Design Process, Polycam & Drafting Automation (Sep 2026)]] · [[Intern Onboarding & Task Menu — Aadi Jain]] · [[Aadi Jain]] |
 | 2026-08-24 | Auto-ingest: 5 new source pages (1 MEP course lesson, 4 Revit tutorial transcripts) + cleanup of 2 already-processed CRM clippings | [[Engineering Drawing and Documentation (MEP Engineer Course)]] · [[Plumbing in Revit MEP Beginner Tutorial 1]] · [[REVIT 2023 FOR MEP - Lesson 1 Getting Started with an MEP Project]] · [[Lecture 14 HVAC Modelling in Progress 1 (Revit MEP Full Course)]] · [[Autodesk Revit - Full Beginner Course (Complete Project, Start to Finish)]] |
 | 2026-07-14 | Ingested Reuben + reconciled both expert calls against current build | [[Reuben Roy Call — Competition Bids vs BIM Drafting]] · [[Civly Target Dilemma — MEP Drafting vs Competition Bids]] · [[Reuben Roy]] |
 | 2026-06-25 | Ingested Z Fellows application → reusable pitch copy + founder profiles | [[Pitch Copy Library]] · [[Hassaan Shamshiri]] · [[Yash]] |
